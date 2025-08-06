@@ -1,13 +1,19 @@
 import React from 'react';
-import Header from '../components/Header'; // Giả sử bạn có Header trong components
-import Footer from '../components/Footer'; // Giả sử bạn có Footer trong components
+import Header from '../components/Header';
+import MainBanner from '../components/MainBanner';
+import CategoriesGrid from '../components/CategoriesGrid';
+import ProductList from '../components/ProductList';
+import Footer from '../components/Footer';
+
 function Home() {
   return (
-    <>
-        <Header/>
-            <h1>Giới thiệu</h1>
-        <Footer/>
-    </>
+    <div style={{ minHeight: '100vh' }}>
+      <Header />
+      <MainBanner />
+      <CategoriesGrid />
+      <ProductList />
+      <Footer />
+    </div>
   );
 }
 
