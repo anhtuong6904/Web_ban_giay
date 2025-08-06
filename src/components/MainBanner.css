@@ -1,0 +1,40 @@
+.main-banner {
+  background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+  color: white;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.banner-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+}
+
+.banner-subtitle {
+  font-size: 18px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.member-count {
+  color: #ffcc00;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .banner-title {
+    font-size: 24px;
+  }
+  
+  .banner-subtitle {
+    font-size: 16px;
+  }
+} 
