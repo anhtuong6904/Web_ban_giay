@@ -56,8 +56,13 @@
   padding: 0 20px;
 }
 
+.home {
+  text-decoration: none;
+  color: #000;
+}
+
 /* Logo */
-.logo h1 {
+.home h1 {
   font-size: 24px;
   font-weight: 700;
   color: #000;
@@ -114,7 +119,7 @@
   color: #000;
 }
 
-.search-btn, .cart-btn, .flag-btn {
+.search-btn, .cart-btn, .flag-btn, .login-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -176,6 +181,12 @@
   padding: 4px 12px;
   border-radius: 4px;
   font-size: 10px;
+  font-weight: 600;
+}
+
+.back-btn {
+  text-decoration: none;
+  color: #000;
   font-weight: 600;
 }
 
