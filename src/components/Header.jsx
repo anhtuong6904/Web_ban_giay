@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link} from 'react-router-dom';
+import { IoPerson } from "react-icons/io5";
 import './Header.css';
 
 export default function Header() {
@@ -12,7 +13,7 @@ export default function Header() {
       <div className="promo-banner">
         <div className="promo-content">
           <span>BECOME A MEMBER & GET 15% OFF</span>
-          <button className="signup-btn">SIGN UP FOR FREE</button>
+          <Link to="/login" className="person-btn">SIGN UP FOR FREE</Link>
         </div>
       </div>
 
@@ -20,28 +21,34 @@ export default function Header() {
       <div className="header-main">
         <div className="header-container">
           {/* Logo */}
-          <div className="logo">
+          <Link to="/home" className="home">
             <h1>UTH Shoes</h1>
-          </div>
+          </Link>
 
           {/* Navigation */}
           <nav className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
             <ul className="nav-list">
-              <li><a href="/shoes">SHOES</a></li>
-              <li><a href="/men">MEN</a></li>
-              <li><a href="/women">WOMEN</a></li>
-              <li><a href="/kids">KIDS</a></li>
-              <li><a href="/sports">SPORTS</a></li>
-              <li><a href="/brands">BRANDS</a></li>
-              <li className="sale-link"><a href="/sale">BACK TO SCHOOL SALE</a></li>
+              <li><Link to="/shoes">SHOES</Link></li>
+              <li><Link to="/men">MEN</Link></li>
+              <li><Link to="/women">WOMEN</Link></li>
+              <li><Link to="/kids">KIDS</Link></li>
+              <li><Link to="/sports">SPORTS</Link></li>
+              <li><Link to="/brands">BRANDS</Link></li>
+              <li className="sale-link"><Link to="/sale">BACK TO SCHOOL SALE</Link></li>
             </ul>
           </nav>
 
           {/* Header actions */}
           <div className="header-actions">
-            <a href="/help" className="header-link">Help</a>
-            <a href="/tracker" className="header-link">Order Tracker</a>
-            <a href="/member" className="header-link">Become a Member</a>
+            <Link to="/help" className="header-link">Help</Link>
+            <Link to="/tracker" className="header-link">Order Tracker</Link>
+            
+
+            {/* Search, Cart, Flag buttons */}
+
+            <Link to="/login" className="person-btn">
+              <IoPerson className="person-icon" color='#000000'/>
+            </Link>
             <button className="search-btn">
               <i className="fas fa-search"></i>
             </button>
@@ -67,12 +74,9 @@ export default function Header() {
       </div>
 
       {/* Breadcrumb chỉ hiện khi không phải trang chủ */}
-      {location.pathname !== '/' && (
+      {location.pathname !== '/home' && (
         <div className="breadcrumb">
-          <span>← BACK Home / season sale</span>
-          <div className="easy-return">
-            <span>EASY RETURN</span>
-          </div>
+          <Link to = "/home" className='back-btn'> ← BACK Home / season sale </Link>
         </div>
       )}
     </header>
