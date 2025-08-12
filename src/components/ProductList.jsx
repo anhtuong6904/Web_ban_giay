@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './ProductList.css';
 
 export default function ProductList() {
@@ -49,52 +50,58 @@ export default function ProductList() {
         {/* Products Grid */}
         <div className="products-grid">
           {products.map(product => (
-            <div key={product.ProductID} className="product-card">
-              <div className="product-image">
-                <img src={product.MainImage} alt={product.Name} />
-                {product.Discount > 0 && (
-                  <div className="discount-badge">
-                    -{product.Discount}%
-                  </div>
-                )}
-              </div>
-              
-              <div className="product-info">
-                <div className="product-price">
-                  <span className="current-price">
-                    {formatPrice(product.Price)}₫
-                  </span>
-                  {product.OriginalPrice && product.OriginalPrice > product.Price && (
-                    <span className="original-price">
-                      {formatPrice(product.OriginalPrice)}₫
-                    </span>
+            <Link 
+              key={product.ProductID} 
+              to={`/product/${product.ProductID}`}
+              className="product-card-link"
+            >
+              <div className="product-card">
+                <div className="product-image">
+                  <img src={product.MainImage} alt={product.Name} />
+                  {product.Discount > 0 && (
+                    <div className="discount-badge">
+                      -{product.Discount}%
+                    </div>
                   )}
                 </div>
                 
-                <h3 className="product-name">{product.Name}</h3>
-                
-                <div className="product-category">
-                  {product.CategoryID === 1 && "Running"}
-                  {product.CategoryID === 2 && "Casual"}
-                  {product.CategoryID === 3 && "Basketball"}
-                  {product.CategoryID === 4 && "Skateboarding"}
-                  {product.CategoryID === 5 && "Lifestyle"}
-                </div>
-                
-                <div className="product-colors">
-                  {product.ProductID === 1 && "2 colours"}
-                  {product.ProductID === 2 && "1 colour"}
-                  {product.ProductID === 3 && "2 colours"}
-                  {product.ProductID === 4 && "2 colours"}
-                  {product.ProductID === 5 && "2 colours"}
-                  {product.ProductID === 6 && "2 colours"}
-                </div>
-                
-                <div className="member-offer">
-                  Extra 10% off for adiclub members
+                <div className="product-info">
+                  <div className="product-price">
+                    <span className="current-price">
+                      {formatPrice(product.Price)}₫
+                    </span>
+                    {product.OriginalPrice && product.OriginalPrice > product.Price && (
+                      <span className="original-price">
+                        {formatPrice(product.OriginalPrice)}₫
+                      </span>
+                    )}
+                  </div>
+                  
+                  <h3 className="product-name">{product.Name}</h3>
+                  
+                  <div className="product-category">
+                    {product.CategoryID === 1 && "Running"}
+                    {product.CategoryID === 2 && "Casual"}
+                    {product.CategoryID === 3 && "Basketball"}
+                    {product.CategoryID === 4 && "Skateboarding"}
+                    {product.CategoryID === 5 && "Lifestyle"}
+                  </div>
+                  
+                  <div className="product-colors">
+                    {product.ProductID === 1 && "2 colours"}
+                    {product.ProductID === 2 && "1 colour"}
+                    {product.ProductID === 3 && "2 colours"}
+                    {product.ProductID === 4 && "2 colours"}
+                    {product.ProductID === 5 && "2 colours"}
+                    {product.ProductID === 6 && "2 colours"}
+                  </div>
+                  
+                  <div className="member-offer">
+                    Extra 10% off for adiclub members
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 

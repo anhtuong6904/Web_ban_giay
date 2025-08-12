@@ -37,6 +37,17 @@
   margin-bottom: 40px;
 }
 
+/* Product Card Link Styling */
+.product-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-card-link:hover {
+  text-decoration: none;
+}
+
 .product-card {
   background: white;
   border-radius: 8px;
