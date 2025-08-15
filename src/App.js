@@ -25,7 +25,6 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path='/cart' element={<div>Cart Page</div>} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>
