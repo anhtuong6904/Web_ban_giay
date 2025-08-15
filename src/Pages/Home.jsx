@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 
 function Home() {
   return (
+    
     <div style={{ minHeight: '100vh' }}>
       <Header />
       <MainBanner />

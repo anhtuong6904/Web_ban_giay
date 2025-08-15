@@ -5,9 +5,7 @@ import { Link } from 'react-router-dom';
 import { GiCancel } from "react-icons/gi";
 
 
-export default function Cart({ onClose }) {
-
-  
+export default function  Cart({ onClose, isPopup = false }) {
 
   const [cartItems, setCartItems] = useState([
     {
@@ -32,8 +30,7 @@ export default function Cart({ onClose }) {
       image: "/images/cart/shoes3.jpg"
     }
   ]);
-
-  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const handleQuantityChange = (id, newQuantity) => {
     if (newQuantity < 1) return;
@@ -46,27 +43,24 @@ export default function Cart({ onClose }) {
 
   const handleRemoveItem = (id) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== id));
-    console.log(`Sản phẩm có id ${id} đã được xóa khỏi giỏ hàng.`);
     alert(`Sản phẩm có id ${id} đã được xóa khỏi giỏ hàng.`);
   };
 
-  // ham hieu ung slide out khi đóng giỏ hàng
-  
-
-
-
   return (
     <div className="cart-section">
-      {/* Nút Back */}
-
+      {/* Header (chỉ hiện khi popup) */}
+      
+      {isPopup && (
       <div className="cart-header">
-        <h2>UTH Shoes</h2>
-        <h2>YOUR CART</h2>
         <button className="cart-back-btn" onClick={onClose}>
           <GiCancel size={24} />
         </button>
+        <h2>YOUR CART</h2>
       </div>
+      )}
+      
 
+      {/* Danh sách sản phẩm */}
       <div className="cart-items">
         {cartItems.map(item => (
           <div key={item.id} className="cart-item">
@@ -84,7 +78,7 @@ export default function Cart({ onClose }) {
                   onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value))}
                 />
               </div>
-            <p>Total: ${(item.price * item.quantity).toFixed(2)}</p>
+              <p>Total: ${(item.price * item.quantity).toFixed(2)}</p>
             </div>
             <button className='btn-deleteitem' onClick={() => handleRemoveItem(item.id)}>
               <RiDeleteBinLine size={20} />
@@ -92,16 +86,20 @@ export default function Cart({ onClose }) {
           </div>
         ))}
       </div>
-      <br/>
+
+      <br />
       <div className="cart-total">
         <h3>Total Price: ${totalPrice.toFixed(2)}</h3>
       </div>
-      <div className="cart-actions">
-        <Link to = "checkout" className="checkout-btn">
-          Checkout
-        </Link>
-      </div>
 
+      {/* Cart actions (chỉ hiện khi popup) */}
+      {isPopup && (
+        <div className="cart-actions">
+          <Link to="/payment" className="checkout-btn">
+            Order now
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

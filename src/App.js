@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './Pages/Login';
 import Home from './Pages/Home';
 import ProductDetail from './components/ProductDetail';
+import PaymentPage from './Pages/PaymentPage';
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase";
 import { useEffect } from "react";
@@ -25,6 +26,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/payment" element={<PaymentPage />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>

@@ -14,14 +14,12 @@ export default function Header() {
   const handleCartOpen = () => {
     setCartVisible(true);
     setClosing(false);
-    document.body.style.overflow = 'hidden';
   };
 
   const handleCartClose = () => {
     setClosing(true);
     setTimeout(() => {
       setCartVisible(false);
-      document.body.style.overflow = 'auto';
     }, 300); // khớp thời gian CSS
   };
 
@@ -109,7 +107,7 @@ export default function Header() {
 
           {/* Cart trượt vào */}
           <div className={`cart-overlay ${closing ? 'closing' : 'opening'}`}>
-            <Cart onClose={handleCartClose} />
+            <Cart isPopup={true} onClose={handleCartClose} />
           </div>
         </>
       )}
