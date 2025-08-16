@@ -79,7 +79,7 @@ const handlePageChange = (pageNumber) => {
 ### 2. Điều hướng thông minh
 - Nút Trước/Tiếp với trạng thái disabled
 - Số trang với ellipsis cho navigation dài
-- Scroll to top khi chuyển trang
+- Giữ nguyên vị trí scroll khi chuyển trang (UX tốt hơn)
 
 ### 3. Thông tin chi tiết
 - Hiển thị sản phẩm đang xem (VD: 1-12 trong tổng số 100)
@@ -134,7 +134,7 @@ import PaginationDemo from './components/PaginationDemo';
 
 ## Lưu ý quan trọng
 
-1. **Scroll to top**: Tự động scroll lên đầu khi chuyển trang
+1. **Giữ vị trí scroll**: Không tự động scroll lên đầu khi chuyển trang (UX tốt hơn)
 2. **State management**: Sử dụng React hooks để quản lý trang hiện tại
 3. **Performance**: Chỉ render sản phẩm của trang hiện tại
 4. **Accessibility**: Hỗ trợ keyboard navigation và screen readers

@@ -22,7 +22,7 @@ export default function PaginationDemo() {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Không scroll to top để giữ nguyên vị trí của người dùng
   };
 
   const formatPrice = (price) => {

@@ -16,6 +16,23 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.products-stats {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.products-stats span {
+  background: #007bff;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .filter-sort-btn {
@@ -110,7 +127,7 @@
 .discount-badge {
   position: absolute;
   top: 12px;
-  left: 12px;
+  right: 12px;
   background: #e74c3c;
   color: white;
   padding: 6px 10px;
@@ -118,6 +135,7 @@
   font-size: 12px;
   font-weight: 700;
   z-index: 2;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
 }
 
 /* Product Info */
@@ -219,6 +237,16 @@
     flex-direction: column;
     gap: 20px;
     align-items: stretch;
+  }
+  
+  .products-stats {
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .products-stats span {
+    font-size: 13px;
+    padding: 6px 12px;
   }
   
   .filter-sort-btn {
