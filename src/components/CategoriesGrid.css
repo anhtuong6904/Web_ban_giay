@@ -1,6 +1,7 @@
+/* Categories Grid - Inspired by Biti's design */
 .categories-section {
-  background: #f0f0f0;
-  padding: 40px 0;
+  background: white;
+  padding: 60px 0;
 }
 
 .categories-container {
@@ -11,28 +12,35 @@
 
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
 }
 
+/* Category Card */
 .category-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  position: relative;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transform: translateY(-10px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
 }
 
 .category-image {
   position: relative;
-  width: 100%;
-  height: 120px;
+  height: 200px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
 
@@ -40,48 +48,194 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
+.category-card:hover .category-image img {
+  transform: scale(1.1);
+}
+
+/* Category Overlay */
 .category-overlay {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  background: rgba(0,0,0,0.8);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.9), rgba(41, 128, 185, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.category-card:hover .category-overlay {
+  opacity: 1;
+}
+
+.overlay-content {
+  text-align: center;
   color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 600;
+}
+
+.overlay-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.overlay-subtitle {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+/* Category Info */
+.category-info {
+  padding: 25px;
+  text-align: center;
 }
 
 .category-title {
-  padding: 12px;
-  margin: 0;
-  font-size: 12px;
-  font-weight: 600;
-  text-align: center;
-  color: #333;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 12px;
   line-height: 1.3;
 }
 
+.category-description {
+  font-size: 14px;
+  color: #7f8c8d;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.category-cta {
+  display: inline-block;
+  background: #3498db;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.category-cta:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+/* Special Category Cards */
+.category-card.featured {
+  grid-column: span 2;
+}
+
+.category-card.featured .category-image {
+  height: 250px;
+}
+
+.category-card.featured .category-title {
+  font-size: 24px;
+}
+
+.category-card.featured .category-description {
+  font-size: 16px;
+}
+
+/* Category Badge */
+.category-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: #e74c3c;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive Design */
 @media (max-width: 1024px) {
   .categories-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+  }
+  
+  .category-card.featured {
+    grid-column: span 1;
   }
 }
 
 @media (max-width: 768px) {
+  .categories-section {
+    padding: 40px 0;
+  }
+  
+  .categories-container {
+    padding: 0 15px;
+  }
+  
   .categories-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
   }
   
   .category-image {
-    height: 100px;
+    height: 180px;
+  }
+  
+  .category-info {
+    padding: 20px;
+  }
+  
+  .category-title {
+    font-size: 18px;
+  }
+  
+  .category-description {
+    font-size: 13px;
   }
 }
 
 @media (max-width: 480px) {
+  .categories-section {
+    padding: 30px 0;
+  }
+  
   .categories-grid {
     grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .category-image {
+    height: 160px;
+  }
+  
+  .category-info {
+    padding: 15px;
+  }
+  
+  .category-title {
+    font-size: 16px;
+  }
+  
+  .category-description {
+    font-size: 12px;
+  }
+  
+  .category-cta {
+    padding: 8px 16px;
+    font-size: 12px;
   }
 } 

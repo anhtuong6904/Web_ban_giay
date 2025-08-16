@@ -1,0 +1,33 @@
+# FIREBASE STORAGE RULES - Sửa lỗi CORS
+
+## Bước 1: Vào Firebase Console
+1. Truy cập: https://console.firebase.google.com/
+2. Chọn project: webshoesuth
+3. Vào Storage > Rules
+
+## Bước 2: Thay thế rules hiện tại bằng:
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Cho phép đọc/ghi ảnh profile cho user đã đăng nhập
+    match /profile-images/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Cho phép đọc public images
+    match /public/{allPaths=**} {
+      allow read: if true;
+    }
+    
+    // Cho phép đọc/ghi cho tất cả user đã đăng nhập (tạm thời)
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+
+## Bước 3: Publish Rules
+Click "Publish" để lưu thay đổi
+
+## Bước 4: Kiểm tra CORS
+Sau khi sửa rules, restart app và test lại

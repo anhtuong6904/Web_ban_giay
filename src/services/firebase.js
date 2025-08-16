@@ -1,9 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getStorage, connectStorageEmulator } from "firebase/storage";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -19,6 +17,31 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const auth = getAuth(app);
-export { app, analytics, auth };
+const storage = getStorage(app);
+
+// Cấu hình Storage để tránh lỗi CORS
+if (process.env.NODE_ENV === 'development') {
+  console.log('Development mode: Using Firebase Storage with CORS fix');
+  
+  // Thêm headers để tránh CORS issues
+  const originalFetch = window.fetch;
+  window.fetch = function(url, options = {}) {
+    if (url.includes('firebasestorage.googleapis.com')) {
+      options.mode = 'cors';
+      options.credentials = 'omit';
+      if (!options.headers) options.headers = {};
+      options.headers['Access-Control-Allow-Origin'] = '*';
+    }
+    return originalFetch(url, options);
+  };
+}
+
+// Log để debug
+console.log('Firebase initialized with config:', {
+  projectId: firebaseConfig.projectId,
+  storageBucket: firebaseConfig.storageBucket,
+  environment: process.env.NODE_ENV
+});
+
+export { app, auth, storage };
