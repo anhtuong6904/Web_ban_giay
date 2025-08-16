@@ -7,6 +7,7 @@ export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState('Đen');
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0); // Thêm state cho ảnh được chọn
 
   const product = {
     name: "Giày Thể Thao UTH Shoes Helio Teen Nam Màu Đen",
@@ -19,10 +20,10 @@ export default function ProductDetail() {
     views: 143,
     sales: 7,
     images: [
-      "/images/products/giay-the-thao-1.jpg",
-      "/images/products/giay-the-thao-2.jpg", 
-      "/images/products/giay-the-thao-3.jpg",
-      "/images/products/giay-the-thao-4.jpg"
+      "/images/products/giay-the-thao-helio-teen-nam-den-main.jpg",
+      "/images/products/giay-the-thao-helio-teen-nam-den-side.jpg",
+      "/images/products/giay-the-thao-helio-teen-nam-den-top.jpg",
+      "/images/products/giay-the-thao-helio-teen-nam-den-detail.jpg"
     ],
     colors: ["Đen", "Trắng", "Xanh"],
     sizes: ["38", "39", "40", "41", "42", "43"],
@@ -63,6 +64,11 @@ export default function ProductDetail() {
     alert('Chuyển đến trang thanh toán...');
   };
 
+  // Hàm xử lý click vào thumbnail
+  const handleThumbnailClick = (index) => {
+    setSelectedImageIndex(index);
+  };
+
   return (
     <div className="product-detail">
       <div className="product-detail-container">
@@ -80,13 +86,25 @@ export default function ProductDetail() {
           {/* Product Images */}
           <div className="product-images">
             <div className="main-image">
-              <img src={product.images[0]} alt={product.name} />
+              <img
+                src={product.images[selectedImageIndex]}
+                alt={`${product.name} - Ảnh ${selectedImageIndex + 1}`}
+                className="main-product-image"
+              />
               <div className="image-badge">Mới</div>
             </div>
             <div className="thumbnail-images">
               {product.images.map((image, index) => (
-                <div key={index} className="thumbnail">
-                  <img src={image} alt={`${product.name} ${index + 1}`} />
+                <div
+                  key={index}
+                  className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
+                  onClick={() => handleThumbnailClick(index)}
+                >
+                  <img
+                    src={image}
+                    alt={`${product.name} ${index + 1}`}
+                    className="thumbnail-image"
+                  />
                 </div>
               ))}
             </div>
@@ -151,9 +169,9 @@ export default function ProductDetail() {
               <label>Số lượng:</label>
               <div className="quantity-selector">
                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
-                <input 
-                  type="number" 
-                  value={quantity} 
+                <input
+                  type="number"
+                  value={quantity}
                   onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                   min="1"
                 />
@@ -173,7 +191,7 @@ export default function ProductDetail() {
 
             {/* Favorite & Share */}
             <div className="product-utilities">
-              <button 
+              <button
                 className={`btn-favorite ${isFavorite ? 'active' : ''}`}
                 onClick={() => setIsFavorite(!isFavorite)}
               >
@@ -202,7 +220,7 @@ export default function ProductDetail() {
         <div className="product-description">
           <h2>Mô tả sản phẩm</h2>
           <p>{product.description}</p>
-          
+
           <h3>Đặc điểm nổi bật:</h3>
           <ul>
             {product.features.map((feature, index) => (
