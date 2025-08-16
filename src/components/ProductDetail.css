@@ -49,26 +49,31 @@
 
 /* Product Images */
 .product-images {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  flex: 1;
+  max-width: 500px;
 }
 
 .main-image {
   position: relative;
+  margin-bottom: 20px;
   border-radius: 12px;
   overflow: hidden;
   background: #f8f9fa;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.main-image img {
+.main-product-image {
   width: 100%;
-  height: 400px;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain; /* Giữ tỷ lệ khung hình, không cắt ảnh */
+  object-position: center;
   transition: transform 0.3s ease;
 }
 
-.main-image:hover img {
+.main-image:hover .main-product-image {
   transform: scale(1.05);
 }
 
@@ -87,8 +92,8 @@
 
 .thumbnail-images {
   display: flex;
-  gap: 15px;
-  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .thumbnail {
@@ -99,17 +104,32 @@
   cursor: pointer;
   border: 2px solid transparent;
   transition: all 0.3s ease;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .thumbnail:hover {
-  border-color: #007bff;
-  transform: scale(1.1);
+  border-color: #3498db;
+  transform: translateY(-2px);
 }
 
-.thumbnail img {
+.thumbnail.active {
+  border-color: #3498db;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.thumbnail-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* Cắt ảnh để vừa khung thumbnail */
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+.thumbnail:hover .thumbnail-image {
+  transform: scale(1.1);
 }
 
 /* Product Info */
@@ -513,62 +533,74 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .product-main {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: 30px;
   }
   
-  .product-detail-container {
-    padding: 0 15px;
+  .product-images {
+    max-width: 100%;
   }
   
-  .product-main {
-    padding: 30px;
+  .main-image {
+    aspect-ratio: 4/3;
+  }
+  
+  .thumbnail {
+    width: 70px;
+    height: 70px;
   }
 }
 
 @media (max-width: 768px) {
-  .product-detail {
-    padding: 15px 0;
+  .product-detail-container {
+    padding: 20px;
   }
   
-  .product-main {
+  .main-image {
+    aspect-ratio: 1;
+  }
+  
+  .thumbnail-images {
+    gap: 8px;
+    justify-content: center;
+  }
+  
+  .thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .product-info {
     padding: 20px;
-    gap: 25px;
   }
   
   .product-title {
     font-size: 24px;
   }
   
-  .current-price {
-    font-size: 28px;
-  }
-  
   .product-actions {
     flex-direction: column;
+    gap: 15px;
   }
   
-  .product-utilities {
-    flex-direction: column;
-  }
-  
-  .store-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .product-description,
-  .store-info {
-    padding: 25px;
+  .btn-buy-now,
+  .btn-add-to-cart {
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
   .product-detail-container {
-    padding: 0 10px;
+    padding: 15px;
   }
   
-  .product-main {
-    padding: 15px;
+  .main-image {
+    margin-bottom: 15px;
+  }
+  
+  .thumbnail {
+    width: 50px;
+    height: 50px;
   }
   
   .product-title {
@@ -581,24 +613,47 @@
   
   .color-options,
   .size-options {
-    justify-content: center;
+    gap: 8px;
   }
   
-  .thumbnail-images {
-    gap: 10px;
+  .color-option,
+  .size-option {
+    padding: 8px 12px;
+    font-size: 12px;
   }
-  
-  .thumbnail {
-    width: 60px;
-    height: 60px;
+}
+
+/* Smooth transitions for all interactive elements */
+.product-images *,
+.product-info *,
+.product-actions * {
+  transition: all 0.3s ease;
+}
+
+/* Loading state for images */
+.main-product-image,
+.thumbnail-image {
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
   }
-  
-  .main-image img {
-    height: 300px;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  .product-description,
-  .store-info {
-    padding: 20px;
-  }
+}
+
+/* Hover effects for better UX */
+.thumbnail:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.main-image:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 } 

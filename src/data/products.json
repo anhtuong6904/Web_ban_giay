@@ -1,115 +1,68 @@
 [
   {
-    "ProductID": 1,
-    "Name": "Nike Air Max 270",
-    "Price": 1500000,
-    "OriginalPrice": 1800000,
-    "Discount": 17,
-    "CategoryID": 1,
-    "BrandID": 2,
-    "Gender": "Unisex",
-    "Description": "Iconic Air Max design with visible Air unit for maximum comfort",
-    "MainImage": "/images/products/nike-air-max-270.jpg",
-    "ThumbnailImages": ["/images/products/nike-air-max-270.jpg", "/images/products/nike-air-max-270-white.jpg"],
-    "DetailImages": ["/images/products/nike-air-max-270.jpg", "/images/products/nike-air-max-270-white.jpg"],
-    "ColorImages": {
-      "white": "/images/products/nike-air-max-270-white.jpg",
-      "black": "/images/products/nike-air-max-270-black.jpg"
-    },
-    "IsActive": 1
+    "id": 1,
+    "Name": "Giày Thể Thao UTH Shoes Helio Teen Nam",
+    "MainImage": "/images/products/giay-the-thao-helio-teen-nam-den-main.jpg",
+    "Price": 595000,
+    "OriginalPrice": 750000,
+    "Discount": 21,
+    "Category": "Giày thể thao",
+    "Brand": "UTH Shoes",
+    "Colors": ["Đen", "Trắng", "Xanh"]
   },
   {
-    "ProductID": 2,
-    "Name": "Adidas Ultraboost 22",
-    "Price": 2800000,
-    "OriginalPrice": 3200000,
-    "Discount": 12,
-    "CategoryID": 1,
-    "BrandID": 1,
-    "Gender": "Unisex",
-    "Description": "Premium running shoes with energy return technology",
-    "MainImage": "/images/products/adidas-ultraboost-22.jpg",
-    "ThumbnailImages": ["/images/products/adidas-ultraboost-22.jpg"],
-    "DetailImages": ["/images/products/adidas-ultraboost-22.jpg"],
-    "ColorImages": {
-      "black": "/images/products/adidas-ultraboost-22.jpg"
-    },
-    "IsActive": 1
-  },
-  {
-    "ProductID": 3,
-    "Name": "Converse Chuck Taylor All Star",
+    "id": 2,
+    "Name": "Giày Chạy Bộ UTH Shoes Runner Pro",
+    "MainImage": "/images/products/giay-chay-bo-runner-pro-main.jpg",
     "Price": 850000,
-    "OriginalPrice": 950000,
-    "Discount": 11,
-    "CategoryID": 2,
-    "BrandID": 3,
-    "Gender": "Unisex",
-    "Description": "Classic canvas sneaker with timeless design",
-    "MainImage": "/images/products/converse-chuck-taylor.jpg",
-    "ThumbnailImages": ["/images/products/converse-chuck-taylor.jpg", "/images/products/converse-chuck-taylor-white.jpg"],
-    "DetailImages": ["/images/products/converse-chuck-taylor.jpg", "/images/products/converse-chuck-taylor-white.jpg"],
-    "ColorImages": {
-      "white": "/images/products/converse-chuck-taylor-white.jpg",
-      "black": "/images/products/converse-chuck-taylor-black.jpg"
-    },
-    "IsActive": 1
+    "OriginalPrice": 1000000,
+    "Discount": 15,
+    "Category": "Giày chạy bộ",
+    "Brand": "UTH Shoes",
+    "Colors": ["Xanh dương", "Đỏ", "Đen"]
   },
   {
-    "ProductID": 4,
-    "Name": "Vans Old Skool",
+    "id": 3,
+    "Name": "Giày Đá Banh UTH Shoes Football Elite",
+    "MainImage": "/images/products/giay-da-banh-football-elite-main.jpg",
     "Price": 1200000,
-    "OriginalPrice": 1400000,
-    "Discount": 14,
-    "CategoryID": 4,
-    "BrandID": 4,
-    "Gender": "Unisex",
-    "Description": "Iconic skateboarding shoe with side stripe",
-    "MainImage": "/images/products/vans-old-skool.jpg",
-    "ThumbnailImages": ["/images/products/vans-old-skool.jpg", "/images/products/vans-old-skool-black.jpg"],
-    "DetailImages": ["/images/products/vans-old-skool.jpg", "/images/products/vans-old-skool-black.jpg"],
-    "ColorImages": {
-      "black": "/images/products/vans-old-skool-black.jpg",
-      "white": "/images/products/vans-old-skool-white.jpg"
-    },
-    "IsActive": 1
+    "OriginalPrice": 1500000,
+    "Discount": 20,
+    "Category": "Giày đá banh",
+    "Brand": "UTH Shoes",
+    "Colors": ["Trắng", "Đen", "Vàng"]
   },
   {
-    "ProductID": 5,
-    "Name": "New Balance 574",
-    "Price": 1100000,
-    "OriginalPrice": 1250000,
-    "Discount": 12,
-    "CategoryID": 5,
-    "BrandID": 5,
-    "Gender": "Unisex",
-    "Description": "Classic lifestyle sneaker with superior comfort",
-    "MainImage": "/images/products/new-balance-574.jpg",
-    "ThumbnailImages": ["/images/products/new-balance-574.jpg", "/images/products/new-balance-574-grey.jpg"],
-    "DetailImages": ["/images/products/new-balance-574.jpg", "/images/products/new-balance-574-grey.jpg"],
-    "ColorImages": {
-      "grey": "/images/products/new-balance-574-grey.jpg",
-      "navy": "/images/products/new-balance-574-navy.jpg"
-    },
-    "IsActive": 1
+    "id": 4,
+    "Name": "Giày Tây UTH Shoes Business Classic",
+    "MainImage": "/images/products/giay-tay-business-classic-main.jpg",
+    "Price": 950000,
+    "OriginalPrice": 1200000,
+    "Discount": 21,
+    "Category": "Giày tây",
+    "Brand": "UTH Shoes",
+    "Colors": ["Đen", "Nâu", "Xanh đen"]
   },
   {
-    "ProductID": 6,
-    "Name": "Jordan Air 1 Retro High",
-    "Price": 2200000,
-    "OriginalPrice": 2500000,
-    "Discount": 12,
-    "CategoryID": 3,
-    "BrandID": 2,
-    "Gender": "Unisex",
-    "Description": "Legendary basketball shoe with Air cushioning",
-    "MainImage": "/images/products/jordan-air-1-retro.jpg",
-    "ThumbnailImages": ["/images/products/jordan-air-1-retro.jpg", "/images/products/jordan-air-1-retro-red.jpg"],
-    "DetailImages": ["/images/products/jordan-air-1-retro.jpg", "/images/products/jordan-air-1-retro-red.jpg"],
-    "ColorImages": {
-      "red": "/images/products/jordan-air-1-retro-red.jpg",
-      "black": "/images/products/jordan-air-1-retro-black.jpg"
-    },
-    "IsActive": 1
+    "id": 5,
+    "Name": "Dép UTH Shoes Comfort Slide",
+    "MainImage": "/images/products/dep-comfort-slide-main.jpg",
+    "Price": 250000,
+    "OriginalPrice": 350000,
+    "Discount": 29,
+    "Category": "Dép",
+    "Brand": "UTH Shoes",
+    "Colors": ["Đen", "Trắng", "Xanh"]
+  },
+  {
+    "id": 6,
+    "Name": "Giày Búp Bê UTH Shoes Princess",
+    "MainImage": "/images/products/giay-bup-be-princess-main.jpg",
+    "Price": 450000,
+    "OriginalPrice": 600000,
+    "Discount": 25,
+    "Category": "Giày búp bê",
+    "Brand": "UTH Shoes",
+    "Colors": ["Hồng", "Trắng", "Đỏ"]
   }
 ] 
