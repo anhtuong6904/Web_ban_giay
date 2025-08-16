@@ -1,0 +1,42 @@
+# HƯỚNG DẪN THÊM ẢNH SẢN PHẨM
+
+## Các file ảnh cần tạo:
+
+### 1. Nike Air Max 270
+- nike-air-max-270.jpg
+- nike-air-max-270-white.jpg  
+- nike-air-max-270-black.jpg
+
+### 2. Adidas Ultraboost 22
+- adidas-ultraboost-22.jpg
+
+### 3. Converse Chuck Taylor All Star
+- converse-chuck-taylor.jpg
+- converse-chuck-taylor-white.jpg
+- converse-chuck-taylor-black.jpg
+
+### 4. Vans Old Skool
+- vans-old-skool.jpg
+- vans-old-skool-black.jpg
+- vans-old-skool-white.jpg
+
+### 5. New Balance 574
+- new-balance-574.jpg
+- new-balance-574-grey.jpg
+- new-balance-574-navy.jpg
+
+### 6. Jordan Air 1 Retro High
+- jordan-air-1-retro-high.jpg
+- jordan-air-1-retro-high-white.jpg
+- jordan-air-1-retro-high-black.jpg
+
+## Yêu cầu ảnh:
+- Định dạng: JPG, PNG
+- Kích thước: 400x400px (khuyến nghị)
+- Chất lượng: Tối ưu cho web
+- Tên file: Chính xác như trong products.json
+
+## Cách thêm:
+1. Tải ảnh vào thư mục này
+2. Đặt tên file chính xác
+3. Refresh trang web

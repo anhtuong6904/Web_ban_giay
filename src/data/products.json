@@ -1,329 +1,115 @@
-{
-  "products": [
-    {
-      "id": 1,
-      "name": "Nike Air Max 270",
-      "brand": "Nike",
-      "category": "Running",
-      "price": 1500000,
-      "originalPrice": 1800000,
-      "discount": 17,
-      "description": "Giày thể thao Nike Air Max 270 với công nghệ Air Max đỉnh cao, phù hợp cho chạy bộ và thể thao hàng ngày.",
-      "features": [
-        "Công nghệ Air Max",
-        "Đế cao su bền bỉ",
-        "Thoáng khí",
-        "Nhẹ và êm ái"
-      ],
-      "sizes": [36, 37, 38, 39, 40, 41, 42, 43, 44],
-      "colors": [
-        {
-          "name": "Đen",
-          "code": "#000000",
-          "images": [
-            "/images/nike-airmax-270-black-1.jpg",
-            "/images/nike-airmax-270-black-2.jpg",
-            "/images/nike-airmax-270-black-3.jpg"
-          ]
-        },
-        {
-          "name": "Trắng",
-          "code": "#FFFFFF",
-          "images": [
-            "/images/nike-airmax-270-white-1.jpg",
-            "/images/nike-airmax-270-white-2.jpg",
-            "/images/nike-airmax-270-white-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/nike-airmax-270-black-1.jpg",
-      "rating": 4.5,
-      "reviews": 128,
-      "inStock": true,
-      "stockQuantity": 45,
-      "tags": ["running", "sport", "nike", "airmax"],
-      "createdAt": "2024-01-15T10:30:00Z",
-      "updatedAt": "2024-01-15T10:30:00Z"
+[
+  {
+    "ProductID": 1,
+    "Name": "Nike Air Max 270",
+    "Price": 1500000,
+    "OriginalPrice": 1800000,
+    "Discount": 17,
+    "CategoryID": 1,
+    "BrandID": 2,
+    "Gender": "Unisex",
+    "Description": "Iconic Air Max design with visible Air unit for maximum comfort",
+    "MainImage": "/images/products/nike-air-max-270.jpg",
+    "ThumbnailImages": ["/images/products/nike-air-max-270.jpg", "/images/products/nike-air-max-270-white.jpg"],
+    "DetailImages": ["/images/products/nike-air-max-270.jpg", "/images/products/nike-air-max-270-white.jpg"],
+    "ColorImages": {
+      "white": "/images/products/nike-air-max-270-white.jpg",
+      "black": "/images/products/nike-air-max-270-black.jpg"
     },
-    {
-      "id": 2,
-      "name": "Adidas Ultraboost 22",
-      "brand": "Adidas",
-      "category": "Running",
-      "price": 2800000,
-      "originalPrice": 3200000,
-      "discount": 12,
-      "description": "Giày chạy bộ Adidas Ultraboost 22 với công nghệ Boost và Primeknit, mang lại cảm giác êm ái tối đa.",
-      "features": [
-        "Công nghệ Boost",
-        "Upper Primeknit",
-        "Đế Continental",
-        "Responsive cushioning"
-      ],
-      "sizes": [36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
-      "colors": [
-        {
-          "name": "Xanh dương",
-          "code": "#0066CC",
-          "images": [
-            "/images/adidas-ultraboost-blue-1.jpg",
-            "/images/adidas-ultraboost-blue-2.jpg",
-            "/images/adidas-ultraboost-blue-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/adidas-ultraboost-blue-1.jpg",
-      "rating": 4.8,
-      "reviews": 95,
-      "inStock": true,
-      "stockQuantity": 32,
-      "tags": ["running", "adidas", "ultraboost", "premium"],
-      "createdAt": "2024-01-10T14:20:00Z",
-      "updatedAt": "2024-01-10T14:20:00Z"
+    "IsActive": 1
+  },
+  {
+    "ProductID": 2,
+    "Name": "Adidas Ultraboost 22",
+    "Price": 2800000,
+    "OriginalPrice": 3200000,
+    "Discount": 12,
+    "CategoryID": 1,
+    "BrandID": 1,
+    "Gender": "Unisex",
+    "Description": "Premium running shoes with energy return technology",
+    "MainImage": "/images/products/adidas-ultraboost-22.jpg",
+    "ThumbnailImages": ["/images/products/adidas-ultraboost-22.jpg"],
+    "DetailImages": ["/images/products/adidas-ultraboost-22.jpg"],
+    "ColorImages": {
+      "black": "/images/products/adidas-ultraboost-22.jpg"
     },
-    {
-      "id": 3,
-      "name": "Converse Chuck Taylor All Star",
-      "brand": "Converse",
-      "category": "Casual",
-      "price": 850000,
-      "originalPrice": 950000,
-      "discount": 11,
-      "description": "Giày canvas cổ điển Converse Chuck Taylor All Star, phù hợp cho mọi dịp và phong cách thời trang.",
-      "features": [
-        "Canvas bền bỉ",
-        "Đế cao su",
-        "Thiết kế cổ điển",
-        "Dễ phối đồ"
-      ],
-      "sizes": [35, 36, 37, 38, 39, 40, 41, 42, 43, 44],
-      "colors": [
-        {
-          "name": "Trắng",
-          "code": "#FFFFFF",
-          "images": [
-            "/images/converse-chuck-white-1.jpg",
-            "/images/converse-chuck-white-2.jpg",
-            "/images/converse-chuck-white-3.jpg"
-          ]
-        },
-        {
-          "name": "Đen",
-          "code": "#000000",
-          "images": [
-            "/images/converse-chuck-black-1.jpg",
-            "/images/converse-chuck-black-2.jpg",
-            "/images/converse-chuck-black-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/converse-chuck-white-1.jpg",
-      "rating": 4.3,
-      "reviews": 256,
-      "inStock": true,
-      "stockQuantity": 78,
-      "tags": ["casual", "converse", "classic", "canvas"],
-      "createdAt": "2024-01-05T09:15:00Z",
-      "updatedAt": "2024-01-05T09:15:00Z"
+    "IsActive": 1
+  },
+  {
+    "ProductID": 3,
+    "Name": "Converse Chuck Taylor All Star",
+    "Price": 850000,
+    "OriginalPrice": 950000,
+    "Discount": 11,
+    "CategoryID": 2,
+    "BrandID": 3,
+    "Gender": "Unisex",
+    "Description": "Classic canvas sneaker with timeless design",
+    "MainImage": "/images/products/converse-chuck-taylor.jpg",
+    "ThumbnailImages": ["/images/products/converse-chuck-taylor.jpg", "/images/products/converse-chuck-taylor-white.jpg"],
+    "DetailImages": ["/images/products/converse-chuck-taylor.jpg", "/images/products/converse-chuck-taylor-white.jpg"],
+    "ColorImages": {
+      "white": "/images/products/converse-chuck-taylor-white.jpg",
+      "black": "/images/products/converse-chuck-taylor-black.jpg"
     },
-    {
-      "id": 4,
-      "name": "Vans Old Skool",
-      "brand": "Vans",
-      "category": "Skateboarding",
-      "price": 1200000,
-      "originalPrice": 1400000,
-      "discount": 14,
-      "description": "Giày skateboard Vans Old Skool với thiết kế đặc trưng và độ bền cao, phù hợp cho trượt ván và thời trang đường phố.",
-      "features": [
-        "Canvas và suede",
-        "Đế cao su waffle",
-        "Thiết kế Sidestripe",
-        "Bền bỉ cho skateboarding"
-      ],
-      "sizes": [36, 37, 38, 39, 40, 41, 42, 43, 44],
-      "colors": [
-        {
-          "name": "Đen",
-          "code": "#000000",
-          "images": [
-            "/images/vans-oldskool-black-1.jpg",
-            "/images/vans-oldskool-black-2.jpg",
-            "/images/vans-oldskool-black-3.jpg"
-          ]
-        },
-        {
-          "name": "Xanh navy",
-          "code": "#000080",
-          "images": [
-            "/images/vans-oldskool-navy-1.jpg",
-            "/images/vans-oldskool-navy-2.jpg",
-            "/images/vans-oldskool-navy-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/vans-oldskool-black-1.jpg",
-      "rating": 4.6,
-      "reviews": 189,
-      "inStock": true,
-      "stockQuantity": 56,
-      "tags": ["skateboarding", "vans", "streetwear", "classic"],
-      "createdAt": "2024-01-12T11:45:00Z",
-      "updatedAt": "2024-01-12T11:45:00Z"
+    "IsActive": 1
+  },
+  {
+    "ProductID": 4,
+    "Name": "Vans Old Skool",
+    "Price": 1200000,
+    "OriginalPrice": 1400000,
+    "Discount": 14,
+    "CategoryID": 4,
+    "BrandID": 4,
+    "Gender": "Unisex",
+    "Description": "Iconic skateboarding shoe with side stripe",
+    "MainImage": "/images/products/vans-old-skool.jpg",
+    "ThumbnailImages": ["/images/products/vans-old-skool.jpg", "/images/products/vans-old-skool-black.jpg"],
+    "DetailImages": ["/images/products/vans-old-skool.jpg", "/images/products/vans-old-skool-black.jpg"],
+    "ColorImages": {
+      "black": "/images/products/vans-old-skool-black.jpg",
+      "white": "/images/products/vans-old-skool-white.jpg"
     },
-    {
-      "id": 5,
-      "name": "New Balance 574",
-      "brand": "New Balance",
-      "category": "Lifestyle",
-      "price": 1600000,
-      "originalPrice": 1800000,
-      "discount": 11,
-      "description": "Giày lifestyle New Balance 574 với thiết kế retro và công nghệ ENCAP, mang lại sự thoải mái tối đa.",
-      "features": [
-        "Công nghệ ENCAP",
-        "Upper mesh và suede",
-        "Đế cao su",
-        "Thiết kế retro"
-      ],
-      "sizes": [36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
-      "colors": [
-        {
-          "name": "Xám",
-          "code": "#808080",
-          "images": [
-            "/images/newbalance-574-grey-1.jpg",
-            "/images/newbalance-574-grey-2.jpg",
-            "/images/newbalance-574-grey-3.jpg"
-          ]
-        },
-        {
-          "name": "Navy",
-          "code": "#000080",
-          "images": [
-            "/images/newbalance-574-navy-1.jpg",
-            "/images/newbalance-574-navy-2.jpg",
-            "/images/newbalance-574-navy-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/newbalance-574-grey-1.jpg",
-      "rating": 4.4,
-      "reviews": 203,
-      "inStock": true,
-      "stockQuantity": 67,
-      "tags": ["lifestyle", "newbalance", "retro", "comfortable"],
-      "createdAt": "2024-01-08T16:30:00Z",
-      "updatedAt": "2024-01-08T16:30:00Z"
+    "IsActive": 1
+  },
+  {
+    "ProductID": 5,
+    "Name": "New Balance 574",
+    "Price": 1100000,
+    "OriginalPrice": 1250000,
+    "Discount": 12,
+    "CategoryID": 5,
+    "BrandID": 5,
+    "Gender": "Unisex",
+    "Description": "Classic lifestyle sneaker with superior comfort",
+    "MainImage": "/images/products/new-balance-574.jpg",
+    "ThumbnailImages": ["/images/products/new-balance-574.jpg", "/images/products/new-balance-574-grey.jpg"],
+    "DetailImages": ["/images/products/new-balance-574.jpg", "/images/products/new-balance-574-grey.jpg"],
+    "ColorImages": {
+      "grey": "/images/products/new-balance-574-grey.jpg",
+      "navy": "/images/products/new-balance-574-navy.jpg"
     },
-    {
-      "id": 6,
-      "name": "Jordan Air 1 Retro High",
-      "brand": "Nike",
-      "category": "Basketball",
-      "price": 3500000,
-      "originalPrice": 4000000,
-      "discount": 12,
-      "description": "Giày bóng rổ Jordan Air 1 Retro High với thiết kế huyền thoại và công nghệ Air-Sole, biểu tượng của văn hóa sneaker.",
-      "features": [
-        "Công nghệ Air-Sole",
-        "Upper leather premium",
-        "Đế cao su",
-        "Thiết kế huyền thoại"
-      ],
-      "sizes": [36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
-      "colors": [
-        {
-          "name": "Đen/Đỏ",
-          "code": "#000000",
-          "images": [
-            "/images/jordan-air1-black-red-1.jpg",
-            "/images/jordan-air1-black-red-2.jpg",
-            "/images/jordan-air1-black-red-3.jpg"
-          ]
-        },
-        {
-          "name": "Trắng/Đen",
-          "code": "#FFFFFF",
-          "images": [
-            "/images/jordan-air1-white-black-1.jpg",
-            "/images/jordan-air1-white-black-2.jpg",
-            "/images/jordan-air1-white-black-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/jordan-air1-black-red-1.jpg",
-      "rating": 4.9,
-      "reviews": 342,
-      "inStock": true,
-      "stockQuantity": 28,
-      "tags": ["basketball", "jordan", "nike", "legendary", "sneaker"],
-      "createdAt": "2024-01-20T13:15:00Z",
-      "updatedAt": "2024-01-20T13:15:00Z"
-    }
-  ],
-  "categories": [
-    {
-      "id": 1,
-      "name": "Running",
-      "description": "Giày chạy bộ và thể thao",
-      "image": "/images/categories/running.jpg"
+    "IsActive": 1
+  },
+  {
+    "ProductID": 6,
+    "Name": "Jordan Air 1 Retro High",
+    "Price": 2200000,
+    "OriginalPrice": 2500000,
+    "Discount": 12,
+    "CategoryID": 3,
+    "BrandID": 2,
+    "Gender": "Unisex",
+    "Description": "Legendary basketball shoe with Air cushioning",
+    "MainImage": "/images/products/jordan-air-1-retro.jpg",
+    "ThumbnailImages": ["/images/products/jordan-air-1-retro.jpg", "/images/products/jordan-air-1-retro-red.jpg"],
+    "DetailImages": ["/images/products/jordan-air-1-retro.jpg", "/images/products/jordan-air-1-retro-red.jpg"],
+    "ColorImages": {
+      "red": "/images/products/jordan-air-1-retro-red.jpg",
+      "black": "/images/products/jordan-air-1-retro-black.jpg"
     },
-    {
-      "id": 2,
-      "name": "Casual",
-      "description": "Giày thường ngày",
-      "image": "/images/categories/casual.jpg"
-    },
-    {
-      "id": 3,
-      "name": "Basketball",
-      "description": "Giày bóng rổ",
-      "image": "/images/categories/basketball.jpg"
-    },
-    {
-      "id": 4,
-      "name": "Skateboarding",
-      "description": "Giày trượt ván",
-      "image": "/images/categories/skateboarding.jpg"
-    },
-    {
-      "id": 5,
-      "name": "Lifestyle",
-      "description": "Giày thời trang",
-      "image": "/images/categories/lifestyle.jpg"
-    }
-  ],
-  "brands": [
-    {
-      "id": 1,
-      "name": "Nike",
-      "logo": "/images/brands/nike-logo.png",
-      "description": "Just Do It"
-    },
-    {
-      "id": 2,
-      "name": "Adidas",
-      "logo": "/images/brands/adidas-logo.png",
-      "description": "Impossible is Nothing"
-    },
-    {
-      "id": 3,
-      "name": "Converse",
-      "logo": "/images/brands/converse-logo.png",
-      "description": "Made by you"
-    },
-    {
-      "id": 4,
-      "name": "Vans",
-      "logo": "/images/brands/vans-logo.png",
-      "description": "Off The Wall"
-    },
-    {
-      "id": 5,
-      "name": "New Balance",
-      "logo": "/images/brands/newbalance-logo.png",
-      "description": "Fearlessly Independent"
-    }
-  ]
-} 
+    "IsActive": 1
+  }
+] 
