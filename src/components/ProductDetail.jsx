@@ -1,117 +1,108 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import Header from './Header';
-import Footer from './Footer';
+import { IoHeart, IoHeartOutline, IoShareSocial, IoLocation, IoTime, IoCall, IoMail } from 'react-icons/io5';
 import './ProductDetail.css';
 
 export default function ProductDetail() {
-  const { id } = useParams();
-  const [selectedColor, setSelectedColor] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('Đen');
   const [quantity, setQuantity] = useState(1);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0); // Thêm state cho ảnh được chọn
 
-  // Mock data - sau này sẽ fetch từ API
   const product = {
-    id: id || 1,
-    name: "Men's Originals CAMPUS 00S SHOES",
-    price: 77,
-    originalPrice: 110,
-    discount: 30,
-    rating: 4.8,
-    reviewCount: 657,
-    colors: [
-      {
-        id: 0,
-        name: "Crystal White / Core Black / Off White",
-        image: "/images/products/campus-white.jpg",
-        isAvailable: true
-      },
-      {
-        id: 1,
-        name: "Core Black / Core Black / Core Black",
-        image: "/images/products/campus-black.jpg",
-        isAvailable: true
-      },
-      {
-        id: 2,
-        name: "Cloud White / Core Black / Cloud White",
-        image: "/images/products/campus-cloud.jpg",
-        isAvailable: true
-      }
-    ],
-    sizes: [
-      { id: 1, name: "M 5 / W 6", isAvailable: true },
-      { id: 2, name: "M 6 / W 7", isAvailable: true },
-      { id: 3, name: "M 7 / W 8", isAvailable: true },
-      { id: 4, name: "M 8 / W 9", isAvailable: true },
-      { id: 5, name: "M 9 / W 10", isAvailable: true },
-      { id: 6, name: "M 10 / W 11", isAvailable: true },
-      { id: 7, name: "M 11 / W 12", isAvailable: true },
-      { id: 8, name: "M 12 / W 13", isAvailable: false }
-    ],
+    name: "Giày Thể Thao UTH Shoes Helio Teen Nam Màu Đen",
+    code: "UTH008100DEN",
+    price: 595000,
+    originalPrice: 750000,
+    discount: 21,
+    status: "Còn hàng",
+    brand: "UTH Shoes",
+    views: 143,
+    sales: 7,
     images: [
-      "/images/products/campus-main.jpg",
-      "/images/products/campus-side.jpg",
-      "/images/products/campus-back.jpg",
-      "/images/products/campus-sole.jpg"
+      "/images/products/giay-the-thao-helio-teen-nam-den-main.jpg",
+      "/images/products/giay-the-thao-helio-teen-nam-den-side.jpg",
+      "/images/products/giay-the-thao-helio-teen-nam-den-top.jpg",
+      "/images/products/giay-the-thao-helio-teen-nam-den-detail.jpg"
     ],
-    description: "The Campus 00s brings back the classic '80s look with a modern twist. Features premium leather upper with signature 3-Stripes and gum sole.",
+    colors: ["Đen", "Trắng", "Xanh"],
+    sizes: ["38", "39", "40", "41", "42", "43"],
+    description: "Với phối màu trắng phối đen cá tính, mẫu Helio UTH008100 mang lại diện mạo thể thao mạnh mẽ và dễ phối hợp với đa dạng phong cách. Phù hợp cho cả teen nam và nữ, đôi giày này lý tưởng để mang đi học, tập luyện nhẹ hoặc dạo phố cuối tuần.",
     features: [
-      "Premium leather upper",
-      "Signature 3-Stripes",
-      "Gum sole",
-      "Classic '80s design"
+      "Phần upper gồm da tổng hợp phủ mịn và lưới mesh",
+      "Thiết kế cổ thấp basic, form ôm vừa chân",
+      "Đế IP siêu nhẹ, có rãnh chống trượt",
+      "Hỗ trợ di chuyển linh hoạt"
+    ],
+    benefits: [
+      "Cam kết chính hãng UTH Shoes 100%",
+      "Bảo hành 03 tháng",
+      "Đổi size trong vòng 7 ngày",
+      "Đổi trả hàng trong vòng 7 ngày",
+      "Free ship đơn hàng 1.5 Triệu",
+      "Hỗ trợ giao hàng 2h khi chọn Grab"
     ]
+  };
+
+  const formatPrice = (price) => {
+    return price.toLocaleString('vi-VN') + ' ₫';
   };
 
   const handleAddToCart = () => {
     if (!selectedSize) {
-      alert('Vui lòng chọn kích cỡ');
+      alert('Vui lòng chọn size');
       return;
     }
-    alert(`Đã thêm ${product.name} vào giỏ hàng!`);
+    alert(`Đã thêm ${product.name} - Size ${selectedSize} vào giỏ hàng!`);
   };
 
-  const handleFavorite = () => {
-    alert('Đã thêm vào danh sách yêu thích!');
+  const handleBuyNow = () => {
+    if (!selectedSize) {
+      alert('Vui lòng chọn size');
+      return;
+    }
+    alert('Chuyển đến trang thanh toán...');
+  };
+
+  // Hàm xử lý click vào thumbnail
+  const handleThumbnailClick = (index) => {
+    setSelectedImageIndex(index);
   };
 
   return (
-    <div style={{ minHeight: '100vh' }}>
-      <Header />
-      
+    <div className="product-detail">
       <div className="product-detail-container">
         {/* Breadcrumb */}
         <div className="breadcrumb">
-          <Link to="/home" className="breadcrumb-link">Back Home</Link>
-          <span className="breadcrumb-separator">/</span>
-          <Link to="/men" className="breadcrumb-link">Men</Link>
-          <span className="breadcrumb-separator">/</span>
-          <Link to="/shoes" className="breadcrumb-link">Shoes</Link>
-          <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-current">{product.name}</span>
+          <a href="/home">Trang chủ</a>
+          <span>/</span>
+          <a href="/shoes">Giày thể thao</a>
+          <span>/</span>
+          <span>{product.name}</span>
         </div>
 
-        <div className="product-detail-content">
-          {/* Left side - Product Images */}
-          <div className="product-images-section">
-            <div className="main-image-container">
-              <img 
-                src={product.images[0]} 
-                alt={product.name} 
-                className="main-image"
+        {/* Product Main Section */}
+        <div className="product-main">
+          {/* Product Images */}
+          <div className="product-images">
+            <div className="main-image">
+              <img
+                src={product.images[selectedImageIndex]}
+                alt={`${product.name} - Ảnh ${selectedImageIndex + 1}`}
+                className="main-product-image"
               />
-              <div className="image-overlay">
-                <button className="zoom-btn">🔍</button>
-              </div>
+              <div className="image-badge">Mới</div>
             </div>
-            
             <div className="thumbnail-images">
               {product.images.map((image, index) => (
-                <div key={index} className="thumbnail-container">
-                  <img 
-                    src={image} 
-                    alt={`${product.name} ${index + 1}`} 
+                <div
+                  key={index}
+                  className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
+                  onClick={() => handleThumbnailClick(index)}
+                >
+                  <img
+                    src={image}
+                    alt={`${product.name} ${index + 1}`}
                     className="thumbnail-image"
                   />
                 </div>
@@ -119,48 +110,39 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* Right side - Product Info */}
-          <div className="product-info-section">
+          {/* Product Info */}
+          <div className="product-info">
             <div className="product-header">
               <h1 className="product-title">{product.name}</h1>
-              
-              <div className="product-rating">
-                <div className="stars">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className={`star ${i < Math.floor(product.rating) ? 'filled' : ''}`}>
-                      ★
-                    </span>
-                  ))}
-                </div>
-                <span className="rating-text">({product.reviewCount} reviews)</span>
-              </div>
+              <div className="product-code">Mã sản phẩm: <strong>{product.code}</strong></div>
+            </div>
 
-              <div className="product-price">
-                <span className="current-price">${product.price}</span>
-                <span className="original-price">${product.originalPrice}</span>
-                <span className="discount-badge">-{product.discount}%</span>
-              </div>
+            <div className="product-price-section">
+              <div className="current-price">{formatPrice(product.price)}</div>
+              <div className="original-price">{formatPrice(product.originalPrice)}</div>
+              <div className="discount-badge">-{product.discount}%</div>
+            </div>
 
-              <div className="popular-notice">
-                Popular - 159 people have bought this product in the last 24 hours
-              </div>
+            <div className="product-stats">
+              <span><strong>{product.views}</strong> lượt xem</span>
+              <span><strong>{product.sales}</strong> lượt mua Online</span>
+            </div>
+
+            <div className="product-status">
+              Tình trạng: <strong style={{color: '#27ae60'}}>{product.status}</strong>
             </div>
 
             {/* Color Selection */}
             <div className="product-option">
-              <div className="option-header">
-                <h3>Colors</h3>
-                <span className="selected-color-name">{product.colors[selectedColor].name}</span>
-              </div>
+              <label>Màu sắc:</label>
               <div className="color-options">
                 {product.colors.map((color) => (
                   <button
-                    key={color.id}
-                    className={`color-option ${selectedColor === color.id ? 'selected' : ''} ${!color.isAvailable ? 'unavailable' : ''}`}
-                    onClick={() => setSelectedColor(color.id)}
-                    disabled={!color.isAvailable}
+                    key={color}
+                    className={`color-option ${selectedColor === color ? 'active' : ''}`}
+                    onClick={() => setSelectedColor(color)}
                   >
-                    <img src={color.image} alt={color.name} />
+                    {color}
                   </button>
                 ))}
               </div>
@@ -168,117 +150,120 @@ export default function ProductDetail() {
 
             {/* Size Selection */}
             <div className="product-option">
-              <div className="option-header">
-                <h3>Sizes</h3>
-                <Link to="/size-guide" className="size-guide-link">Size guide</Link>
-              </div>
+              <label>Kích thước:</label>
               <div className="size-options">
                 {product.sizes.map((size) => (
                   <button
-                    key={size.id}
-                    className={`size-option ${selectedSize === size.id ? 'selected' : ''} ${!size.isAvailable ? 'unavailable' : ''}`}
-                    onClick={() => setSelectedSize(size.id)}
-                    disabled={!size.isAvailable}
+                    key={size}
+                    className={`size-option ${selectedSize === size ? 'active' : ''}`}
+                    onClick={() => setSelectedSize(size)}
                   >
-                    {size.name}
+                    {size}
                   </button>
                 ))}
-              </div>
-              <div className="size-note">
-                True to size. We recommend ordering your usual size.
               </div>
             </div>
 
             {/* Quantity */}
             <div className="product-option">
-              <div className="option-header">
-                <h3>Quantity</h3>
-              </div>
+              <label>Số lượng:</label>
               <div className="quantity-selector">
-                <button 
-                  className="quantity-btn"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                >
-                  -
-                </button>
-                <span className="quantity-value">{quantity}</span>
-                <button 
-                  className="quantity-btn"
-                  onClick={() => setQuantity(quantity + 1)}
-                >
-                  +
-                </button>
+                <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  min="1"
+                />
+                <button onClick={() => setQuantity(quantity + 1)}>+</button>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="product-actions">
-              <button 
-                className="add-to-cart-btn"
-                onClick={handleAddToCart}
-                disabled={!selectedSize}
-              >
-                Add to Bag
+              <button className="btn-buy-now" onClick={handleBuyNow}>
+                Mua ngay
               </button>
-              
-              <button 
-                className="favorite-btn"
-                onClick={handleFavorite}
-              >
-                ❤
+              <button className="btn-add-to-cart" onClick={handleAddToCart}>
+                Thêm vào giỏ
               </button>
             </div>
 
-            {/* Payment Info */}
-            <div className="payment-info">
-              <div className="klarna-info">
-                From ${(product.price / 4).toFixed(2)}/month, or 4 payments at 0% interest with Klarna
-                <Link to="/klarna" className="learn-more-link">Learn more</Link>
-              </div>
+            {/* Favorite & Share */}
+            <div className="product-utilities">
+              <button
+                className={`btn-favorite ${isFavorite ? 'active' : ''}`}
+                onClick={() => setIsFavorite(!isFavorite)}
+              >
+                {isFavorite ? <IoHeart size={20} /> : <IoHeartOutline size={20} />}
+                {isFavorite ? 'Bỏ yêu thích' : 'Yêu thích'}
+              </button>
+              <button className="btn-share">
+                <IoShareSocial size={20} />
+                Chia sẻ
+              </button>
             </div>
 
-            {/* Shipping Info */}
-            <div className="shipping-info">
-              <div className="shipping-item">
-                <span className="shipping-icon">🚚</span>
-                <div className="shipping-text">
-                  <div>Free Prime delivery and easy returns available</div>
-                  <Link to="/delivery" className="delivery-link">Get delivery dates</Link>
-                </div>
-              </div>
-              
-              <div className="shipping-item">
-                <span className="shipping-icon">⭐</span>
-                <div className="shipping-text">
-                  Free standard shipping with adiClub
-                </div>
-              </div>
-              
-              <div className="shipping-item">
-                <span className="shipping-icon">↩</span>
-                <div className="shipping-text">
-                  Free 30 day returns
-                </div>
-              </div>
-            </div>
-
-            {/* Product Description */}
-            <div className="product-description">
-              <h3>Product Details</h3>
-              <p>{product.description}</p>
-              
-              <h4>Features:</h4>
-              <ul className="features-list">
-                {product.features.map((feature, index) => (
-                  <li key={index}>{feature}</li>
+            {/* Product Benefits */}
+            <div className="product-benefits">
+              <h3>Ưu đãi đi kèm</h3>
+              <ul>
+                {product.benefits.map((benefit, index) => (
+                  <li key={index}>{benefit}</li>
                 ))}
               </ul>
             </div>
           </div>
         </div>
+
+        {/* Product Description */}
+        <div className="product-description">
+          <h2>Mô tả sản phẩm</h2>
+          <p>{product.description}</p>
+
+          <h3>Đặc điểm nổi bật:</h3>
+          <ul>
+            {product.features.map((feature, index) => (
+              <li key={index}>{feature}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Store Information */}
+        <div className="store-info">
+          <h2>Tìm sản phẩm tại hệ thống cửa hàng</h2>
+          <div className="store-grid">
+            <div className="store-item">
+              <IoLocation size={24} />
+              <div>
+                <h4>22 Lý Chiêu Hoàng, P.10, Q.6, TP.HCM</h4>
+                <p>Trụ sở chính</p>
+              </div>
+            </div>
+            <div className="store-item">
+              <IoTime size={24} />
+              <div>
+                <h4>8h - 21h30 (Trừ ngày Lễ, Tết)</h4>
+                <p>Giờ làm việc</p>
+              </div>
+            </div>
+            <div className="store-item">
+              <IoCall size={24} />
+              <div>
+                <h4>0966 158 666</h4>
+                <p>Hotline hỗ trợ</p>
+              </div>
+            </div>
+            <div className="store-item">
+              <IoMail size={24} />
+              <div>
+                <h4>chamsockhachhang@uthshoes.com</h4>
+                <p>Email hỗ trợ</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <Footer />
     </div>
   );
 }

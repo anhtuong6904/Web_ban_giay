@@ -1,0 +1,211 @@
+/* Collaboration Banner - Disney Stitch Style */
+.collaboration-banner {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #ff6b35 100%);
+  border-radius: 20px;
+  padding: 40px;
+  margin: 50px auto;
+  max-width: 1200px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.collaboration-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="tropical" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="2" fill="rgba(255,107,53,0.1)"/><circle cx="80" cy="80" r="2" fill="rgba(255,107,53,0.1)"/><circle cx="50" cy="10" r="1" fill="rgba(255,107,53,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23tropical)"/></svg>');
+  opacity: 0.3;
+}
+
+.collaboration-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 30px;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* Left Section - Brand Logo */
+.collab-left {
+  text-align: center;
+}
+
+.collab-brand-logo {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ff6b35;
+  margin-bottom: 15px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.collab-brand-subtitle {
+  font-size: 14px;
+  color: #2c3e50;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Center Section - Main Message */
+.collab-center {
+  text-align: center;
+}
+
+.collab-main-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #ff6b35;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  line-height: 1.2;
+}
+
+.collab-description {
+  font-size: 16px;
+  color: #2c3e50;
+  line-height: 1.6;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Right Section - Product Showcase */
+.collab-right {
+  text-align: center;
+}
+
+.collab-product-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.collab-product {
+  width: 120px;
+  height: 80px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.collab-product:hover {
+  transform: scale(1.05);
+}
+
+.collab-product.secondary {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+/* Decorative Elements */
+.collab-decoration {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 107, 53, 0.1);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite;
+}
+
+.collab-decoration:nth-child(1) {
+  top: -75px;
+  left: -75px;
+  animation-delay: 0s;
+}
+
+.collab-decoration:nth-child(2) {
+  top: -50px;
+  right: -75px;
+  animation-delay: 2s;
+}
+
+.collab-decoration:nth-child(3) {
+  bottom: -75px;
+  left: 50%;
+  animation-delay: 4s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(180deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .collaboration-banner {
+    margin: 40px 20px;
+  }
+  
+  .collaboration-content {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    text-align: center;
+  }
+  
+  .collab-main-title {
+    font-size: 32px;
+  }
+  
+  .collab-product-showcase {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .collaboration-banner {
+    margin: 30px 15px;
+    padding: 30px 20px;
+  }
+  
+  .collab-main-title {
+    font-size: 28px;
+  }
+  
+  .collab-description {
+    font-size: 14px;
+  }
+  
+  .collab-product {
+    width: 100px;
+    height: 70px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .collaboration-banner {
+    margin: 20px 10px;
+    padding: 25px 15px;
+  }
+  
+  .collab-main-title {
+    font-size: 24px;
+  }
+  
+  .collab-description {
+    font-size: 13px;
+  }
+  
+  .collab-product {
+    width: 80px;
+    height: 60px;
+    font-size: 11px;
+  }
+}

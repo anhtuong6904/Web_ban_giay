@@ -1,329 +1,68 @@
-{
-  "products": [
-    {
-      "id": 1,
-      "name": "Nike Air Max 270",
-      "brand": "Nike",
-      "category": "Running",
-      "price": 1500000,
-      "originalPrice": 1800000,
-      "discount": 17,
-      "description": "Giày thể thao Nike Air Max 270 với công nghệ Air Max đỉnh cao, phù hợp cho chạy bộ và thể thao hàng ngày.",
-      "features": [
-        "Công nghệ Air Max",
-        "Đế cao su bền bỉ",
-        "Thoáng khí",
-        "Nhẹ và êm ái"
-      ],
-      "sizes": [36, 37, 38, 39, 40, 41, 42, 43, 44],
-      "colors": [
-        {
-          "name": "Đen",
-          "code": "#000000",
-          "images": [
-            "/images/nike-airmax-270-black-1.jpg",
-            "/images/nike-airmax-270-black-2.jpg",
-            "/images/nike-airmax-270-black-3.jpg"
-          ]
-        },
-        {
-          "name": "Trắng",
-          "code": "#FFFFFF",
-          "images": [
-            "/images/nike-airmax-270-white-1.jpg",
-            "/images/nike-airmax-270-white-2.jpg",
-            "/images/nike-airmax-270-white-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/nike-airmax-270-black-1.jpg",
-      "rating": 4.5,
-      "reviews": 128,
-      "inStock": true,
-      "stockQuantity": 45,
-      "tags": ["running", "sport", "nike", "airmax"],
-      "createdAt": "2024-01-15T10:30:00Z",
-      "updatedAt": "2024-01-15T10:30:00Z"
-    },
-    {
-      "id": 2,
-      "name": "Adidas Ultraboost 22",
-      "brand": "Adidas",
-      "category": "Running",
-      "price": 2800000,
-      "originalPrice": 3200000,
-      "discount": 12,
-      "description": "Giày chạy bộ Adidas Ultraboost 22 với công nghệ Boost và Primeknit, mang lại cảm giác êm ái tối đa.",
-      "features": [
-        "Công nghệ Boost",
-        "Upper Primeknit",
-        "Đế Continental",
-        "Responsive cushioning"
-      ],
-      "sizes": [36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
-      "colors": [
-        {
-          "name": "Xanh dương",
-          "code": "#0066CC",
-          "images": [
-            "/images/adidas-ultraboost-blue-1.jpg",
-            "/images/adidas-ultraboost-blue-2.jpg",
-            "/images/adidas-ultraboost-blue-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/adidas-ultraboost-blue-1.jpg",
-      "rating": 4.8,
-      "reviews": 95,
-      "inStock": true,
-      "stockQuantity": 32,
-      "tags": ["running", "adidas", "ultraboost", "premium"],
-      "createdAt": "2024-01-10T14:20:00Z",
-      "updatedAt": "2024-01-10T14:20:00Z"
-    },
-    {
-      "id": 3,
-      "name": "Converse Chuck Taylor All Star",
-      "brand": "Converse",
-      "category": "Casual",
-      "price": 850000,
-      "originalPrice": 950000,
-      "discount": 11,
-      "description": "Giày canvas cổ điển Converse Chuck Taylor All Star, phù hợp cho mọi dịp và phong cách thời trang.",
-      "features": [
-        "Canvas bền bỉ",
-        "Đế cao su",
-        "Thiết kế cổ điển",
-        "Dễ phối đồ"
-      ],
-      "sizes": [35, 36, 37, 38, 39, 40, 41, 42, 43, 44],
-      "colors": [
-        {
-          "name": "Trắng",
-          "code": "#FFFFFF",
-          "images": [
-            "/images/converse-chuck-white-1.jpg",
-            "/images/converse-chuck-white-2.jpg",
-            "/images/converse-chuck-white-3.jpg"
-          ]
-        },
-        {
-          "name": "Đen",
-          "code": "#000000",
-          "images": [
-            "/images/converse-chuck-black-1.jpg",
-            "/images/converse-chuck-black-2.jpg",
-            "/images/converse-chuck-black-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/converse-chuck-white-1.jpg",
-      "rating": 4.3,
-      "reviews": 256,
-      "inStock": true,
-      "stockQuantity": 78,
-      "tags": ["casual", "converse", "classic", "canvas"],
-      "createdAt": "2024-01-05T09:15:00Z",
-      "updatedAt": "2024-01-05T09:15:00Z"
-    },
-    {
-      "id": 4,
-      "name": "Vans Old Skool",
-      "brand": "Vans",
-      "category": "Skateboarding",
-      "price": 1200000,
-      "originalPrice": 1400000,
-      "discount": 14,
-      "description": "Giày skateboard Vans Old Skool với thiết kế đặc trưng và độ bền cao, phù hợp cho trượt ván và thời trang đường phố.",
-      "features": [
-        "Canvas và suede",
-        "Đế cao su waffle",
-        "Thiết kế Sidestripe",
-        "Bền bỉ cho skateboarding"
-      ],
-      "sizes": [36, 37, 38, 39, 40, 41, 42, 43, 44],
-      "colors": [
-        {
-          "name": "Đen",
-          "code": "#000000",
-          "images": [
-            "/images/vans-oldskool-black-1.jpg",
-            "/images/vans-oldskool-black-2.jpg",
-            "/images/vans-oldskool-black-3.jpg"
-          ]
-        },
-        {
-          "name": "Xanh navy",
-          "code": "#000080",
-          "images": [
-            "/images/vans-oldskool-navy-1.jpg",
-            "/images/vans-oldskool-navy-2.jpg",
-            "/images/vans-oldskool-navy-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/vans-oldskool-black-1.jpg",
-      "rating": 4.6,
-      "reviews": 189,
-      "inStock": true,
-      "stockQuantity": 56,
-      "tags": ["skateboarding", "vans", "streetwear", "classic"],
-      "createdAt": "2024-01-12T11:45:00Z",
-      "updatedAt": "2024-01-12T11:45:00Z"
-    },
-    {
-      "id": 5,
-      "name": "New Balance 574",
-      "brand": "New Balance",
-      "category": "Lifestyle",
-      "price": 1600000,
-      "originalPrice": 1800000,
-      "discount": 11,
-      "description": "Giày lifestyle New Balance 574 với thiết kế retro và công nghệ ENCAP, mang lại sự thoải mái tối đa.",
-      "features": [
-        "Công nghệ ENCAP",
-        "Upper mesh và suede",
-        "Đế cao su",
-        "Thiết kế retro"
-      ],
-      "sizes": [36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
-      "colors": [
-        {
-          "name": "Xám",
-          "code": "#808080",
-          "images": [
-            "/images/newbalance-574-grey-1.jpg",
-            "/images/newbalance-574-grey-2.jpg",
-            "/images/newbalance-574-grey-3.jpg"
-          ]
-        },
-        {
-          "name": "Navy",
-          "code": "#000080",
-          "images": [
-            "/images/newbalance-574-navy-1.jpg",
-            "/images/newbalance-574-navy-2.jpg",
-            "/images/newbalance-574-navy-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/newbalance-574-grey-1.jpg",
-      "rating": 4.4,
-      "reviews": 203,
-      "inStock": true,
-      "stockQuantity": 67,
-      "tags": ["lifestyle", "newbalance", "retro", "comfortable"],
-      "createdAt": "2024-01-08T16:30:00Z",
-      "updatedAt": "2024-01-08T16:30:00Z"
-    },
-    {
-      "id": 6,
-      "name": "Jordan Air 1 Retro High",
-      "brand": "Nike",
-      "category": "Basketball",
-      "price": 3500000,
-      "originalPrice": 4000000,
-      "discount": 12,
-      "description": "Giày bóng rổ Jordan Air 1 Retro High với thiết kế huyền thoại và công nghệ Air-Sole, biểu tượng của văn hóa sneaker.",
-      "features": [
-        "Công nghệ Air-Sole",
-        "Upper leather premium",
-        "Đế cao su",
-        "Thiết kế huyền thoại"
-      ],
-      "sizes": [36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
-      "colors": [
-        {
-          "name": "Đen/Đỏ",
-          "code": "#000000",
-          "images": [
-            "/images/jordan-air1-black-red-1.jpg",
-            "/images/jordan-air1-black-red-2.jpg",
-            "/images/jordan-air1-black-red-3.jpg"
-          ]
-        },
-        {
-          "name": "Trắng/Đen",
-          "code": "#FFFFFF",
-          "images": [
-            "/images/jordan-air1-white-black-1.jpg",
-            "/images/jordan-air1-white-black-2.jpg",
-            "/images/jordan-air1-white-black-3.jpg"
-          ]
-        }
-      ],
-      "mainImage": "/images/jordan-air1-black-red-1.jpg",
-      "rating": 4.9,
-      "reviews": 342,
-      "inStock": true,
-      "stockQuantity": 28,
-      "tags": ["basketball", "jordan", "nike", "legendary", "sneaker"],
-      "createdAt": "2024-01-20T13:15:00Z",
-      "updatedAt": "2024-01-20T13:15:00Z"
-    }
-  ],
-  "categories": [
-    {
-      "id": 1,
-      "name": "Running",
-      "description": "Giày chạy bộ và thể thao",
-      "image": "/images/categories/running.jpg"
-    },
-    {
-      "id": 2,
-      "name": "Casual",
-      "description": "Giày thường ngày",
-      "image": "/images/categories/casual.jpg"
-    },
-    {
-      "id": 3,
-      "name": "Basketball",
-      "description": "Giày bóng rổ",
-      "image": "/images/categories/basketball.jpg"
-    },
-    {
-      "id": 4,
-      "name": "Skateboarding",
-      "description": "Giày trượt ván",
-      "image": "/images/categories/skateboarding.jpg"
-    },
-    {
-      "id": 5,
-      "name": "Lifestyle",
-      "description": "Giày thời trang",
-      "image": "/images/categories/lifestyle.jpg"
-    }
-  ],
-  "brands": [
-    {
-      "id": 1,
-      "name": "Nike",
-      "logo": "/images/brands/nike-logo.png",
-      "description": "Just Do It"
-    },
-    {
-      "id": 2,
-      "name": "Adidas",
-      "logo": "/images/brands/adidas-logo.png",
-      "description": "Impossible is Nothing"
-    },
-    {
-      "id": 3,
-      "name": "Converse",
-      "logo": "/images/brands/converse-logo.png",
-      "description": "Made by you"
-    },
-    {
-      "id": 4,
-      "name": "Vans",
-      "logo": "/images/brands/vans-logo.png",
-      "description": "Off The Wall"
-    },
-    {
-      "id": 5,
-      "name": "New Balance",
-      "logo": "/images/brands/newbalance-logo.png",
-      "description": "Fearlessly Independent"
-    }
-  ]
-} 
+[
+  {
+    "id": 1,
+    "Name": "Giày Thể Thao UTH Shoes Helio Teen Nam",
+    "MainImage": "/images/products/giay-the-thao-helio-teen-nam-den-main.jpg",
+    "Price": 595000,
+    "OriginalPrice": 750000,
+    "Discount": 21,
+    "Category": "Giày thể thao",
+    "Brand": "UTH Shoes",
+    "Colors": ["Đen", "Trắng", "Xanh"]
+  },
+  {
+    "id": 2,
+    "Name": "Giày Chạy Bộ UTH Shoes Runner Pro",
+    "MainImage": "/images/products/giay-chay-bo-runner-pro-main.jpg",
+    "Price": 850000,
+    "OriginalPrice": 1000000,
+    "Discount": 15,
+    "Category": "Giày chạy bộ",
+    "Brand": "UTH Shoes",
+    "Colors": ["Xanh dương", "Đỏ", "Đen"]
+  },
+  {
+    "id": 3,
+    "Name": "Giày Đá Banh UTH Shoes Football Elite",
+    "MainImage": "/images/products/giay-da-banh-football-elite-main.jpg",
+    "Price": 1200000,
+    "OriginalPrice": 1500000,
+    "Discount": 20,
+    "Category": "Giày đá banh",
+    "Brand": "UTH Shoes",
+    "Colors": ["Trắng", "Đen", "Vàng"]
+  },
+  {
+    "id": 4,
+    "Name": "Giày Tây UTH Shoes Business Classic",
+    "MainImage": "/images/products/giay-tay-business-classic-main.jpg",
+    "Price": 950000,
+    "OriginalPrice": 1200000,
+    "Discount": 21,
+    "Category": "Giày tây",
+    "Brand": "UTH Shoes",
+    "Colors": ["Đen", "Nâu", "Xanh đen"]
+  },
+  {
+    "id": 5,
+    "Name": "Dép UTH Shoes Comfort Slide",
+    "MainImage": "/images/products/dep-comfort-slide-main.jpg",
+    "Price": 250000,
+    "OriginalPrice": 350000,
+    "Discount": 29,
+    "Category": "Dép",
+    "Brand": "UTH Shoes",
+    "Colors": ["Đen", "Trắng", "Xanh"]
+  },
+  {
+    "id": 6,
+    "Name": "Giày Búp Bê UTH Shoes Princess",
+    "MainImage": "/images/products/giay-bup-be-princess-main.jpg",
+    "Price": 450000,
+    "OriginalPrice": 600000,
+    "Discount": 25,
+    "Category": "Giày búp bê",
+    "Brand": "UTH Shoes",
+    "Colors": ["Hồng", "Trắng", "Đỏ"]
+  }
+] 

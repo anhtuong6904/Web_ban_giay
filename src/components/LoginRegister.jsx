@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { auth } from '../services/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { useAuth } from '../contexts/AuthContext';
 import './LoginRegister.css';
 
 export default function LoginRegister() {
@@ -9,30 +10,62 @@ export default function LoginRegister() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // Lấy username từ email nếu không có displayName
+        const displayName = user.displayName || email.split('@')[0];
+        
+        const userInfo = {
+          uid: user.uid,
+          email: user.email,
+          displayName: displayName,
+          photoURL: user.photoURL
+        };
+        
+        login(userInfo);
         alert('Đăng nhập thành công!');
+        navigate('/home');
       } else {
         if (password !== confirmPassword) {
           alert('Mật khẩu không khớp!');
           return;
         }
-        await createUserWithEmailAndPassword(auth, email, password);
+        
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // Sử dụng username người dùng nhập hoặc lấy từ email
+        const displayName = username || email.split('@')[0];
+        
+        const userInfo = {
+          uid: user.uid,
+          email: user.email,
+          displayName: displayName,
+          photoURL: user.photoURL
+        };
+        
+        login(userInfo);
         alert('Đăng ký thành công!');
+        navigate('/home');
       }
     } catch (error) {
       alert(error.message);
     }
+    
+    // Reset form
     setEmail('');
     setPassword('');
     setConfirmPassword('');
-    // Redirect to home page after login/register
-    window.location.href = '/home';
-    
+    setUsername('');
   };
 
   return (
@@ -41,6 +74,19 @@ export default function LoginRegister() {
         <h1>{isLogin ? 'Đăng Nhập' : 'Đăng Ký'}</h1>
       </div>
       <form className="login-register-form" onSubmit={handleSubmit}>
+        {!isLogin && (
+          <div className="form-group">
+            <label htmlFor="username">Tên người dùng:</label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Nhập tên người dùng (tùy chọn)"
+            />
+          </div>
+        )}
+
         <div className="form-group">
           <label htmlFor="email">Email:</label>
           <input
