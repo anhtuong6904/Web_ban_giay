@@ -1,116 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import './ProductList.css';
+import { useEffect, useState } from "react";
 
-export default function ProductList() {
+function ProductList() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/products')
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data);
-        setLoading(false);
+    fetch("http://localhost:5000/api/products")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Server error: " + res.status);
+        }
+        return res.json();
       })
-      .catch(err => {
-        console.error('Error fetching products:', err);
-        setLoading(false);
-      });
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          setError("API did not return an array");
+        }
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
-  const formatPrice = (price) => {
-    return price.toLocaleString('vi-VN');
-  };
+  if (loading) return <div>Loading products...</div>;
+  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
 
-  const calculateDiscountedPrice = (originalPrice, discount) => {
-    return originalPrice - (originalPrice * discount / 100);
-  };
-
-  if (loading) {
-    return (
-      <div className="loading">
-        <div className="loading-spinner"></div>
-        <p>Đang tải sản phẩm...</p>
-      </div>
-    );
-  }
+  const formatPrice = (price) => price.toLocaleString("vi-VN") + "₫";
 
   return (
-    <div className="products-section">
-      <div className="products-container">
-        {/* Filter & Sort Button */}
-        <div className="products-header">
-          <button className="filter-sort-btn">
-            <i className="fas fa-bars"></i>
-            FILTER & SORT
-          </button>
-        </div>
-
-        {/* Products Grid */}
-        <div className="products-grid">
-          {products.map(product => (
-            <Link 
-              key={product.ProductID} 
-              to={`/product/${product.ProductID}`}
-              className="product-card-link"
-            >
-              <div className="product-card">
-                <div className="product-image">
-                  <img src={product.MainImage} alt={product.Name} />
-                  {product.Discount > 0 && (
-                    <div className="discount-badge">
-                      -{product.Discount}%
-                    </div>
-                  )}
-                </div>
-                
-                <div className="product-info">
-                  <div className="product-price">
-                    <span className="current-price">
-                      {formatPrice(product.Price)}₫
-                    </span>
-                    {product.OriginalPrice && product.OriginalPrice > product.Price && (
-                      <span className="original-price">
-                        {formatPrice(product.OriginalPrice)}₫
-                      </span>
-                    )}
-                  </div>
-                  
-                  <h3 className="product-name">{product.Name}</h3>
-                  
-                  <div className="product-category">
-                    {product.CategoryID === 1 && "Running"}
-                    {product.CategoryID === 2 && "Casual"}
-                    {product.CategoryID === 3 && "Basketball"}
-                    {product.CategoryID === 4 && "Skateboarding"}
-                    {product.CategoryID === 5 && "Lifestyle"}
-                  </div>
-                  
-                  <div className="product-colors">
-                    {product.ProductID === 1 && "2 colours"}
-                    {product.ProductID === 2 && "1 colour"}
-                    {product.ProductID === 3 && "2 colours"}
-                    {product.ProductID === 4 && "2 colours"}
-                    {product.ProductID === 5 && "2 colours"}
-                    {product.ProductID === 6 && "2 colours"}
-                  </div>
-                  
-                  <div className="member-offer">
-                    Extra 10% off for adiclub members
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Pagination */}
-        <div className="pagination">
-          <span>Page: 1 of 92</span>
-          <button className="next-btn">NEXT</button>
-        </div>
-      </div>
-    </div>
+    <ul>
+      {products.map((p, index) => (
+        <li key={p.ProductID || index}>
+          {p.Name} - {formatPrice(p.Price)}
+        </li>
+      ))}
+    </ul>
   );
 }
+
+export default ProductList;

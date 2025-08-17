@@ -1,9 +1,9 @@
 // backend/routes/payment.ts
 import { VNPay } from 'vnpay'; // ✅ Import đầy đủ trên backend
-import defaultconfig from '../data/vnpay.json' 
+
 const vnpay = new VNPay({
-  tmnCode: defaultconfig.tmnCode,
-  secureSecret: defaultconfig.secureSecret,
+  tmnCode: process.env.vnp_TmnCode,
+  secureSecret: process.env.vnp_HashSecret,
   testMode: true
 });
 

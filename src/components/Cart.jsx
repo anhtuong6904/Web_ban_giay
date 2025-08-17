@@ -3,34 +3,34 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import './Cart.css';
 import { Link } from 'react-router-dom';
 import { GiCancel } from "react-icons/gi";
+import { formatPrice } from '../utils/formatPrice';  // ✅ import hàm format
 
-
-export default function  Cart({ onClose, isPopup = false }) {
-
+export default function Cart({ onClose, isPopup = false }) {
   const [cartItems, setCartItems] = useState([
     {
       id: 1,
-      name: "Running Shoes",
-      price: 59.99,
+      name: "Giày chạy bộ",
+      price: 599000,
       quantity: 2,
       image: "/images/cart/shoes1.jpg"
     },
     {
       id: 2,
-      name: "Basketball Sneakers",
-      price: 89.99,
+      name: "Giày bóng rổ",
+      price: 899000,
       quantity: 1,
       image: "/images/cart/shoes2.jpg"
     },
     {
       id: 3,
-      name: "Casual Sneakers",
-      price: 49.99,
+      name: "Giày sneaker thường ngày",
+      price: 499000,
       quantity: 3,
       image: "/images/cart/shoes3.jpg"
     }
   ]);
-const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const handleQuantityChange = (id, newQuantity) => {
     if (newQuantity < 1) return;
@@ -48,17 +48,15 @@ const totalPrice = cartItems.reduce((total, item) => total + item.price * item.q
 
   return (
     <div className="cart-section">
-      {/* Header (chỉ hiện khi popup) */}
-      
+      {/* Header (popup) */}
       {isPopup && (
-      <div className="cart-header">
-        <button className="cart-back-btn" onClick={onClose}>
-          <GiCancel size={24} />
-        </button>
-        <h2>YOUR CART</h2>
-      </div>
+        <div className="cart-header">
+          <button className="cart-back-btn" onClick={onClose}>
+            <GiCancel size={24} />
+          </button>
+          <h2>GIỎ HÀNG</h2>
+        </div>
       )}
-      
 
       {/* Danh sách sản phẩm */}
       <div className="cart-items">
@@ -67,9 +65,9 @@ const totalPrice = cartItems.reduce((total, item) => total + item.price * item.q
             <img src={item.image} alt={item.name} />
             <div className="item-details">
               <h3>{item.name}</h3>
-              <p>Price: ${item.price.toFixed(2)}</p>
+              <p>Giá: {formatPrice(item.price)}</p>
               <div className="quantity-control">
-                <p>Quantity: </p>
+                <p>Số lượng: </p>
                 <input
                   type="number"
                   value={item.quantity}
@@ -78,7 +76,7 @@ const totalPrice = cartItems.reduce((total, item) => total + item.price * item.q
                   onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value))}
                 />
               </div>
-              <p>Total: ${(item.price * item.quantity).toFixed(2)}</p>
+              <p>Tạm tính: {formatPrice(item.price * item.quantity)}</p>
             </div>
             <button className='btn-deleteitem' onClick={() => handleRemoveItem(item.id)}>
               <RiDeleteBinLine size={20} />
@@ -89,14 +87,14 @@ const totalPrice = cartItems.reduce((total, item) => total + item.price * item.q
 
       <br />
       <div className="cart-total">
-        <h3>Total Price: ${totalPrice.toFixed(2)}</h3>
+        <h3>Tổng cộng: {formatPrice(totalPrice)}</h3>
       </div>
 
-      {/* Cart actions (chỉ hiện khi popup) */}
+      {/* Cart actions (popup) */}
       {isPopup && (
         <div className="cart-actions">
           <Link to="/payment" className="checkout-btn">
-            Order now
+            Đặt hàng ngay
           </Link>
         </div>
       )}
