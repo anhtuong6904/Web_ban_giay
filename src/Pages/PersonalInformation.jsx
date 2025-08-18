@@ -6,7 +6,7 @@ import Footer from '../components/Footer';
 function PersonalInformationPage() {
   return (
     <div style={{ minHeight: '100vh' }}>
-      <Header />
+      {/* <Header /> */}
       <PersonalInformation />
       <Footer />
     </div>

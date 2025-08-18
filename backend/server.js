@@ -6,6 +6,50 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const { VNPay } = require('vnpay');
+require('dotenv').config();
+
+const vnpay = new VNPay({
+  tmnCode: process.env.VNP_TMNCODE,
+  secureSecret: process.env.VNP_HASHSECRET,
+  testMode: true
+});
+
+// API tạo thanh toán
+app.post('/api/payments/create', (req, res) => {
+  try {
+    const { amount, orderInfo } = req.body;
+
+    const paymentUrl = vnpay.buildPaymentUrl({
+      vnp_Amount: amount * 100, // VNPay yêu cầu nhân 100
+      vnp_IpAddr: req.ip,
+      vnp_ReturnUrl: `${process.env.APP_URL}/api/payments/verify`,
+      vnp_TxnRef: `ORDER_${Date.now()}`,
+      vnp_OrderInfo: orderInfo,
+    });
+
+    res.json({ success: true, paymentUrl });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// API xác thực thanh toán từ VNPay trả về
+app.get('/api/payments/verify', (req, res) => {
+  try {
+    const verification = vnpay.verifyReturnUrl(req.query);
+    if (verification.isVerified) {
+      res.json({ success: true, data: verification });
+    } else {
+      res.status(400).json({ success: false, message: 'Invalid signature' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
+
 // Test endpoint để kiểm tra server
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend server is running!' });

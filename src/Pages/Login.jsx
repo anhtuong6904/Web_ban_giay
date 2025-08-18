@@ -7,9 +7,9 @@ function Login(){
     
     return (
     <div style={{ minHeight: '100vh' }}>
-        <Header />
+        
         <LoginRegister/>
-        <Footer />
+        
     </div>
     );
     

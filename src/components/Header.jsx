@@ -1,31 +1,24 @@
-<<<<<<< HEAD
-import React, { useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { IoPerson } from "react-icons/io5";
-import Cart from './Cart';
-import './Header.css';
 
-export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cartVisible, setCartVisible] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const location = useLocation();
-=======
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { IoPerson, IoSearch, IoCart, IoFlag } from 'react-icons/io5';
+import { MdOutlineShoppingCart } from "react-icons/md";
+import Cart from './Cart';
 import './Header.css';
 
 export default function Header() {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cartVisible, setCartVisible] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     navigate('/home');
   };
->>>>>>> 0f76abe901858f46646ba3533d9c0d0af3c8a0e9
 
 
   const handleCartOpen = () => {
@@ -78,24 +71,19 @@ export default function Header() {
             <li><Link to="/brands">BRANDS</Link></li>
             <li><Link to="/sale" style={{ color: '#e74c3c', fontWeight: '700' }}>BACK TO SCHOOL SALE</Link></li>
           </nav>
+          {/* Cart */}
+            
 
           {/* Header Actions */}
           <div className="header-actions">
             <Link to="/help" className="header-link">Help</Link>
-<<<<<<< HEAD
-            <Link to="/tracker" className="header-link">Order Tracker</Link>
 
-            {/* Search, Cart, Flag buttons */}
-            <Link to="/login" className="person-btn">
-              <IoPerson className="person-icon" color="#000000" />
-            </Link>
-            <button className="search-btn">
-              <i className="fas fa-search"></i>
-            </button>
-            <button className="cart-btn" onClick={handleCartOpen}>
-              <i className="fas fa-shopping-cart"></i>
-=======
             <Link to="/order-tracker" className="header-link">Order Tracker</Link>
+
+            <button className="cart-btn" onClick={handleCartOpen}>
+              <MdOutlineShoppingCart />
+              <span className="cart-count">1</span>
+            </button> 
             
             {currentUser ? (
               <Link to="/profile" className="profile-link">
@@ -118,36 +106,20 @@ export default function Header() {
               />
               <IoSearch className="search-icon" size={18} />
             </div>
+            
 
-            {/* Cart */}
-            <div className="cart-icon">
-              <IoCart size={20} />
->>>>>>> 0f76abe901858f46646ba3533d9c0d0af3c8a0e9
-              <span className="cart-count">1</span>
+           
+
+            {/* Language Selector */}
+            <div className="language-selector">
+              <IoFlag size={16} />
+              <span>VN</span>
             </div>
+            
 
-<<<<<<< HEAD
-          {/* Mobile menu button */}
-          <button
-            className="mobile-menu-btn"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+          </div>
         </div>
       </div>
-
-      {/* Breadcrumb */}
-      {location.pathname !== '/home' && (
-        <div className="breadcrumb">
-          <Link to="/home" className="back-btn">
-            ← BACK Home / season sale
-          </Link>
-        </div>
-      )}
-
       {/* Cart popup */}
       {cartVisible && (
         <>
@@ -163,17 +135,6 @@ export default function Header() {
           </div>
         </>
       )}
-
-=======
-            {/* Language Selector */}
-            <div className="language-selector">
-              <IoFlag size={16} />
-              <span>VN</span>
-            </div>
-          </div>
-        </div>
-      </div>
->>>>>>> 0f76abe901858f46646ba3533d9c0d0af3c8a0e9
     </header>
   );
 }

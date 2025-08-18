@@ -93,7 +93,7 @@ export default function Cart({ onClose, isPopup = false }) {
       {/* Cart actions (popup) */}
       {isPopup && (
         <div className="cart-actions">
-          <Link to="/payment" className="checkout-btn">
+          <Link to="/payment" className="checkout-btn" onClick={onClose}>
             Đặt hàng ngay
           </Link>
         </div>

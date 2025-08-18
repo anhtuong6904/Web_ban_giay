@@ -4,7 +4,6 @@ import Footer from '../components/Footer'; // Giả sử bạn có Footer trong 
 function PaymentPage() {
   return (
     <div>
-        <Header/>
         <Recipient/>
         <Footer/>
     </div>
