@@ -78,17 +78,12 @@
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   transition: all 0.3s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .product-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-}
-
-.product-card-link {
-  text-decoration: none;
-  color: inherit;
-  display: block;
 }
 
 /* Product Image */
@@ -123,6 +118,59 @@
   padding: 20px;
 }
 
+/* Banner khuyến mãi chính */
+.main-promo-banner {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  z-index: 3;
+  max-width: 80px;
+}
+
+.promo-text {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.promo-main {
+  font-size: 8px;
+  line-height: 1.2;
+}
+
+.promo-sub {
+  font-size: 7px;
+  line-height: 1.1;
+  opacity: 0.9;
+}
+
+/* Banner khuyến mãi (MỚI, HOT) */
+.promo-banner {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  z-index: 2;
+  color: white;
+}
+
+.promo-banner.new {
+  background: #27ae60;
+}
+
+.promo-banner.hot {
+  background: #e74c3c;
+}
+
 /* Discount Badge */
 .discount-badge {
   position: absolute;
@@ -134,15 +182,149 @@
   border-radius: 20px;
   font-size: 12px;
   font-weight: 700;
-  z-index: 2;
-  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  min-width: 40px;
+  text-align: center;
 }
 
 /* Product Info */
 .product-info {
   padding: 20px;
+  position: relative;
 }
 
+/* Tag độc quyền online */
+.exclusive-tag {
+  position: absolute;
+  top: -15px;
+  left: 20px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  line-height: 1.2;
+  z-index: 2;
+}
+
+/* Banner khuyến mãi dưới */
+.bottom-promo-banner {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.bottom-promo-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><path d="M0,10 Q25,0 50,10 T100,10" stroke="rgba(255,255,255,0.3)" fill="none" stroke-width="2"/></svg>') repeat-x;
+  opacity: 0.3;
+}
+
+.promo-dates {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.promo-offer {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+/* Thông tin sản phẩm */
+.product-details {
+  margin-top: 15px;
+}
+
+/* Màu sắc */
+.color-options {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.color-swatch.active {
+  border-color: #3498db;
+  transform: scale(1.1);
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+/* Tên sản phẩm */
+.product-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Đánh giá sao */
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.stars i {
+  font-size: 14px;
+  color: #ddd;
+}
+
+.stars i.filled {
+  color: #f39c12;
+}
+
+.stars i.half-filled {
+  color: #f39c12;
+}
+
+.stars i.empty {
+  color: #ddd;
+}
+
+.review-count {
+  font-size: 12px;
+  color: #7f8c8d;
+}
+
+/* Giá cả */
 .product-price {
   display: flex;
   align-items: center;
@@ -160,32 +342,6 @@
   font-size: 16px;
   color: #7f8c8d;
   text-decoration: line-through;
-  font-weight: 500;
-}
-
-.product-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 8px;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.product-category {
-  font-size: 12px;
-  color: #7f8c8d;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.product-colors {
-  font-size: 12px;
-  color: #95a5a6;
   font-weight: 500;
 }
 

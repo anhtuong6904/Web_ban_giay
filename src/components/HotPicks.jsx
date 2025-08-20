@@ -1,16 +1,87 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { allProducts } from '../data/allProducts';
+import { getProducts } from '../services/productService';
 import './HotPicks.css';
 
 export default function HotPicks() {
-  // Tạm thời chọn 3 sản phẩm đầu tiên làm HOT PICKS
-  // Khi có dữ liệu thực tế, sẽ thay bằng logic chọn sản phẩm có lượt bán cao nhất
-  const hotPicksProducts = allProducts.slice(0, 3);
+  const [hotPicksProducts, setHotPicksProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHotPicks = async () => {
+      try {
+        const allProducts = await getProducts();
+        // Lấy 3 sản phẩm có rating cao nhất hoặc bán chạy nhất
+        const topProducts = allProducts
+          .sort((a, b) => (b.Rating || 0) - (a.Rating || 0))
+          .slice(0, 3);
+        setHotPicksProducts(topProducts);
+      } catch (error) {
+        console.error('Lỗi khi tải sản phẩm hot picks:', error);
+        // Fallback: tạo 3 sản phẩm mẫu từ database mới
+        setHotPicksProducts([
+          {
+            ProductID: 4,
+            Name: "Nike Air Max 90",
+            MainImage: "/images/products/giay-the-thao-1.jpg",
+            Price: 3007807,
+            OriginalPrice: 3669525,
+            Discount: 18,
+            Category: "Lifestyle",
+            Brand: "Nike",
+            Rating: 5.0
+          },
+          {
+            ProductID: 16,
+            Name: "Adidas Superstar",
+            MainImage: "/images/products/giay-the-thao-2.jpg",
+            Price: 2968871,
+            OriginalPrice: 3562645,
+            Discount: 17,
+            Category: "Casual",
+            Brand: "Adidas",
+            Rating: 4.9
+          },
+          {
+            ProductID: 25,
+            Name: "Converse Chuck Taylor All Star",
+            MainImage: "/images/products/giay-the-thao-3.jpg",
+            Price: 826197,
+            OriginalPrice: 950127,
+            Discount: 13,
+            Category: "Casual",
+            Brand: "Converse",
+            Rating: 4.7
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHotPicks();
+  }, []);
 
   const formatPrice = (price) => {
     return price.toLocaleString('vi-VN') + ' ₫';
   };
+
+  if (loading) {
+    return (
+      <section className="hot-picks-section">
+        <div className="hot-picks-container">
+          <div className="hot-picks-header">
+            <h2>🔥 HOT PICKS</h2>
+            <p>Sản phẩm bán chạy nhất tuần này</p>
+          </div>
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Đang tải sản phẩm hot picks...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="hot-picks-section">
@@ -22,8 +93,8 @@ export default function HotPicks() {
 
         <div className="hot-picks-grid">
           {hotPicksProducts.map((product) => (
-            <div key={product.id} className="hot-pick-card">
-              <Link to={`/product/${product.id}`} className="hot-pick-link">
+            <div key={product.ProductID || product.id} className="hot-pick-card">
+              <Link to={`/product/${product.ProductID || product.id}`} className="hot-pick-link">
                 <div className="hot-pick-image-container">
                   <img
                     src={product.MainImage}
@@ -75,14 +146,10 @@ export default function HotPicks() {
                     )}
                   </div>
 
-                  <div className="hot-pick-colors">
-                    {product.Colors.slice(0, 3).join(', ')}
-                  </div>
-
                   <div className="hot-pick-stats">
                     <span className="sales-count">
                       <i className="fas fa-chart-line"></i>
-                      Bán chạy
+                      Rating: {product.Rating || 'N/A'}
                     </span>
                   </div>
                 </div>

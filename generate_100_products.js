@@ -410,13 +410,25 @@ const fs = require('fs');
 fs.writeFileSync('100_products.json', JSON.stringify(products, null, 2));
 console.log('Đã lưu danh sách sản phẩm vào file 100_products.json');
 
-// Tạo file SQL
+// Tạo file SQL (đảm bảo Unicode với tiền tố N cho NVARCHAR)
 let sqlContent = '-- Script thêm 100 sản phẩm cho database shopgiay\n';
 sqlContent += 'USE [shopgiay]\nGO\n\n';
 
+function escapeSqlUnicode(text) {
+  return String(text).replace(/'/g, "''");
+}
+
 products.forEach(product => {
+  const name = escapeSqlUnicode(product.Name);
+  const brand = escapeSqlUnicode(product.Brand);
+  const category = escapeSqlUnicode(product.Category);
+  const description = escapeSqlUnicode(product.Description);
+  const mainImage = escapeSqlUnicode(product.MainImage);
+  const thumbnailImages = escapeSqlUnicode(JSON.stringify(product.Images.slice(1)));
+  const detailImages = escapeSqlUnicode(JSON.stringify(product.Images));
+
   sqlContent += `INSERT INTO [dbo].[Products] ([Name], [BrandID], [CategoryID], [Price], [OriginalPrice], [Discount], [Description], [MainImage], [ThumbnailImages], [DetailImages], [InStock], [StockQuantity])\n`;
-  sqlContent += `VALUES ('${product.Name}', (SELECT [BrandID] FROM [dbo].[Brands] WHERE [Name] = '${product.Brand}'), (SELECT [CategoryID] FROM [dbo].[Categories] WHERE [Name] = '${product.Category}'), ${product.Price}, ${product.OriginalPrice}, ${product.Discount}, '${product.Description}', '${product.MainImage}', '${JSON.stringify(product.Images.slice(1))}', '${JSON.stringify(product.Images)}', 1, ${Math.floor(Math.random() * 50) + 50});\n\n`;
+  sqlContent += `VALUES (N'${name}', (SELECT [BrandID] FROM [dbo].[Brands] WHERE [Name] = N'${brand}'), (SELECT [CategoryID] FROM [dbo].[Categories] WHERE [Name] = N'${category}'), ${product.Price}, ${product.OriginalPrice}, ${product.Discount}, N'${description}', N'${mainImage}', N'${thumbnailImages}', N'${detailImages}', 1, ${Math.floor(Math.random() * 50) + 50});\n\n`;
 });
 
 fs.writeFileSync('insert_100_products.sql', sqlContent);

@@ -1,29 +1,95 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { allProducts } from '../data/allProducts';
+import { getProducts } from '../services/productService';
 import './NewProducts.css';
 
 export default function NewProducts() {
-  // Tạm thời chọn 3 sản phẩm cuối cùng làm sản phẩm mới
-  // Khi có dữ liệu thực tế, sẽ thay bằng logic chọn sản phẩm mới nhất
-  const newProducts = allProducts.slice(-3).reverse();
+  const [newProducts, setNewProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNewProducts = async () => {
+      try {
+        const allProducts = await getProducts();
+        // Lấy 3 sản phẩm mới nhất (có thể sort theo CreatedAt hoặc lấy cuối mảng)
+        const latestProducts = allProducts.slice(-3).reverse();
+        setNewProducts(latestProducts);
+      } catch (error) {
+        console.error('Lỗi khi tải sản phẩm mới:', error);
+        // Fallback: tạo 3 sản phẩm mẫu từ database mới
+        setNewProducts([
+          {
+            ProductID: 1,
+            Name: "Nike Air Zoom Pegasus 40",
+            MainImage: "/images/products/giay-the-thao-1.jpg",
+            Price: 1004719,
+            OriginalPrice: 1145380,
+            Discount: 12,
+            Category: "Running",
+            Brand: "Nike"
+          },
+          {
+            ProductID: 2,
+            Name: "Nike Air Force 1",
+            MainImage: "/images/products/giay-the-thao-2.jpg",
+            Price: 2599013,
+            OriginalPrice: 2936885,
+            Discount: 12,
+            Category: "Casual",
+            Brand: "Nike"
+          },
+          {
+            ProductID: 3,
+            Name: "Nike Air Max 270",
+            MainImage: "/images/products/giay-the-thao-3.jpg",
+            Price: 2095239,
+            OriginalPrice: 2619049,
+            Discount: 20,
+            Category: "Lifestyle",
+            Brand: "Nike"
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNewProducts();
+  }, []);
 
   const formatPrice = (price) => {
     return price.toLocaleString('vi-VN') + ' ₫';
   };
+
+  if (loading) {
+    return (
+      <section className="new-products-section">
+        <div className="new-products-container">
+          <div className="new-products-header">
+            <h2>🆕 SẢN PHẨM MỚI</h2>
+            <p>Những sản phẩm mới nhất từ các thương hiệu hàng đầu</p>
+          </div>
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Đang tải sản phẩm mới...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="new-products-section">
       <div className="new-products-container">
         <div className="new-products-header">
           <h2>🆕 SẢN PHẨM MỚI</h2>
-          <p>Những sản phẩm mới nhất từ UTH Shoes</p>
+          <p>Những sản phẩm mới nhất từ các thương hiệu hàng đầu</p>
         </div>
 
         <div className="new-products-grid">
           {newProducts.map((product) => (
-            <div key={product.id} className="new-product-card">
-              <Link to={`/product/${product.id}`} className="new-product-link">
+            <div key={product.ProductID || product.id} className="new-product-card">
+              <Link to={`/product/${product.ProductID || product.id}`} className="new-product-link">
                 <div className="new-product-image-container">
                   <img
                     src={product.MainImage}
@@ -73,10 +139,6 @@ export default function NewProducts() {
                     {product.OriginalPrice > product.Price && (
                       <span className="original-price">{formatPrice(product.OriginalPrice)}</span>
                     )}
-                  </div>
-
-                  <div className="new-product-colors">
-                    {product.Colors.slice(0, 3).join(', ')}
                   </div>
 
                   <div className="new-product-stats">

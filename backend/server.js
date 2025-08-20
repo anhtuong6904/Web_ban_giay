@@ -98,10 +98,10 @@ app.get('/api/products/:id', async (req, res) => {
     const { id } = req.params;
     
     // Query đơn giản hơn, không join với bảng khác
-    const query = 'SELECT * FROM Products WHERE ProductID = @ProductID';
+    const query = `SELECT * FROM Products WHERE ProductID = ${parseInt(id)}`;
     console.log('Executing query:', query);
     
-    const result = await sql.query(query, { ProductID: parseInt(id) });
+    const result = await sql.query(query);
     console.log(`Found ${result.recordset.length} products with ID ${id}`);
     
     if (result.recordset.length === 0) {

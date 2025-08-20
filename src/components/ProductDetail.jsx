@@ -1,29 +1,118 @@
-import React, { useState, useEffect } from 'react';
-import { IoHeart, IoHeartOutline, IoShareSocial, IoLocation, IoTime, IoCall, IoMail, IoStar } from 'react-icons/io5';
-import { Link, useParams } from 'react-router-dom';
-import { allProducts } from '../data/allProducts';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { IoHeart, IoHeartOutline, IoShareSocial, IoLocation, IoTime, IoCall, IoMail, IoArrowBack, IoArrowForward } from 'react-icons/io5';
+import { getProductById, getProducts } from '../services/productService';
 import './ProductDetail.css';
 
 export default function ProductDetail() {
-  const { id } = useParams(); // Lấy ID từ URL params
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('Đen');
+  const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [newComment, setNewComment] = useState('');
-  const [userRating, setUserRating] = useState(0); // Bắt đầu với 0 sao để người dùng phải chọn
-  const [hoverRating, setHoverRating] = useState(0); // Để hiển thị preview khi hover
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('description');
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const relatedProductsRef = useRef(null);
 
-  // Lấy thông tin sản phẩm theo ID từ URL
-  const getProductById = (productId) => {
-    const product = allProducts.find(p => p.id === parseInt(productId));
-    console.log('Looking for product with ID:', productId);
-    console.log('Found product:', product);
-    return product;
-  };
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        console.log('Fetching product with ID:', id);
+        const productData = await getProductById(id);
+        console.log('Product data received:', productData);
+        setProduct(productData);
+        
+        // Set default color nếu có
+        if (productData.Colors && productData.Colors.length > 0) {
+          setSelectedColor(productData.Colors[0]);
+        }
+      } catch (err) {
+        console.error('Lỗi khi lấy thông tin sản phẩm:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const currentProduct = getProductById(id);
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
+
+  // Cuộn lên đầu trang khi product ID thay đổi
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [id]);
+
+  // Fetch related products
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      try {
+        const allProducts = await getProducts();
+        // Lọc ra 5 sản phẩm khác với sản phẩm hiện tại
+        const filtered = allProducts.filter(p => 
+          (p.ProductID || p.id) !== (product?.ProductID || product?.id)
+        );
+        // Lấy 5 sản phẩm đầu tiên
+        setRelatedProducts(filtered.slice(0, 5));
+      } catch (error) {
+        console.error('Lỗi khi tải sản phẩm liên quan:', error);
+        // Fallback: tạo 5 sản phẩm mẫu
+        setRelatedProducts([
+          {
+            id: 101,
+            Name: "Giày Thể Thao UTH Shoes Runner Pro",
+            MainImage: "/images/products/giay-the-thao-2.jpg",
+            Price: 850000,
+            OriginalPrice: 1000000,
+            Discount: 15
+          },
+          {
+            id: 102,
+            Name: "Giày Thể Thao UTH Shoes Air Max",
+            MainImage: "/images/products/giay-the-thao-3.jpg",
+            Price: 950000,
+            OriginalPrice: 1200000,
+            Discount: 20
+          },
+          {
+            id: 103,
+            Name: "Giày Thể Thao UTH Shoes Ultra Boost",
+            MainImage: "/images/products/giay-the-thao-1.jpg",
+            Price: 750000,
+            OriginalPrice: 900000,
+            Discount: 16
+          },
+          {
+            id: 104,
+            Name: "Giày Thể Thao UTH Shoes Zoom",
+            MainImage: "/images/products/giay-the-thao-2.jpg",
+            Price: 800000,
+            OriginalPrice: 1000000,
+            Discount: 20
+          },
+          {
+            id: 105,
+            Name: "Giày Thể Thao UTH Shoes React",
+            MainImage: "/images/products/giay-the-thao-3.jpg",
+            Price: 900000,
+            OriginalPrice: 1100000,
+            Discount: 18
+          }
+        ]);
+      }
+    };
+
+    if (product) {
+      fetchRelatedProducts();
+    }
+  }, [product]);
 
   // Tự động scroll lên đầu trang khi component mount
   useEffect(() => {
@@ -146,63 +235,181 @@ export default function ProductDetail() {
 
   const [comments, setComments] = useState(sampleComments);
 
-  // Lấy 3 sản phẩm liên quan (cùng category hoặc brand)
-  const getRelatedProducts = () => {
-    // Sử dụng thông tin từ sản phẩm hiện tại thay vì cố định
-    const currentProductCategory = currentProduct.Category;
-    const currentProductBrand = currentProduct.Brand;
-    
-    console.log('=== DEBUG RELATED PRODUCTS ===');
-    console.log('Đang tìm sản phẩm liên quan cho:', currentProduct.Name);
-    console.log('Category:', currentProductCategory);
-    console.log('Brand:', currentProductBrand);
-    console.log('Tổng số sản phẩm:', allProducts.length);
-    console.log('allProducts[0]:', allProducts[0]);
-    
-    // Lọc sản phẩm cùng category hoặc brand, loại trừ sản phẩm hiện tại
-    const related = allProducts.filter(p => {
-      const matchesCategory = p.Category === currentProductCategory;
-      const matchesBrand = p.Brand === currentProductBrand;
-      const isNotCurrent = p.id !== currentProduct.id; // Loại trừ sản phẩm hiện tại
-      
-      console.log(`Product ${p.id}: Category=${p.Category}, Brand=${p.Brand}, matchesCategory=${matchesCategory}, matchesBrand=${matchesBrand}, isNotCurrent=${isNotCurrent}`);
-      
-      return isNotCurrent && (matchesCategory || matchesBrand);
-    });
-    
-    console.log('Sản phẩm liên quan tìm được:', related.length);
-    console.log('Danh sách:', related);
-    
-    // Lấy 3 sản phẩm đầu tiên
-    const result = related.slice(0, 3);
-    console.log('Kết quả cuối cùng (3 sản phẩm):', result);
-    console.log('=== END DEBUG ===');
-    
-    return result;
-  };
-
-  const relatedProducts = getRelatedProducts();
-  
-  console.log('Related Products cuối cùng:', relatedProducts);
-
-  // Nếu không tìm thấy sản phẩm, hiển thị thông báo lỗi
-  if (!currentProduct) {
+  // Xử lý khi không tìm thấy sản phẩm
+  if (error) {
     return (
       <div className="product-detail">
         <div className="product-detail-container">
-          <div style={{ textAlign: 'center', padding: '50px' }}>
-            <h2>Sản phẩm không tồn tại</h2>
-            <p>Không tìm thấy sản phẩm với ID: {id}</p>
-            <Link to="/" style={{ color: '#007bff', textDecoration: 'none' }}>
-              ← Quay về trang chủ
-            </Link>
+          <div className="error-message">
+            <h2>Không tìm thấy sản phẩm</h2>
+            <p>{error}</p>
+            <button onClick={() => navigate('/')} className="btn-back">
+              Quay về trang chủ
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
+  // Loading state
+  if (loading || !product) {
+    return (
+      <div className="product-detail">
+        <div className="product-detail-container">
+          <div className="loading">
+            <div className="loading-spinner"></div>
+            <p>Đang tải thông tin sản phẩm...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Tạo danh sách ảnh từ dữ liệu sản phẩm
+  const productImages = [
+    product.MainImage || "/images/products/giay-the-thao-1.jpg",
+    product.SideImage || "/images/products/giay-the-thao-2.jpg", 
+    product.BackImage || "/images/products/giay-the-thao-3.jpg",
+    product.SoleImage || "/images/products/giay-the-thao-1.jpg"
+  ].filter(img => img); // Loại bỏ ảnh null/undefined
+
+  // Tạo danh sách màu sắc - xử lý cả array và string
+  const productColors = (() => {
+    if (!product.Colors) return ['Đen'];
+    
+    if (Array.isArray(product.Colors)) {
+      return product.Colors;
+    }
+    
+    if (typeof product.Colors === 'string') {
+      return product.Colors.split(',').map(c => c.trim());
+    }
+    
+    return ['Đen'];
+  })();
+  
+  // Tạo danh sách size
+  const productSizes = ['38', '39', '40', '41', '42', '43'];
+
+  // Tính discount
+  const discount = product.OriginalPrice && product.Price ? 
+    Math.round(((product.OriginalPrice - product.Price) / product.OriginalPrice) * 100) : 0;
+
+  // Navigation tabs
+  const tabs = [
+    { id: 'description', label: 'Mô tả sản phẩm' },
+    { id: 'return-policy', label: 'Quy định đổi trả' },
+    { id: 'care-guide', label: 'Hướng dẫn chăm sóc' },
+    { id: 'maintenance', label: 'Hướng dẫn bảo quản' }
+  ];
+
+  // Render tab content
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'description':
+        return (
+          <div className="tab-content">
+            <h3>Mô tả chi tiết</h3>
+            <p>{product.ShortDescription || product.Description || 'Chưa có mô tả chi tiết cho sản phẩm này.'}</p>
+            
+            {product.Features && (
+              <>
+                <h4>Đặc điểm nổi bật:</h4>
+                <ul>
+                  {(() => {
+                    if (Array.isArray(product.Features)) {
+                      return product.Features.map((feature, index) => (
+                        <li key={index}>{feature}</li>
+                      ));
+                    }
+                    
+                    if (typeof product.Features === 'string') {
+                      return product.Features.split(',').map((feature, index) => (
+                        <li key={index}>{feature.trim()}</li>
+                      ));
+                    }
+                    
+                    return null;
+                  })()}
+                </ul>
+              </>
+            )}
+
+            {product.Benefits && (
+              <>
+                <h4>Lợi ích:</h4>
+                <ul>
+                  {(() => {
+                    if (Array.isArray(product.Benefits)) {
+                      return product.Benefits.map((benefit, index) => (
+                        <li key={index}>{benefit}</li>
+                      ));
+                    }
+                    
+                    if (typeof product.Benefits === 'string') {
+                      return product.Benefits.split(',').map((benefit, index) => (
+                        <li key={index}>{benefit.trim()}</li>
+                      ));
+                    }
+                    
+                    return null;
+                  })()}
+                </ul>
+              </>
+            )}
+          </div>
+        );
+      
+      case 'return-policy':
+        return (
+          <div className="tab-content">
+            <h3>Quy định đổi trả</h3>
+            <ul>
+              <li>Đổi size trong vòng 7 ngày kể từ ngày mua</li>
+              <li>Đổi trả hàng trong vòng 7 ngày nếu có lỗi từ nhà sản xuất</li>
+              <li>Sản phẩm phải còn nguyên vẹn, chưa sử dụng</li>
+              <li>Giữ nguyên tem mác và bao bì gốc</li>
+              <li>Không áp dụng cho sản phẩm đã giảm giá</li>
+            </ul>
+          </div>
+        );
+      
+      case 'care-guide':
+        return (
+          <div className="tab-content">
+            <h3>Hướng dẫn chăm sóc</h3>
+            <ul>
+              <li>Lau sạch bụi bẩn bằng khăn ẩm sau mỗi lần sử dụng</li>
+              <li>Để khô tự nhiên, tránh ánh nắng trực tiếp</li>
+              <li>Không sử dụng hóa chất tẩy rửa mạnh</li>
+              <li>Bảo quản nơi khô ráo, thoáng mát</li>
+              <li>Định kỳ vệ sinh đế giày để duy trì độ bám</li>
+            </ul>
+          </div>
+        );
+      
+      case 'maintenance':
+        return (
+          <div className="tab-content">
+            <h3>Hướng dẫn bảo quản</h3>
+            <ul>
+              <li>Đặt giày ở nơi khô ráo, tránh ẩm ướt</li>
+              <li>Không để giày gần nguồn nhiệt cao</li>
+              <li>Sử dụng hộp đựng giày hoặc túi bảo vệ</li>
+              <li>Định kỳ kiểm tra và vệ sinh giày</li>
+              <li>Không để giày dưới ánh nắng mặt trời trực tiếp</li>
+            </ul>
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
   const formatPrice = (price) => {
+    if (!price) return '0 ₫';
     return price.toLocaleString('vi-VN') + ' ₫';
   };
 
@@ -211,7 +418,7 @@ export default function ProductDetail() {
       alert('Vui lòng chọn size');
       return;
     }
-    alert(`Đã thêm ${currentProduct.Name} - Size ${selectedSize} vào giỏ hàng!`);
+    alert(`Đã thêm ${product.Name} - Size ${selectedSize} vào giỏ hàng!`);
   };
 
   const handleBuyNow = () => {
@@ -222,68 +429,54 @@ export default function ProductDetail() {
     alert('Chuyển đến trang thanh toán...');
   };
 
-  // Hàm xử lý click vào thumbnail
   const handleThumbnailClick = (index) => {
     setSelectedImageIndex(index);
   };
 
-  // Hàm xử lý gửi bình luận mới
-  const handleSubmitComment = () => {
-    if (!newComment.trim()) {
-      alert('Vui lòng nhập nội dung bình luận');
-      return;
+  const handlePrevImage = () => {
+    setSelectedImageIndex(prev => 
+      prev === 0 ? productImages.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setSelectedImageIndex(prev => 
+      prev === productImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  // Handle related products navigation
+  const handleRelatedScroll = (direction) => {
+    if (!relatedProductsRef.current) return;
+    
+    const container = relatedProductsRef.current;
+    const scrollAmount = 300; // Scroll 300px mỗi lần
+    
+    if (direction === 'prev') {
+      container.scrollLeft -= scrollAmount;
+    } else {
+      container.scrollLeft += scrollAmount;
     }
+  };
 
-    if (userRating === 0) {
-      alert('Vui lòng chọn số sao đánh giá');
-      return;
+  // Handle related product click
+  const handleRelatedProductClick = (relatedProduct) => {
+    const relatedProductId = relatedProduct.ProductID || relatedProduct.id;
+    if (relatedProductId) {
+      // Cuộn lên đầu trang trước khi chuyển
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Reset các state về giá trị mặc định
+      setSelectedSize('');
+      setSelectedColor('');
+      setQuantity(1);
+      setSelectedImageIndex(0);
+      setActiveTab('description');
+      
+      // Chuyển đến trang sản phẩm mới
+      navigate(`/product/${relatedProductId}`);
     }
-
-    const newCommentObj = {
-      id: comments.length + 1,
-      user: currentUser.name || "Khách",
-      avatar: currentUser.avatar,
-      rating: userRating,
-      date: new Date().toLocaleDateString('vi-VN'),
-      comment: newComment,
-      likes: 0,
-      verified: currentUser.name && currentUser.name !== "Khách" // Chỉ verified nếu có tên thực
-    };
-
-    setComments([newCommentObj, ...comments]);
-    setNewComment('');
-    setUserRating(0); // Reset về 0 sao
-    alert('Bình luận đã được gửi thành công!');
   };
-
-  // Hàm render sao đánh giá
-  const renderStars = (rating) => {
-    return [...Array(5)].map((_, index) => (
-      <IoStar
-        key={index}
-        className={index < rating ? 'star filled' : 'star empty'}
-        size={16}
-      />
-    ));
-  };
-
-  // Hàm render sao cho form đánh giá (có hover effect)
-  const renderRatingStars = () => {
-    return [...Array(5)].map((_, index) => (
-      <IoStar
-        key={index}
-        className={`star-icon ${index < (hoverRating || userRating) ? 'filled' : ''}`}
-        size={24}
-        onClick={() => setUserRating(index + 1)}
-        onMouseEnter={() => setHoverRating(index + 1)}
-        onMouseLeave={() => setHoverRating(0)}
-        style={{ cursor: 'pointer' }}
-      />
-    ));
-  };
-
-  // Tính điểm đánh giá trung bình
-  const averageRating = comments.reduce((acc, comment) => acc + comment.rating, 0) / comments.length;
 
   return (
     <div className="product-detail">
@@ -292,79 +485,104 @@ export default function ProductDetail() {
         <div className="breadcrumb">
           <a href="/home">Trang chủ</a>
           <span>/</span>
-          <a href={`/shoes?category=${currentProduct.Category}`}>{currentProduct.Category}</a>
+          <a href={`/shoes?category=${product.Category || 'Giày'}`}>{product.Category || 'Giày'}</a>
           <span>/</span>
-          <span>{currentProduct.Name}</span>
+          <span>{product.Name}</span>
         </div>
 
-        {/* Product Main Section */}
+        {/* Product Title */}
+        <div className="product-title-section">
+          <h1 className="main-product-title">{product.Name}</h1>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="product-tabs">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Product Main Section - 2 cột */}
         <div className="product-main">
-          {/* Product Images */}
+          {/* Left Column - Product Images */}
           <div className="product-images">
             <div className="main-image">
               <img
-                src={currentProduct.MainImage}
-                alt={`${currentProduct.Name} - Ảnh ${selectedImageIndex + 1}`}
+                src={productImages[selectedImageIndex] || productImages[0]}
+                alt={`${product.Name} - Ảnh ${selectedImageIndex + 1}`}
                 className="main-product-image"
               />
-              <div className="image-badge">Mới</div>
-            </div>
-            <div className="thumbnail-images">
-              {currentProduct.images ? currentProduct.images.map((image, index) => (
-                <div
-                  key={index}
-                  className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
-                  onClick={() => handleThumbnailClick(index)}
-                >
-                  <img
-                    src={image}
-                    alt={`${currentProduct.Name} ${index + 1}`}
-                    className="thumbnail-image"
-                  />
-                </div>
-              )) : (
-                // Fallback: hiển thị ảnh chính làm thumbnail
-                <div
-                  className={`thumbnail ${selectedImageIndex === 0 ? 'active' : ''}`}
-                  onClick={() => handleThumbnailClick(0)}
-                >
-                  <img
-                    src={currentProduct.MainImage}
-                    alt={currentProduct.Name}
-                    className="thumbnail-image"
-                  />
-                </div>
+              {product.IsNew && <div className="image-badge">Mới</div>}
+              {discount > 0 && (
+                <div className="discount-badge">-{discount}%</div>
               )}
+            </div>
+            
+            {/* Thumbnail Navigation */}
+            <div className="thumbnail-navigation">
+              <button className="nav-arrow prev" onClick={handlePrevImage}>
+                <IoArrowBack />
+              </button>
+              
+              <div className="thumbnail-images">
+                {productImages.map((image, index) => (
+                  <div
+                    key={index}
+                    className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
+                    onClick={() => handleThumbnailClick(index)}
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.Name} ${index + 1}`}
+                      className="thumbnail-image"
+                    />
+                  </div>
+                ))}
+              </div>
+              
+              <button className="nav-arrow next" onClick={handleNextImage}>
+                <IoArrowForward />
+              </button>
             </div>
           </div>
 
-          {/* Product Info */}
+          {/* Right Column - Product Info & Specifications */}
           <div className="product-info">
+            {/* Basic Product Info */}
             <div className="product-header">
-              <h1 className="product-title">{currentProduct.Name}</h1>
-              <div className="product-code">Mã sản phẩm: <strong>{currentProduct.id}</strong></div>
+              <h2 className="product-title">{product.Name}</h2>
+              <div className="product-code">Mã sản phẩm: <strong>{product.ProductCode || `UTH${product.ProductID}`}</strong></div>
             </div>
 
             <div className="product-price-section">
-              <div className="current-price">{formatPrice(currentProduct.Price)}</div>
-              <div className="original-price">{formatPrice(currentProduct.OriginalPrice)}</div>
-              <div className="discount-badge">-{currentProduct.Discount}%</div>
+              <div className="current-price">{formatPrice(product.Price)}</div>
+              {product.OriginalPrice && (
+                <div className="original-price">{formatPrice(product.OriginalPrice)}</div>
+              )}
             </div>
 
             <div className="product-stats">
-              <span><strong>143</strong> lượt xem</span>
-              <span><strong>7</strong> lượt mua Online</span>
+              <span><strong>{product.ViewCount || 0}</strong> lượt xem</span>
+              <span><strong>{product.SalesCount || 0}</strong> lượt mua Online</span>
             </div>
 
             <div className="product-status">
-              Tình trạng: <strong style={{color: '#27ae60'}}>Còn hàng</strong>
+              Tình trạng: <strong style={{color: '#27ae60'}}>
+                {product.StockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}
+              </strong>
             </div>
 
             {/* Color Selection */}
             <div className="product-option">
               <label>Màu sắc:</label>
               <div className="color-options">
-                {currentProduct.Colors.map((color) => (
+                {productColors.map((color) => (
                   <button
                     key={color}
                     className={`color-option ${selectedColor === color ? 'active' : ''}`}
@@ -380,7 +598,7 @@ export default function ProductDetail() {
             <div className="product-option">
               <label>Kích thước:</label>
               <div className="size-options">
-                {["38", "39", "40", "41", "42", "43"].map((size) => (
+                {productSizes.map((size) => (
                   <button
                     key={size}
                     className={`size-option ${selectedSize === size ? 'active' : ''}`}
@@ -402,6 +620,7 @@ export default function ProductDetail() {
                   value={quantity}
                   onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                   min="1"
+                  max={product.StockQuantity || 99}
                 />
                 <button onClick={() => setQuantity(quantity + 1)}>+</button>
               </div>
@@ -436,41 +655,143 @@ export default function ProductDetail() {
             <div className="product-benefits">
               <h3>Ưu đãi đi kèm</h3>
               <ul>
-                {currentProduct.Benefits ? currentProduct.Benefits.map((benefit, index) => (
-                  <li key={index}>{benefit}</li>
-                )) : (
-                  <>
-                    <li>Cam kết chính hãng UTH Shoes 100%</li>
-                    <li>Bảo hành 03 tháng</li>
-                    <li>Đổi size trong vòng 7 ngày</li>
-                    <li>Đổi trả hàng trong vòng 7 ngày</li>
-                    <li>Free ship đơn hàng 1.5 Triệu</li>
-                    <li>Hỗ trợ giao hàng 2h khi chọn Grab</li>
-                  </>
-                )}
+                <li>Cam kết chính hãng UTH Shoes 100%</li>
+                <li>Bảo hành 03 tháng</li>
+                <li>Đổi size trong vòng 7 ngày</li>
+                <li>Đổi trả hàng trong vòng 7 ngày</li>
+                <li>Free ship đơn hàng 1.5 Triệu</li>
+                <li>Hỗ trợ giao hàng 2h khi chọn Grab</li>
               </ul>
             </div>
           </div>
         </div>
 
-        {/* Product Description */}
-        <div className="product-description">
-          <h2>Mô tả sản phẩm</h2>
-          <p>{currentProduct.Description || `${currentProduct.Name} - Sản phẩm chất lượng cao từ UTH Shoes với thiết kế hiện đại, phù hợp cho nhiều phong cách khác nhau.`}</p>
+        {/* Tab Content Section */}
+        <div className="tab-content-section">
+          {renderTabContent()}
+        </div>
 
-          <h3>Đặc điểm nổi bật:</h3>
-          <ul>
-            {currentProduct.Features ? currentProduct.Features.map((feature, index) => (
-              <li key={index}>{feature}</li>
-            )) : (
-              <>
-                <li>Chất liệu cao cấp, bền bỉ</li>
-                <li>Thiết kế hiện đại, thời trang</li>
-                <li>Phù hợp nhiều phong cách</li>
-                <li>Đế cao su chống trượt</li>
-              </>
-            )}
-          </ul>
+        {/* Description & Specifications Section - 2 cột */}
+        <div className="description-specs-section">
+          <div className="description-specs-container">
+            {/* Cột trái - Mô tả sản phẩm */}
+            <div className="product-description-column">
+              <h2>Mô tả sản phẩm</h2>
+              <div className="description-content">
+                <p>
+                  Chinh phục mọi cung đường và phá vỡ kỷ lục cá nhân với đôi giày chạy địa hình 
+                  Columbia Konos Trillium ATR™. Được thiết kế đặc biệt cho phụ nữ, đôi giày này 
+                  kết hợp công nghệ tiên tiến với thiết kế thời trang để mang lại trải nghiệm 
+                  chạy bộ tối ưu trên mọi địa hình.
+                </p>
+                
+                {product.Features && (
+                  <>
+                    <h3>Đặc điểm nổi bật:</h3>
+                    <ul>
+                      {(() => {
+                        if (Array.isArray(product.Features)) {
+                          return product.Features.map((feature, index) => (
+                            <li key={index}>{feature}</li>
+                          ));
+                        }
+                        
+                        if (typeof product.Features === 'string') {
+                          return product.Features.split(',').map((feature, index) => (
+                            <li key={index}>{feature.trim()}</li>
+                          ));
+                        }
+                        
+                        return null;
+                      })()}
+                    </ul>
+                  </>
+                )}
+
+                {product.Benefits && (
+                  <>
+                    <h3>Lợi ích:</h3>
+                    <ul>
+                      {(() => {
+                        if (Array.isArray(product.Benefits)) {
+                          return product.Benefits.map((benefit, index) => (
+                            <li key={index}>{benefit}</li>
+                          ));
+                        }
+                        
+                        if (typeof product.Benefits === 'string') {
+                          return product.Benefits.split(',').map((benefit, index) => (
+                            <li key={index}>{benefit.trim()}</li>
+                          ));
+                        }
+                        
+                        return null;
+                      })()}
+                    </ul>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Cột phải - Thông số kỹ thuật */}
+            <div className="product-specifications-column">
+              <h2>Thông số</h2>
+              <div className="specs-list">
+                <div className="spec-item">
+                  <span className="spec-label">Trọng lượng:</span>
+                  <span className="spec-value">{product.Weight || '276g'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Chiều cao gót:</span>
+                  <span className="spec-value">{product.SoleHeight || '35mm'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Độ chênh lệch gót - mũi:</span>
+                  <span className="spec-value">{product.HeelToeDrop || '8mm'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Độ cao gai đế/vấu giày:</span>
+                  <span className="spec-value">{product.LugHeight || '4mm'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Công nghệ đế:</span>
+                  <span className="spec-value">{product.Technology || 'Omni-MAX™, TechLite+™'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Chất liệu thân giày:</span>
+                  <span className="spec-value">{product.UpperMaterial || 'Da tổng hợp + Lưới mesh'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Bề mặt sử dụng:</span>
+                  <span className="spec-value">{product.Surface || 'Đường phố, Sân thể thao'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Dịp sử dụng:</span>
+                  <span className="spec-value">{product.Occasion || 'Thể thao, Dạo phố'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Môn thể thao:</span>
+                  <span className="spec-value">{product.Sport || 'Chạy bộ, Thể dục'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Tính năng nổi bật:</span>
+                  <span className="spec-value">{product.Features || 'Chống trượt, Thoáng khí'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Loại dây giày:</span>
+                  <span className="spec-value">{product.LaceType || 'Dây thường'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Cổ giày:</span>
+                  <span className="spec-value">{product.CollarType || 'Cổ thấp'}</span>
+                </div>
+                <div className="spec-item">
+                  <span className="spec-label">Kiểu dáng:</span>
+                  <span className="spec-value">{product.Style || 'Thể thao hiện đại'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Store Information */}
@@ -508,181 +829,73 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Bình luận và Đánh giá */}
-        <div className="product-reviews">
-          <h2>Bình luận và Đánh giá</h2>
-          <div className="review-header">
-            <div className="average-rating">
-              <h3>Đánh giá trung bình: {averageRating.toFixed(1)}/5</h3>
-              <div className="stars">{renderStars(Math.round(averageRating))}</div>
-            </div>
-            <div className="add-review-section">
-              <h3>Thêm bình luận mới</h3>
-              <div className={`rating-selector ${userRating === 0 ? 'required' : ''}`}>
-                <span>Đánh giá của bạn:</span>
-                {renderRatingStars()}
-              </div>
-              {userRating === 0 && (
-                <div className="rating-instruction">
-                  Vui lòng chọn số sao đánh giá trước khi gửi bình luận
-                </div>
-              )}
-              <textarea
-                placeholder="Viết bình luận của bạn..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                rows="4"
-                cols="50"
-                className={newComment.trim() === '' ? 'error' : ''}
-              />
-              <button 
-                onClick={handleSubmitComment}
-                disabled={userRating === 0 || newComment.trim() === ''}
-              >
-                Gửi bình luận
-              </button>
-            </div>
-          </div>
-
-          <div className="comments-list">
-            {comments.map((comment) => (
-              <div key={comment.id} className="comment-item">
-                <div className="comment-header">
-                  <img src={comment.avatar} alt={comment.user} className="comment-avatar" />
-                  <div className="comment-user-info">
-                    <h4>{comment.user}</h4>
-                    <div className="comment-rating">{renderStars(comment.rating)}</div>
-                    <span>{comment.date}</span>
-                    {comment.verified && <span className="verified-badge">Đã xác thực</span>}
-                  </div>
-                </div>
-                <p>{comment.comment}</p>
-                <div className="comment-actions">
-                  <span>{comment.likes} lượt thích</span>
-                  <button>Thích</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Related Products */}
         <div className="related-products">
           <h2>Sản phẩm liên quan</h2>
-          
-          {/* Test Button */}
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <button 
-              onClick={() => {
-                console.log('Test button clicked');
-                console.log('relatedProducts:', relatedProducts);
-                console.log('allProducts length:', allProducts.length);
-              }}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginRight: '10px'
-              }}
-            >
-              Test Related Products
+          <div className="related-products-container">
+            <button className="nav-arrow prev" onClick={() => handleRelatedScroll('prev')}>
+              <IoArrowBack />
             </button>
             
-            <button 
-              onClick={() => {
-                console.log('Test navigation clicked');
-                window.location.href = '/product/2';
-              }}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer'
-              }}
-            >
-              Test Navigation
-            </button>
-          </div>
-          
-          {console.log('Rendering Related Products, relatedProducts:', relatedProducts)}
-          <div className="related-products-grid">
-            {relatedProducts && relatedProducts.length > 0 ? (
-              relatedProducts.map((relatedProduct) => {
-                console.log('Rendering Related Product:', relatedProduct);
+            <div className="related-products-grid" ref={relatedProductsRef}>
+              {relatedProducts.map((relatedProduct) => {
+                const relatedProductId = relatedProduct.ProductID || relatedProduct.id;
+                const imageUrl = relatedProduct.MainImage || "/images/products/giay-the-thao-1.jpg";
+                const currentPrice = relatedProduct.Price || 0;
+                const originalPrice = relatedProduct.OriginalPrice || null;
+                const discount = relatedProduct.Discount || 0;
+
                 return (
-                  <div key={relatedProduct.id} className="related-product-card">
-                    <Link 
-                      to={`/product/${relatedProduct.id}`}
-                      className="related-product-link"
-                      onClick={() => {
-                        console.log('Click vào Related Product:', relatedProduct.id);
-                        console.log('Link:', `/product/${relatedProduct.id}`);
-                      }}
-                    >
-                      <div className="related-product-image-container">
-                        <img
-                          src={relatedProduct.MainImage}
-                          alt={relatedProduct.Name}
-                          className="related-product-image"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'block';
-                          }}
-                        />
-                        <div
-                          className="related-product-image-placeholder"
-                          style={{
-                            display: 'none',
-                            width: '100%',
-                            height: '150px',
-                            backgroundColor: '#f8f9fa',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#6c757d',
-                            fontSize: '12px'
-                          }}
-                        >
-                          <i className="fas fa-image" style={{ fontSize: '20px', marginRight: '6px' }}></i>
-                          {relatedProduct.Name}
-                        </div>
-                        
-                        {relatedProduct.Discount > 0 && (
-                          <div className="related-product-discount-badge">
-                            -{relatedProduct.Discount}%
-                          </div>
+                  <div
+                    key={relatedProductId}
+                    className="related-product-card"
+                    onClick={() => handleRelatedProductClick(relatedProduct)}
+                  >
+                    <div className="related-product-image">
+                      <img src={imageUrl} alt={relatedProduct.Name} />
+                      {discount > 0 && (
+                        <div className="related-discount-badge">-{discount}%</div>
+                      )}
+                    </div>
+                    
+                    <div className="related-product-info">
+                      <div className="related-product-brand">
+                        <span className="brand-logo">UTH SHOES</span>
+                      </div>
+                      
+                      <h4 className="related-product-name">{relatedProduct.Name}</h4>
+                      
+                      <div className="related-product-price">
+                        <span className="related-current-price">
+                          {currentPrice.toLocaleString('vi-VN')} ₫
+                        </span>
+                        {originalPrice && (
+                          <span className="related-original-price">
+                            {originalPrice.toLocaleString('vi-VN')} ₫
+                          </span>
                         )}
                       </div>
                       
-                      <div className="related-product-info">
-                        <h3 className="related-product-name">{relatedProduct.Name}</h3>
-                        <div className="related-product-category">{relatedProduct.Category}</div>
-                        <div className="related-product-price">
-                          <span className="related-product-current-price">
-                            {formatPrice(relatedProduct.Price)}
-                          </span>
-                          {relatedProduct.OriginalPrice > relatedProduct.Price && (
-                            <span className="related-product-original-price">
-                              {formatPrice(relatedProduct.OriginalPrice)}
-                            </span>
-                          )}
+                      {/* Promotional Banner */}
+                      <div className="related-promo-banner">
+                        <div className="promo-dates">07.08 - 21.09</div>
+                        <div className="promo-offer">NHẬN BA LÔ</div>
+                        <div className="promo-tiers">
+                          <span className="promo-tier">890K</span>
+                          <span className="promo-condition">từ 2.5 triệu</span>
+                          <span className="promo-tier">1690K</span>
+                          <span className="promo-condition">từ 5 triệu</span>
                         </div>
                       </div>
-                    </Link>
+                    </div>
                   </div>
                 );
-              })
-            ) : (
-              <div className="no-related-products">
-                <p>Không có sản phẩm liên quan</p>
-                {console.log('Không có sản phẩm liên quan để hiển thị')}
-              </div>
-            )}
+              })}
+            </div>
+            
+            <button className="nav-arrow next" onClick={() => handleRelatedScroll('next')}>
+              <IoArrowForward />
+            </button>
           </div>
         </div>
       </div>

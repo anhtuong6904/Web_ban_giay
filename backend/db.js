@@ -6,7 +6,7 @@ const config = {
   user: process.env.DB_USER || 'sa',
   password: process.env.DB_PASSWORD || 'Giakiet@123',  // Password đúng
   server: process.env.DB_SERVER || 'DESKTOP-3UR600M',
-  database: process.env.DB_DATABASE || 'WebShoesUTH',
+  database: process.env.DB_DATABASE || 'shopgiay',  // Cập nhật tên database mới
   port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 1433,
   options: {
     encrypt: false,

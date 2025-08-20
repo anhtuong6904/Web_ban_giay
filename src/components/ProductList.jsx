@@ -1,51 +1,86 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { getProducts } from '../services/productService';
+import { formatPrice } from '../utils/formatPrice';
 import Pagination from './Pagination';
 import './ProductList.css';
 
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(12);
+  const navigate = useNavigate();
+
+  const PRODUCTS_PER_PAGE = 12; // 4 x 3 layout
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Server error: " + res.status);
+    let isMounted = true;
+    (async () => {
+      try {
+        const data = await getProducts();
+        if (isMounted) {
+          setProducts(Array.isArray(data) ? data : []);
+          setCurrentPage(1);
         }
-        return res.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else {
-          setError("API did not return an array");
-        }
-        console.log("Products fetched:", data);
-      })
-      .catch((err) => setError(err.message));
+      } catch (err) {
+        if (isMounted) setError(err.message || "Không thể tải sản phẩm");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  if (error) return <div style={{color: "red"}}>Error: {error}</div>;
+  if (loading) {
+    return (
+      <div className="loading-spinner">
+        <div className="spinner"></div>
+        <p>Đang tải sản phẩm...</p>
+      </div>
+    );
+  }
 
-  // Tính toán phân trang
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  if (error) {
+    return <div style={{ color: "red", textAlign: "center", padding: "20px" }}>Lỗi: {error}</div>;
+  }
 
-  // Xử lý thay đổi trang
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    // Không scroll to top để giữ nguyên vị trí của người dùng
+  const totalPages = Math.max(1, Math.ceil((products?.length || 0) / PRODUCTS_PER_PAGE));
+  const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const endIndex = startIndex + PRODUCTS_PER_PAGE;
+  const pageItems = (products || []).slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
-  // Reset về trang 1 khi products thay đổi
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [products]);
+  const handleProductClick = (product) => {
+    const productId = product.ProductID || product.id;
+    if (productId) {
+      navigate(`/product/${productId}`);
+    }
+  };
+
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(<i key={i} className="fas fa-star filled"></i>);
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(<i key={i} className="fas fa-star-half-alt half-filled"></i>);
+      } else {
+        stars.push(<i key={i} className="fas fa-star empty"></i>);
+      }
+    }
+    return stars;
+  };
 
   return (
     <section className="products-section" id="products">
@@ -63,19 +98,33 @@ function ProductList() {
         </div>
         
         <div className="products-grid">
-          {currentProducts.map(product => (
-            <div key={product.ProductID} className="product-card">
-              <Link to={`/product/${product.ProductID}`}>
+          {pageItems.map(product => (
+            <div key={product.ProductID || product.id} className="product-card" onClick={() => handleProductClick(product)}>
+              <div className="product-image">
                 <img 
-                  src={product.ImageURL || '/images/products/placeholder.jpg'} 
+                  src={product.ImageURL || product.MainImage || '/images/products/placeholder.jpg'} 
                   alt={product.Name}
                   className="product-image"
                 />
-                <div className="product-info">
-                  <h3 className="product-name">{product.Name}</h3>
-                  <p className="product-price">{product.Price?.toLocaleString('vi-VN')} VNĐ</p>
+                {product.Discount > 0 && (
+                  <div className="discount-badge">
+                    -{product.Discount}%
+                  </div>
+                )}
+              </div>
+              <div className="product-info">
+                <h3 className="product-name">{product.Name}</h3>
+                <div className="product-rating">
+                  {renderStars(product.Rating || 4.5)}
+                  <span className="rating-text">({product.Rating || 4.5})</span>
                 </div>
-              </Link>
+                <div className="product-price">
+                  <span className="current-price">{formatPrice(product.Price)}</span>
+                  {product.OriginalPrice > product.Price && (
+                    <span className="original-price">{formatPrice(product.OriginalPrice)}</span>
+                  )}
+                </div>
+              </div>
             </div>
           ))}
         </div>
