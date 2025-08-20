@@ -1,0 +1,24 @@
+.filters-sidebar {
+  width: 260px;
+  background: #fff;
+  color: #111827;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  position: sticky;
+  top: 84px;
+  height: fit-content;
+}
+
+.filter-group { margin-bottom: 20px; }
+.filter-group h4 { margin: 0 0 8px; font-size: 13px; letter-spacing: .3px; font-weight: 700; color: #111827; }
+.filter-item { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 13px; }
+.filter-item input { accent-color: #111827; }
+.clear-btn { background: none; border: 0; color: #2563eb; cursor: pointer; margin-top: 6px; font-size: 12px; }
+
+.filters-sidebar select { width: 100%; padding: 10px 12px; border-radius: 6px; background: #fff; color: #111827; border: 1px solid #e5e7eb; font-size: 13px; }
+
+.price-chip { display: block; width: 100%; text-align: left; background: #fff; color: #111827; border: 1px solid #e5e7eb; padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; cursor: pointer; font-size: 13px; }
+.price-chip.active { background: #111827; color: #fff; border-color: #111827; }
+
+

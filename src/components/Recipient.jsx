@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import Cart from './Cart';
 import './Recipient.css';
+import { readCart, clearCart, getCheckoutItems, clearCheckoutItems } from '../services/cartService';
+import { createOrder } from '../services/orderService';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Recipient() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -52,6 +56,38 @@ export default function Recipient() {
     alert("Không kết nối được server!");
   }
 };
+
+  // Momo: tạo đơn qua backend (demo lưu DB), rồi điều hướng
+  const handlePaymentMomo = async () => {
+    try {
+      setLoading(true);
+      const cart = readCart();
+      const result = await createOrder(formData, cart, 'MOMO');
+      alert(`Đã tạo đơn hàng #${result.orderId}. Vui lòng tiếp tục thanh toán trên ứng dụng MoMo.`);
+      clearCart();
+      navigate('/');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // COD: xác nhận và tạo đơn nội bộ
+  const handlePaymentCOD = () => {
+    const ok = window.confirm('Xác nhận đặt hàng và thanh toán khi nhận hàng (COD)?');
+    if (!ok) return;
+    (async () => {
+      setLoading(true);
+      try {
+        const cart = readCart();
+        const result = await createOrder(formData, cart, 'COD');
+        alert(`Đặt hàng thành công! Mã đơn #${result.orderId}.`);
+        clearCart();
+        navigate('/');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  };
 
   return (
     <div className="container">
@@ -117,8 +153,8 @@ export default function Recipient() {
         <button onClick={handlePayment} disabled={loading}>
           {loading ? "Đang xử lý..." : "Thanh toán bằng VNPay"}
         </button>
-        <button>Thanh toán bằng Momo</button>
-        <button>Thanh toán khi nhận hàng (COD)</button>
+        <button onClick={handlePaymentMomo} disabled={loading}>Thanh toán bằng Momo</button>
+        <button onClick={handlePaymentCOD} disabled={loading}>Thanh toán khi nhận hàng (COD)</button>
       </div>
     </div>
   );

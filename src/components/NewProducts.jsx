@@ -82,8 +82,8 @@ export default function NewProducts() {
     <section className="new-products-section">
       <div className="new-products-container">
         <div className="new-products-header">
-          <h2>🆕 SẢN PHẨM MỚI</h2>
-          <p>Những sản phẩm mới nhất từ các thương hiệu hàng đầu</p>
+          <h2>NEW PRODUCTS</h2>
+          <p>Step into the Future – Discover Our New Arrivals!</p>
         </div>
 
         <div className="new-products-grid">
@@ -155,7 +155,7 @@ export default function NewProducts() {
 
         <div className="new-products-footer">
           <Link to="/products" className="view-all-btn">
-            Xem tất cả sản phẩm
+          View All Products
             <i className="fas fa-arrow-right"></i>
           </Link>
         </div>

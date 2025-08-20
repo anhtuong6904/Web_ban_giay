@@ -88,7 +88,7 @@ export default function HotPicks() {
       <div className="hot-picks-container">
         <div className="hot-picks-header">
           <h2>🔥 HOT PICKS</h2>
-          <p>Sản phẩm bán chạy nhất tuần này</p>
+          <p>Style That Sizzles – Our Hottest Picks!</p>
         </div>
 
         <div className="hot-picks-grid">
@@ -160,7 +160,7 @@ export default function HotPicks() {
 
         <div className="hot-picks-footer">
           <Link to="/products" className="view-all-btn">
-            Xem tất cả sản phẩm
+            View All Products
             <i className="fas fa-arrow-right"></i>
           </Link>
         </div>

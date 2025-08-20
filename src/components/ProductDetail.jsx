@@ -3,8 +3,11 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { IoHeart, IoHeartOutline, IoShareSocial, IoLocation, IoTime, IoCall, IoMail, IoArrowBack, IoArrowForward } from 'react-icons/io5';
 import { getProductById, getProducts } from '../services/productService';
 import './ProductDetail.css';
+import { addToCart, setCheckoutItems } from '../services/cartService';
+import { useNavigate as useNav } from 'react-router-dom';
 
 export default function ProductDetail() {
+  const nav2 = useNav();
   const { id } = useParams();
   const navigate = useNavigate();
   const [selectedSize, setSelectedSize] = useState('');
@@ -266,13 +269,61 @@ export default function ProductDetail() {
     );
   }
 
-  // Tạo danh sách ảnh từ dữ liệu sản phẩm
-  const productImages = [
-    product.MainImage || "/images/products/giay-the-thao-1.jpg",
-    product.SideImage || "/images/products/giay-the-thao-2.jpg", 
-    product.BackImage || "/images/products/giay-the-thao-3.jpg",
-    product.SoleImage || "/images/products/giay-the-thao-1.jpg"
-  ].filter(img => img); // Loại bỏ ảnh null/undefined
+  // Tạo danh sách ảnh từ dữ liệu sản phẩm (ưu tiên MainImage, ThumbnailImages, DetailImages)
+  const buildProductImages = (p) => {
+    const images = [];
+
+    if (p.MainImage) {
+      images.push(p.MainImage);
+    }
+
+    const addFromField = (fieldValue) => {
+      if (!fieldValue) return;
+      let arr = [];
+      if (Array.isArray(fieldValue)) {
+        arr = fieldValue;
+      } else if (typeof fieldValue === 'string') {
+        try {
+          arr = JSON.parse(fieldValue);
+          if (!Array.isArray(arr)) arr = [];
+        } catch (e) {
+          // Hỗ trợ định dạng phân tách bằng dấu phẩy
+          arr = fieldValue.split(',').map(s => s.trim()).filter(Boolean);
+        }
+      }
+      arr.forEach((uri) => {
+        if (uri && !images.includes(uri)) {
+          images.push(uri);
+        }
+      });
+    };
+
+    addFromField(p.ThumbnailImages);
+    addFromField(p.DetailImages);
+
+    // Fallback: nếu chỉ có 1 ảnh và đúng chuẩn thư mục /images/products/<slug>/1.png
+    if (images.length <= 1 && p.MainImage) {
+      const match = p.MainImage.match(/\/images\/products\/([^/]+)\/\d+\.png$/);
+      if (match && match[1]) {
+        const slug = match[1];
+        const candidates = [
+          `/images/products/${slug}/2.png`,
+          `/images/products/${slug}/3.png`
+        ];
+        candidates.forEach((uri) => {
+          if (!images.includes(uri)) images.push(uri);
+        });
+      }
+    }
+
+    if (images.length === 0) {
+      images.push('/images/products/giay-the-thao-1.jpg');
+    }
+
+    return images;
+  };
+
+  const productImages = buildProductImages(product);
 
   // Tạo danh sách màu sắc - xử lý cả array và string
   const productColors = (() => {
@@ -414,20 +465,27 @@ export default function ProductDetail() {
   };
 
   const handleAddToCart = () => {
-    if (!selectedSize) {
-      alert('Vui lòng chọn size');
-      return;
-    }
-    alert(`Đã thêm ${product.Name} - Size ${selectedSize} vào giỏ hàng!`);
+    const quantityToAdd = Math.max(1, quantity || 1);
+    addToCart(product, { size: selectedSize || null, color: selectedColor || null, quantity: quantityToAdd });
+    alert(`Đã thêm ${product.Name}${selectedSize ? ` - Size ${selectedSize}` : ''} vào giỏ hàng!`);
   };
 
   const handleBuyNow = () => {
-    if (!selectedSize) {
-      alert('Vui lòng chọn size');
-      return;
-    }
-    alert('Chuyển đến trang thanh toán...');
+    const quantityToAdd = Math.max(1, quantity || 1);
+    const item = {
+      key: `${product.ProductID || product.id}|${selectedSize || ''}|${selectedColor || ''}`,
+      productId: product.ProductID || product.id,
+      name: product.Name,
+      price: product.Price || 0,
+      image: product.MainImage,
+      quantity: quantityToAdd,
+      size: selectedSize || null,
+      color: selectedColor || null
+    };
+    setCheckoutItems([item]);
+    nav2('/payment');
   };
+
 
   const handleThumbnailClick = (index) => {
     setSelectedImageIndex(index);

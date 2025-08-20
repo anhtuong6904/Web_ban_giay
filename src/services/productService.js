@@ -1,10 +1,12 @@
 import productsData from '../data/products.json';
 
 // Service để lấy dữ liệu sản phẩm từ local JSON (fallback khi backend không hoạt động)
-export const getProducts = async () => {
+export const getProducts = async (params = {}) => {
   try {
     // Thử gọi API backend trước
-    const response = await fetch('http://localhost:5000/api/products');
+    const qs = new URLSearchParams(params).toString();
+    const url = qs ? `http://localhost:5000/api/products?${qs}` : 'http://localhost:5000/api/products';
+    const response = await fetch(url);
     if (response.ok) {
       return await response.json();
     }

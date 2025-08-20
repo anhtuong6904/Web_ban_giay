@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import FiltersSidebar from './FiltersSidebar';
 import { getProducts } from '../services/productService';
 import { formatPrice } from '../utils/formatPrice';
 import Pagination from './Pagination';
@@ -11,6 +12,7 @@ function ProductList() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const PRODUCTS_PER_PAGE = 12; // 4 x 3 layout
 
@@ -18,8 +20,27 @@ function ProductList() {
     let isMounted = true;
     (async () => {
       try {
-        const data = await getProducts();
+        // Parse query params from URL and pass through to backend
+        const searchParams = new URLSearchParams(location.search);
+        const params = {};
+        // supported: tag, gender, brand, category, brandName, categoryName, sale
+        ['tag', 'gender', 'brand', 'category', 'brandName', 'categoryName', 'sale'].forEach((key) => {
+          const val = searchParams.get(key);
+          if (val !== null && val !== '') params[key] = val;
+        });
+
+        let data = await getProducts(params);
         if (isMounted) {
+          // Client-side fallback filter in case backend ignores params or falls back to local JSON
+          const tag = (params.tag || '').toLowerCase();
+          const genderParam = (params.gender || '').toUpperCase();
+          if (Array.isArray(data)) {
+            if (genderParam) {
+              data = data.filter(p => String(p.Gender || '').toUpperCase() === genderParam);
+            } else if (['men','women','kids'].includes(tag)) {
+              data = data.filter(p => String(p.Gender || '').toUpperCase() === tag.toUpperCase());
+            }
+          }
           setProducts(Array.isArray(data) ? data : []);
           setCurrentPage(1);
         }
@@ -32,7 +53,7 @@ function ProductList() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [location.search]);
 
   if (loading) {
     return (
@@ -84,7 +105,11 @@ function ProductList() {
 
   return (
     <section className="products-section" id="products">
-      <div className="products-container">
+      <div className="products-container" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '20px' }}>
+        <div>
+          <FiltersSidebar products={products} />
+        </div>
+        <div>
         <div className="products-header">
           <h2>TẤT CẢ SẢN PHẨM</h2>
           <div className="products-stats">
@@ -136,6 +161,7 @@ function ProductList() {
             onPageChange={handlePageChange}
           />
         )}
+        </div>
       </div>
     </section>
   );

@@ -1,0 +1,26 @@
+.home-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0f1116 0%, #171a21 40%, #111418 100%);
+}
+
+.section-dark {
+  background: radial-gradient(1200px 600px at 50% -200px, rgba(255,255,255,0.06), rgba(255,255,255,0) 60%),
+              linear-gradient(180deg, #a0a9b5 0%, #0e1014 100%);
+  padding: 40px 0;
+}
+
+.section-ink {
+  background: linear-gradient(135deg, #0f0f12 0%, #1b1f29 50%, #0d1015 100%);
+  padding: 40px 0;
+}
+
+.section-carbon {
+  background: linear-gradient(180deg, #0f1318 0%, #0b0e12 100%);
+  padding: 40px 0;
+}
+
+.container-narrow {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+

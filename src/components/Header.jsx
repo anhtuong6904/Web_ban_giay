@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { IoPerson, IoSearch, IoCart, IoFlag } from 'react-icons/io5';
+import { IoPerson, IoSearch, IoFlag } from 'react-icons/io5';
 import { MdOutlineShoppingCart } from "react-icons/md";
+import { getCartCount, onCartChange } from '../services/cartService';
 import Cart from './Cart';
 import './Header.css';
 
@@ -14,6 +15,13 @@ export default function Header() {
   const [cartVisible, setCartVisible] = useState(false);
   const [closing, setClosing] = useState(false);
   const location = useLocation();
+  const [cartCount, setCartCount] = useState(getCartCount());
+
+  React.useEffect(() => {
+    setCartCount(getCartCount());
+    const off = onCartChange(() => setCartCount(getCartCount()));
+    return off;
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -63,12 +71,12 @@ export default function Header() {
 
           {/* Navigation Menu */}
           <nav className="nav-menu">
-            <li><Link to="/shoes">SHOES</Link></li>
-            <li><Link to="/men">MEN</Link></li>
-            <li><Link to="/women">WOMEN</Link></li>
-            <li><Link to="/kids">KIDS</Link></li>
-            <li><Link to="/sports">SPORTS</Link></li>
-            <li><Link to="/brands">BRANDS</Link></li>
+            <li><Link to="/products?tag=shoes">SHOES</Link></li>
+            <li><Link to="/products?tag=men">MEN</Link></li>
+            <li><Link to="/products?tag=women">WOMEN</Link></li>
+            <li><Link to="/products?tag=kids">KIDS</Link></li>
+            <li><Link to="/products?tag=sports">SPORTS</Link></li>
+            <li><Link to="/products?tag=brands">BRANDS</Link></li>
             <li><Link to="/sale" style={{ color: '#e74c3c', fontWeight: '700' }}>BACK TO SCHOOL SALE</Link></li>
           </nav>
           {/* Cart */}
@@ -80,9 +88,9 @@ export default function Header() {
 
             <Link to="/order-tracker" className="header-link">Order Tracker</Link>
 
-            <button className="cart-btn" onClick={handleCartOpen}>
+            <button className="cart-btn" onClick={() => navigate('/cart')}>
               <MdOutlineShoppingCart />
-              <span className="cart-count">1</span>
+              <span className="cart-count">{cartCount}</span>
             </button> 
             
             {currentUser ? (

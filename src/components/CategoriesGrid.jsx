@@ -12,42 +12,42 @@ function CategoriesGrid() {
       name: 'SHOES',
       icon: '👟',
       description: 'Tất cả giày dép',
-      route: '/products'
+      route: '/products?tag=shoes'
     },
     {
       id: 'men',
       name: 'MEN',
       icon: '👨',
       description: 'Dành cho nam giới',
-      route: '/products?gender=men'
+      route: '/products?tag=men'
     },
     {
       id: 'women',
       name: 'WOMEN',
       icon: '👩',
       description: 'Dành cho phụ nữ',
-      route: '/products?gender=women'
+      route: '/products?tag=women'
     },
     {
       id: 'kids',
       name: 'KIDS',
       icon: '👶',
       description: 'Dành cho trẻ em',
-      route: '/products?gender=kids'
+      route: '/products?tag=kids'
     },
     {
       id: 'sports',
       name: 'SPORTS',
       icon: '⚽',
       description: 'Thể thao chuyên nghiệp',
-      route: '/products?category=sports'
+      route: '/products?tag=sports'
     },
     {
       id: 'brands',
       name: 'BRANDS',
       icon: '🏷️',
       description: 'Thương hiệu nổi tiếng',
-      route: '/products?brand=all'
+      route: '/products?tag=brands'
     }
   ];
 
