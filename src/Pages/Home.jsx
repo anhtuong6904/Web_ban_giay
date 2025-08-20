@@ -8,6 +8,7 @@ import CollaborationBanner from '../components/CollaborationBanner';
 
 function Home() {
   return (
+    
     <div style={{ minHeight: '100vh' }}>
       <MainBanner />
       <CategoriesGrid />

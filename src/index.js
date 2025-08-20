@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import EventEmitter from 'events';
 import App from './App'; // <== bạn đã import App
 import './index.css'; // nếu có
 

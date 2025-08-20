@@ -1,16 +1,36 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+
+import React, { useState } from 'react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { IoPerson, IoSearch, IoCart, IoFlag } from 'react-icons/io5';
+import { MdOutlineShoppingCart } from "react-icons/md";
+import Cart from './Cart';
 import './Header.css';
 
 export default function Header() {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cartVisible, setCartVisible] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     navigate('/home');
+  };
+
+
+  const handleCartOpen = () => {
+    setCartVisible(true);
+    setClosing(false);
+  };
+
+  const handleCartClose = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setCartVisible(false);
+    }, 300); // khớp thời gian CSS
   };
 
   return (
@@ -51,11 +71,19 @@ export default function Header() {
             <li><Link to="/brands">BRANDS</Link></li>
             <li><Link to="/sale" style={{ color: '#e74c3c', fontWeight: '700' }}>BACK TO SCHOOL SALE</Link></li>
           </nav>
+          {/* Cart */}
+            
 
           {/* Header Actions */}
           <div className="header-actions">
             <Link to="/help" className="header-link">Help</Link>
+
             <Link to="/order-tracker" className="header-link">Order Tracker</Link>
+
+            <button className="cart-btn" onClick={handleCartOpen}>
+              <MdOutlineShoppingCart />
+              <span className="cart-count">1</span>
+            </button> 
             
             {currentUser ? (
               <Link to="/profile" className="profile-link">
@@ -78,21 +106,35 @@ export default function Header() {
               />
               <IoSearch className="search-icon" size={18} />
             </div>
+            
 
-            {/* Cart */}
-            <div className="cart-icon">
-              <IoCart size={20} />
-              <span className="cart-count">1</span>
-            </div>
+           
 
             {/* Language Selector */}
             <div className="language-selector">
               <IoFlag size={16} />
               <span>VN</span>
             </div>
+            
+
           </div>
         </div>
       </div>
+      {/* Cart popup */}
+      {cartVisible && (
+        <>
+          {/* Overlay làm mờ trang */}
+          <div
+            className={`cart-backdrop ${closing ? 'closing' : 'opening'}`}
+            onClick={handleCartClose}
+          ></div>
+
+          {/* Cart trượt vào */}
+          <div className={`cart-overlay ${closing ? 'closing' : 'opening'}`}>
+            <Cart isPopup={true} onClose={handleCartClose} />
+          </div>
+        </>
+      )}
     </header>
   );
 }

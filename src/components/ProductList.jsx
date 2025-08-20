@@ -1,15 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Pagination from './Pagination';
-import { allProducts } from '../data/allProducts';
 import './ProductList.css';
 
-export default function ProductList() {
+function ProductList() {
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(12); // 4 hàng × 3 sản phẩm = 12
+  const [productsPerPage] = useState(12);
 
-  // Sử dụng tất cả 100 sản phẩm từ file allProducts.js
-  const products = allProducts;
+  useEffect(() => {
+    fetch("http://localhost:5000/api/products")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Server error: " + res.status);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          setError("API did not return an array");
+        }
+        console.log("Products fetched:", data);
+      })
+      .catch((err) => setError(err.message));
+  }, []);
+
+  if (error) return <div style={{color: "red"}}>Error: {error}</div>;
 
   // Tính toán phân trang
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -28,10 +47,6 @@ export default function ProductList() {
     setCurrentPage(1);
   }, [products]);
 
-  const formatPrice = (price) => {
-    return price.toLocaleString('vi-VN') + ' ₫';
-  };
-
   return (
     <section className="products-section" id="products">
       <div className="products-container">
@@ -46,75 +61,35 @@ export default function ProductList() {
             Lọc & Sắp xếp
           </button>
         </div>
-
+        
         <div className="products-grid">
-          {currentProducts.map((product) => (
-            <div key={product.id} className="product-card">
-              <Link to={`/product/${product.id}`} className="product-card-link">
-                <div className="product-image-container">
-                  <img
-                    src={product.MainImage}
-                    alt={product.Name}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'block';
-                    }}
-                  />
-                  <div
-                    className="product-image-placeholder"
-                    style={{
-                      display: 'none',
-                      width: '100%',
-                      height: '200px',
-                      backgroundColor: '#f8f9fa',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#6c757d',
-                      fontSize: '14px'
-                    }}
-                  >
-                    <i className="fas fa-image" style={{ fontSize: '24px', marginRight: '8px' }}></i>
-                    {product.Name}
-                  </div>
-                  
-                  {product.Discount > 0 && (
-                    <div className="discount-badge">
-                      -{product.Discount}%
-                    </div>
-                  )}
-                </div>
-
+          {currentProducts.map(product => (
+            <div key={product.ProductID} className="product-card">
+              <Link to={`/product/${product.ProductID}`}>
+                <img 
+                  src={product.ImageURL || '/images/products/placeholder.jpg'} 
+                  alt={product.Name}
+                  className="product-image"
+                />
                 <div className="product-info">
-                  <div className="product-category">{product.Category}</div>
                   <h3 className="product-name">{product.Name}</h3>
-                  <div className="product-brand">{product.Brand}</div>
-                  
-                  <div className="product-price">
-                    <span className="current-price">{formatPrice(product.Price)}</span>
-                    {product.OriginalPrice > product.Price && (
-                      <span className="original-price">{formatPrice(product.OriginalPrice)}</span>
-                    )}
-                  </div>
-                  
-                  <div className="product-colors">
-                    {product.Colors.slice(0, 3).join(', ')}
-                  </div>
+                  <p className="product-price">{product.Price?.toLocaleString('vi-VN')} VNĐ</p>
                 </div>
               </Link>
             </div>
           ))}
         </div>
 
-        {/* Component phân trang */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          totalProducts={products.length}
-          productsPerPage={productsPerPage}
-        />
+        {totalPages > 1 && (
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
     </section>
   );
 }
+
+export default ProductList;

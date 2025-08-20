@@ -1,0 +1,131 @@
+/* Container chính */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  background: #f9f9fb;
+  padding: 30px;
+  max-width: 1200px;
+  margin: auto;
+  border-radius: 16px;
+}
+
+.container h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3436;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Bọc 2 card */
+.recipient-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  width: 100%;
+}
+
+/* Card chung */
+.checkout-container,
+.cart-container {
+  flex: 1;
+  min-width: 320px;
+  background: #ffffff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Tiêu đề card */
+.checkout-container h2,
+.cart-container h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #2d3436;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Form box */
+.Name-box,
+.Email-box,
+.Address-box,
+.Phone-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.checkout-container h3 {
+  flex-shrink: 0;
+  width: 80px;
+  font-size: 1rem;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Input style */
+.checkout-container input {
+  flex: 1;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  font-size: 0.95rem;
+  outline: none;
+  background-color: #fafafa;
+  transition: all 0.25s ease;
+}
+
+.checkout-container input:hover {
+  border-color: #b3d9ff;
+}
+
+.checkout-container input:focus {
+  border-color: #4dabf7;
+  background-color: #ffffff;
+  box-shadow: 0 0 8px rgba(77, 171, 247, 0.25);
+}
+
+/* Nút Submit */
+.checkout-button {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  gap: 10px;
+  text-align: center;
+}
+
+.checkout-button button {
+  padding: 12px 28px;
+  background: linear-gradient(45deg, #4dabf7, #228be6);
+  color: white;
+  font-weight: 600;
+  border: none;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.checkout-button button:hover {
+  background: linear-gradient(45deg, #339af0, #1c7ed6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(34, 139, 230, 0.3);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .recipient-container {
+    flex-direction: column;
+  }
+}
