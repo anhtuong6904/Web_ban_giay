@@ -11,42 +11,42 @@ function CategoriesGrid() {
       id: 'shoes',
       name: 'SHOES',
       icon: '👟',
-      description: 'Tất cả giày dép',
+      description: 'All footwear',
       route: '/products?tag=shoes'
     },
     {
       id: 'men',
       name: 'MEN',
       icon: '👨',
-      description: 'Dành cho nam giới',
+      description: 'For men',
       route: '/products?tag=men'
     },
     {
       id: 'women',
       name: 'WOMEN',
       icon: '👩',
-      description: 'Dành cho phụ nữ',
+      description: 'For women',
       route: '/products?tag=women'
     },
     {
       id: 'kids',
       name: 'KIDS',
       icon: '👶',
-      description: 'Dành cho trẻ em',
+      description: 'For kids',
       route: '/products?tag=kids'
     },
     {
       id: 'sports',
       name: 'SPORTS',
       icon: '⚽',
-      description: 'Thể thao chuyên nghiệp',
+      description: 'Professional sports',
       route: '/products?tag=sports'
     },
     {
       id: 'brands',
       name: 'BRANDS',
       icon: '🏷️',
-      description: 'Thương hiệu nổi tiếng',
+      description: 'Top brands',
       route: '/products?tag=brands'
     }
   ];
@@ -59,8 +59,8 @@ function CategoriesGrid() {
     <section className="categories-section">
       <div className="categories-container">
         <div className="categories-header">
-          <h2>🎯 KHÁM PHÁ THEO DANH MỤC</h2>
-          <p>Chọn danh mục yêu thích của bạn</p>
+          <h2>🎯 EXPLORE BY CATEGORY</h2>
+          <p>Choose your favorite category</p>
         </div>
 
         <div className="categories-grid">

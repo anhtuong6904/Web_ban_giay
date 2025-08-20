@@ -1,6 +1,8 @@
 /* Main Banner - Inspired by Biti's design */
 .main-banner {
-  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: white;
   padding: 60px 0;
   text-align: center;
@@ -52,6 +54,8 @@
   line-height: 1.6;
 }
 
+.banner-chips-wrap { margin: 18px auto 24px; max-width: 900px; }
+
 .banner-stats {
   display: flex;
   justify-content: center;
@@ -81,7 +85,7 @@
 .banner-cta {
   display: inline-block;
   background: white;
-  color: #ff6b35;
+  color: #000000;
   padding: 16px 32px;
   border-radius: 50px;
   text-decoration: none;
@@ -90,7 +94,7 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .banner-cta:hover {

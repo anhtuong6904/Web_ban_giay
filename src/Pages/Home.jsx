@@ -13,7 +13,7 @@ function Home() {
     <div className="home-wrapper">
       <MainBanner />
       <Slider />
-      <div className="section-dark"><div className="container-narrow"><CategoriesGrid /></div></div>
+      {/* Category section removed; chips moved into MainBanner */}
       <div className="section-ink"><div className="container-narrow"><HotPicks /></div></div>
       <div className="section-carbon"><div className="container-narrow"><NewProducts /></div></div>
       <CollaborationBanner />

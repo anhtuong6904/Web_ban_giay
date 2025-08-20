@@ -1,63 +1,70 @@
 /* Categories Grid - Hệ thống phân loại sản phẩm */
 .categories-section {
-  background: #f8f9fa;
+  background: transparent;
   padding: 60px 0;
 }
 
 .categories-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 28px 24px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 100%);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  backdrop-filter: saturate(140%) blur(6px);
 }
 
 /* Header */
 .categories-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 .categories-header h2 {
-  font-size: 2.5rem;
-  color: #2c3e50;
-  margin-bottom: 15px;
-  font-weight: 700;
+  font-size: 2.2rem;
+  color: #e9eef5;
+  margin-bottom: 10px;
+  font-weight: 800;
+  letter-spacing: .6px;
 }
 
 .categories-header p {
-  font-size: 1.1rem;
-  color: #7f8c8d;
+  font-size: 1rem;
+  color: rgba(233, 238, 245, 0.7);
   margin: 0;
 }
 
 /* Categories Grid */
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 25px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px;
+  margin-bottom: 8px;
 }
 
 /* Category Card */
 .category-card {
-  background: white;
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  transition: all 0.3s ease;
+  background: linear-gradient(180deg, rgba(9, 12, 16, 0.9) 0%, rgba(12, 16, 20, 0.9) 100%);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  border: 2px solid transparent;
+  border: 1px solid rgba(255,255,255,0.07);
 }
 
 .category-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+  border-color: rgba(255,255,255,0.18);
 }
 
 .category-card.active {
-  border-color: #3498db;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
+  border-color: rgba(93, 156, 236, 0.7);
+  background: linear-gradient(135deg, rgba(15,18,23,0.95) 0%, rgba(10,14,18,0.95) 100%);
 }
 
 .category-card.active::before {
@@ -66,15 +73,24 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #3498db, #2980b9);
+  height: 3px;
+  background: linear-gradient(90deg, #5dade2, #2980b9);
 }
 
 /* Category Icon */
 .category-icon {
-  font-size: 3rem;
-  margin-bottom: 20px;
+  font-size: 2.2rem;
+  margin-bottom: 18px;
   text-align: center;
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  border-radius: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  color: #eaf2ff;
+  background: radial-gradient(120% 120% at 30% 30%, rgba(93,156,236,0.45), rgba(93,156,236,0.12) 60%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid rgba(255,255,255,0.12);
 }
 
 /* Category Content */
@@ -83,18 +99,18 @@
 }
 
 .category-name {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #e9eef5;
+  margin-bottom: 6px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: .8px;
 }
 
 .category-description {
-  color: #7f8c8d;
-  margin-bottom: 20px;
-  font-size: 1rem;
+  color: rgba(233,238,245,0.65);
+  margin-bottom: 8px;
+  font-size: .92rem;
 }
 
 /* Subcategories */
@@ -131,8 +147,8 @@
 }
 
 .category-card:not(.active) .category-status {
-  background: #ecf0f1;
-  color: #7f8c8d;
+  background: rgba(255,255,255,0.08);
+  color: rgba(233,238,245,0.7);
 }
 
 .category-card.active .category-status {

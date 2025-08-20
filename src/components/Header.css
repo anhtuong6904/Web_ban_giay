@@ -1,15 +1,17 @@
 /* Header Styles - Inspired by Biti's design */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap');
 .header {
   background: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   position: sticky;
   top: 0;
   z-index: 1000;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* Top Promo Banner - Biti's style */
 .promo-banner {
-  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  background: linear-gradient(135deg, #000000, #86abd4);
   color: white;
   padding: 8px 0;
   text-align: center;
@@ -60,12 +62,12 @@
 /* Main Header */
 .header-main {
   background: white;
-  padding: 15px 0;
+  padding: 12px 0;
   border-bottom: 1px solid #e9ecef;
 }
 
 .header-container {
-  max-width: 1200px;
+  
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
@@ -100,20 +102,23 @@
 /* Navigation Menu */
 .nav-menu {
   display: flex;
+  align-items: center;
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 30px;
+  gap: 26px;
 }
 
 .nav-menu li a {
-  color: #34495e;
+  color: #2f3a46;
   text-decoration: none;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13.5px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 8px 0;
+  letter-spacing: .6px;
+  height: 44px;
+  display: flex;
+  align-items: center;
   position: relative;
   transition: color 0.3s;
 }
@@ -144,6 +149,15 @@
   gap: 20px;
 }
 
+/* Tidy action links */
+.header-link {
+  color: #2f3a46;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.header-link:hover { color: #3498db; }
+
 .search-bar {
   position: relative;
   width: 300px;
@@ -151,10 +165,11 @@
 
 .search-input {
   width: 100%;
-  padding: 10px 40px 10px 15px;
+  padding: 8px 40px 8px 14px;
   border: 2px solid #e9ecef;
-  border-radius: 25px;
+  border-radius: 999px;
   font-size: 14px;
+  line-height: 1;
   transition: border-color 0.3s;
 }
 
@@ -207,12 +222,19 @@
 }
 
 .cart-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: transparent;
-    border: none;
-  } 
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  gap: 5px;
+  background: #f6f8fa;
+  border: 1px solid #e6e9ee;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.cart-btn svg { color: #2f3a46; font-size: 20px; }
 .cart-icon:hover .cart-count {
   background: #e74c3c;
   color: white;
@@ -223,13 +245,18 @@
 }
 .cart-count {
   position: absolute;
+  top: -6px;
+  right: -6px;
   background: #e74c3c;
   color: white;
-  border-radius: 50%;
-  margin-top: -10px;
-  margin-left: 10px;
-  padding: 2px 6px ;
-  font-size: 12px;
+  border-radius: 999px;
+  padding: 0 6px;
+  height: 18px;
+  min-width: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
 }
 /* Language Selector */
 .language-selector {

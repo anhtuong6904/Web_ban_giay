@@ -1,9 +1,16 @@
 import React from 'react';
 import './MainBanner.css';
+import CategoryChips from './CategoryChips';
 
 export default function MainBanner() {
+  const base = process.env.PUBLIC_URL || '';
   return (
-    <section className="main-banner">
+    <section
+      className="main-banner"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.45)), url(${base}/images/main-banner.png)`
+      }}
+    >
       {/* Decorative Elements */}
       <div className="banner-decoration"></div>
       <div className="banner-decoration"></div>
@@ -35,6 +42,10 @@ export default function MainBanner() {
           </div>
         </div>
         
+        <div className="banner-chips-wrap">
+          <CategoryChips showTitle={false} />
+        </div>
+
         <a href="#products" className="banner-cta">
           Shop Now
         </a>
