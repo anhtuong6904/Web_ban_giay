@@ -13,11 +13,14 @@
 .promo-banner {
   background: linear-gradient(135deg, #000000, #86abd4);
   color: white;
-  padding: 8px 0;
+  padding: 10px 0;
+  min-height: 44px;
   text-align: center;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
 }
 
 .promo-banner a {
@@ -64,6 +67,8 @@
   background: white;
   padding: 12px 0;
   border-bottom: 1px solid #e9ecef;
+  position: relative;
+  z-index: 2;
 }
 
 .header-container {
@@ -87,17 +92,7 @@
   gap: 10px;
 }
 
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 20px;
-}
+.logo-img { width: 40px; height: 40px; object-fit: contain; display: block; }
 
 /* Navigation Menu */
 .nav-menu {
@@ -187,25 +182,115 @@
   cursor: pointer;
 }
 
-/* Profile Link */
-.profile-link {
+/* User Authentication Section */
+.user-section {
   display: flex;
   align-items: center;
-  gap: 8px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   text-decoration: none;
   color: #34495e;
   font-weight: 500;
   font-size: 14px;
-  transition: color 0.3s;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: transparent;
 }
 
-.profile-link:hover {
+.user-profile:hover {
   color: #3498db;
+  background: #f8f9fa;
+  transform: translateY(-1px);
 }
 
-.profile-text {
-  font-size: 14px;
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f3f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-avatar svg {
+  color: #7f8c8d;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.header-logout-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
   font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+}
+
+.header-logout-btn:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+}
+
+/* Auth Buttons */
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-btn {
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.signin-btn {
+  color: #3498db;
+  background: transparent;
+  border-color: #3498db;
+}
+
+.signin-btn:hover {
+  background: #3498db;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.signup-btn {
+  color: white;
+  background: #3498db;
+  border-color: #3498db;
+}
+
+.signup-btn:hover {
+  background: #2980b9;
+  border-color: #2980b9;
+  transform: translateY(-1px);
 }
 
 /* Cart Icon */
@@ -233,16 +318,19 @@
   border: 1px solid #e6e9ee;
   border-radius: 50%;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
-.cart-btn svg { color: #2f3a46; font-size: 20px; }
-.cart-icon:hover .cart-count {
-  background: #e74c3c;
-  color: white;
+
+.cart-btn:hover {
+  background: #e3f2fd;
+  border-color: #2196f3;
 }
-.cart-icon:hover .cart-count {
-  background: #e74c3c;
-  color: white;
+
+.cart-btn svg { 
+  color: #2f3a46; 
+  font-size: 20px; 
 }
+
 .cart-count {
   position: absolute;
   top: -6px;
@@ -257,6 +345,7 @@
   align-items: center;
   justify-content: center;
   font-size: 11px;
+  font-weight: bold;
 }
 /* Language Selector */
 .language-selector {
@@ -269,13 +358,7 @@
   cursor: pointer;
   transition: color 0.3s;
 }
-.cart-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: transparent;
-    border: none;
-  } 
+ 
 
 .language-selector:hover {
   color: #34495e;

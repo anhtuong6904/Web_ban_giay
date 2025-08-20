@@ -4,6 +4,7 @@ import FiltersSidebar from './FiltersSidebar';
 import { getProducts } from '../services/productService';
 import { formatPrice } from '../utils/formatPrice';
 import Pagination from './Pagination';
+import SmartImage from './SmartImage';
 import './ProductList.css';
 
 function ProductList() {
@@ -37,7 +38,7 @@ function ProductList() {
           if (Array.isArray(data)) {
             if (genderParam) {
               data = data.filter(p => String(p.Gender || '').toUpperCase() === genderParam);
-            } else if (['men','women','kids'].includes(tag)) {
+            } else if (['men','women','kids','sports'].includes(tag)) {
               data = data.filter(p => String(p.Gender || '').toUpperCase() === tag.toUpperCase());
             }
           }
@@ -103,10 +104,46 @@ function ProductList() {
     return stars;
   };
 
+  const normalizePath = (p) => {
+    if (!p) return null;
+    let path = String(p).replace(/\\/g, '/');
+    if (path.startsWith('images/')) path = '/' + path;
+    if (!path.startsWith('/')) path = '/' + path;
+    return path;
+  };
+
+  const slugify = (name) => {
+    if (!name) return '';
+    return String(name)
+      .trim()
+      .replace(/[^a-zA-Z0-9\s-]/g, '') // Loại bỏ ký tự đặc biệt
+      .replace(/\s+/g, '-') // Thay khoảng trắng bằng dấu gạch ngang
+      .replace(/-+/g, '-') // Thay nhiều dấu gạch ngang liên tiếp bằng một dấu
+      .replace(/^-|-$/g, ''); // Loại bỏ dấu gạch ngang ở đầu và cuối
+  };
+
+           const getMainImage = (product) => {
+        const direct = normalizePath(product.ImageURL || product.MainImage);
+        if (direct) return direct;
+        const slug = slugify(product.Name || product.ProductName || '');
+        if (slug) {
+          const path = `/images/products/${slug}/1.png`;
+          console.log('Product:', product.Name, 'Generated slug:', slug, 'Image path:', path);
+          console.log('Available folders:', [
+            'Nike-Air-Zoom-Pegasus-40',
+            'Adidas-Ultraboost-21',
+            'Puma-Cell-King',
+            'New-Balance-574'
+          ]);
+          return path;
+        }
+        return '/images/products/placeholder.jpg';
+      };
+
   return (
     <section className="products-section" id="products">
-      <div className="products-container" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '20px' }}>
-        <div>
+      <div className="products-container" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '28px' }}>
+        <div style={{ marginTop: 6 }}>
           <FiltersSidebar products={products} />
         </div>
         <div>
@@ -125,12 +162,12 @@ function ProductList() {
         <div className="products-grid">
           {pageItems.map(product => (
             <div key={product.ProductID || product.id} className="product-card" onClick={() => handleProductClick(product)}>
-              <div className="product-image">
-                <img 
-                  src={product.ImageURL || product.MainImage || '/images/products/placeholder.jpg'} 
-                  alt={product.Name}
-                  className="product-image"
-                />
+                             <div className="product-image">
+                 <SmartImage 
+                   src={getMainImage(product)} 
+                   alt={product.Name}
+                   className="product-image"
+                 />
                 {product.Discount > 0 && (
                   <div className="discount-badge">
                     -{product.Discount}%

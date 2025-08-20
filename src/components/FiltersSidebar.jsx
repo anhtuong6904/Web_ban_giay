@@ -8,8 +8,23 @@ export default function FiltersSidebar({ products }) {
 
   const paramsFromUrl = useMemo(() => {
     const sp = new URLSearchParams(location.search);
+    const tag = sp.get('tag') || '';
+    const gender = sp.get('gender') || '';
+    
+    // Map tag to gender for navigation sync
+    let mappedGender = gender;
+    if (tag && !gender) {
+      const tagToGender = {
+        'men': 'MEN',
+        'women': 'WOMEN', 
+        'kids': 'KIDS',
+        'sports': 'SPORTS'
+      };
+      mappedGender = tagToGender[tag.toLowerCase()] || '';
+    }
+    
     return {
-      gender: sp.get('gender') || '',
+      gender: mappedGender,
       brandName: sp.get('brandName') || '',
       categoryName: sp.get('categoryName') || '',
       priceMin: sp.get('priceMin') || '',
@@ -21,7 +36,7 @@ export default function FiltersSidebar({ products }) {
   useEffect(() => setState(paramsFromUrl), [paramsFromUrl]);
 
   const unique = (arr) => Array.from(new Set(arr.filter(Boolean)));
-  const genders = ['MEN', 'WOMEN', 'KIDS', 'UNISEX'];
+  const genders = ['MEN', 'WOMEN', 'KIDS', 'SPORTS'];
   const brands = useMemo(() => unique((products || []).map(p => p.Brand || p.brand || '')) , [products]);
   const categories = useMemo(() => unique((products || []).map(p => p.Category || p.category || '')) , [products]);
 
@@ -43,7 +58,29 @@ export default function FiltersSidebar({ products }) {
   const onChange = (key, value) => {
     const next = { ...state, [key]: value };
     setState(next);
-    apply(next);
+    
+    // If changing gender, also update tag parameter for navigation sync
+    if (key === 'gender') {
+      const genderToTag = {
+        'MEN': 'men',
+        'WOMEN': 'women',
+        'KIDS': 'kids', 
+        'SPORTS': 'sports'
+      };
+      const tag = genderToTag[value] || '';
+      
+      const sp = new URLSearchParams(location.search);
+      if (tag) {
+        sp.set('tag', tag);
+        sp.set('gender', value);
+      } else {
+        sp.delete('tag');
+        sp.delete('gender');
+      }
+      navigate(`/products?${sp.toString()}`);
+    } else {
+      apply(next);
+    }
   };
 
   const onPriceChange = (range) => {

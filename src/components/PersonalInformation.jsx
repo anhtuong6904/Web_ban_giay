@@ -363,8 +363,29 @@ export default function PersonalInformation() {
         <p>Cập nhật thông tin cá nhân và ảnh đại diện</p>
       </div>
 
-      <div className="personal-info-content">
-        <form onSubmit={handleSubmit} className="personal-info-form">
+      <div className="personal-info-body">
+        {/* Sidebar */}
+        <aside className="sidebar-card">
+          <div className="sidebar-avatar">
+            {imagePreview && !imageError ? (
+              <img src={imagePreview} alt="Avatar" />
+            ) : (
+              <DefaultAvatar />
+            )}
+          </div>
+          <div className="sidebar-info">
+            <h3 className="sidebar-name">{formData.displayName || 'User'}</h3>
+            <p className="sidebar-email">{formData.email}</p>
+          </div>
+          <ul className="sidebar-menu">
+            <li className="active">Profile</li>
+            <li>Recent Activity</li>
+            <li>Edit profile</li>
+          </ul>
+        </aside>
+
+        <div className="personal-info-content">
+          <form onSubmit={handleSubmit} className="personal-info-form">
           {/* Profile Image Section */}
           <div className="profile-image-section">
             <div className="current-image">
@@ -533,6 +554,7 @@ export default function PersonalInformation() {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

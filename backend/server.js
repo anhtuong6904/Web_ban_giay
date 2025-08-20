@@ -142,6 +142,85 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
+// API endpoints cho Users
+app.post('/api/users', async (req, res) => {
+  try {
+    const { firebaseUID, email, displayName, photoURL } = req.body;
+    
+    if (!firebaseUID || !email) {
+      return res.status(400).json({ error: 'FirebaseUID và Email là bắt buộc' });
+    }
+
+    const pool = await sql.connect(config);
+    
+    // Kiểm tra user đã tồn tại chưa
+    const checkUser = await pool.request()
+      .input('firebaseUID', sql.NVarChar, firebaseUID)
+      .query('SELECT UserID FROM Users WHERE FirebaseUID = @firebaseUID');
+    
+    if (checkUser.recordset.length > 0) {
+      // Cập nhật thông tin user
+      await pool.request()
+        .input('firebaseUID', sql.NVarChar, firebaseUID)
+        .input('email', sql.NVarChar, email)
+        .input('displayName', sql.NVarChar, displayName || null)
+        .input('photoURL', sql.NVarChar, photoURL || null)
+        .input('lastLoginAt', sql.DateTime2, new Date())
+        .query(`
+          UPDATE Users 
+          SET Email = @email, 
+              DisplayName = @displayName, 
+              PhotoURL = @photoURL, 
+              LastLoginAt = @lastLoginAt,
+              UpdatedAt = GETDATE()
+          WHERE FirebaseUID = @firebaseUID
+        `);
+      
+      return res.json({ message: 'User updated successfully' });
+    } else {
+      // Tạo user mới
+      const result = await pool.request()
+        .input('firebaseUID', sql.NVarChar, firebaseUID)
+        .input('email', sql.NVarChar, email)
+        .input('displayName', sql.NVarChar, displayName || null)
+        .input('photoURL', sql.NVarChar, photoURL || null)
+        .query(`
+          INSERT INTO Users (FirebaseUID, Email, DisplayName, PhotoURL, LastLoginAt)
+          VALUES (@firebaseUID, @email, @displayName, @photoURL, @lastLoginAt)
+        `);
+      
+      return res.json({ message: 'User created successfully' });
+    }
+  } catch (error) {
+    console.error('Error creating/updating user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    try { await sql.close(); } catch {}
+  }
+});
+
+app.get('/api/users/:firebaseUID', async (req, res) => {
+  try {
+    const { firebaseUID } = req.params;
+    
+    const pool = await sql.connect(config);
+    const result = await pool.request()
+      .input('firebaseUID', sql.NVarChar, firebaseUID)
+      .query('SELECT * FROM Users WHERE FirebaseUID = @firebaseUID');
+    
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json(result.recordset[0]);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    try { await sql.close(); } catch {}
+  }
+});
+
 // API lấy tất cả sản phẩm, có filter
 app.get('/api/products', async (req, res) =>{
   try {
@@ -150,7 +229,7 @@ app.get('/api/products', async (req, res) =>{
     console.log('Database connected successfully');
 
     // Supported query params:
-    // - gender: men|women|kids|unisex
+    // - gender: men|women|kids|sports
     // - brand: BrandID (number)
     // - brandName: string
     // - category: CategoryID (number)
@@ -164,12 +243,10 @@ app.get('/api/products', async (req, res) =>{
     // Tag mapping
     if (tag) {
       const t = String(tag).toLowerCase();
-      if (t === 'men') conditions.push("(Gender = 'MEN' OR Gender = 'UNISEX')");
-      if (t === 'women') conditions.push("(Gender = 'WOMEN' OR Gender = 'UNISEX')");
-      if (t === 'kids') conditions.push("(Gender = 'KIDS' OR Gender = 'UNISEX')");
-      if (t === 'sports') {
-        conditions.push("CategoryID IN (SELECT CategoryID FROM Categories WHERE Name IN ('Running','Basketball','Skateboarding','Giày thể thao','Giày chạy bộ'))");
-      }
+      if (t === 'men') conditions.push("Gender = 'MEN'");
+      if (t === 'women') conditions.push("Gender = 'WOMEN'");
+      if (t === 'kids') conditions.push("Gender = 'KIDS'");
+      if (t === 'sports') conditions.push("Gender = 'SPORTS'");
       // shoes => no extra filter; brands => needs brand/brandName to be effective
     }
 
@@ -265,6 +342,114 @@ app.get('/api/products/:id', async (req, res) => {
   }
 });
 
+// NEW: User API endpoints
+app.post('/api/users', async (req, res) => {
+  try {
+    const { firebaseUID, email, displayName, photoURL } = req.body;
+    if (!firebaseUID || !email) {
+      return res.status(400).json({ error: 'FirebaseUID và Email là bắt buộc' });
+    }
+
+    await sql.connect(config);
+    const checkUser = await sql.query(`
+      SELECT UserID FROM Users WHERE FirebaseUID = '${firebaseUID}'
+    `);
+
+    if (checkUser.recordset.length > 0) {
+      // Update existing user
+      await sql.query(`
+        UPDATE Users 
+        SET Email = '${email}', 
+            DisplayName = '${displayName || ''}', 
+            PhotoURL = '${photoURL || ''}', 
+            LastLoginAt = GETDATE(),
+            UpdatedAt = GETDATE()
+        WHERE FirebaseUID = '${firebaseUID}'
+      `);
+      res.json({ message: 'User updated successfully' });
+    } else {
+      // Create new user
+      await sql.query(`
+        INSERT INTO Users (FirebaseUID, Email, DisplayName, PhotoURL, LastLoginAt)
+        VALUES ('${firebaseUID}', '${email}', '${displayName || ''}', '${photoURL || ''}', GETDATE())
+      `);
+      res.json({ message: 'User created successfully' });
+    }
+  } catch (error) {
+    console.error('Error creating/updating user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    try {
+      await sql.close();
+    } catch {}
+  }
+});
+
+app.get('/api/users/:firebaseUID', async (req, res) => {
+  try {
+    const { firebaseUID } = req.params;
+    await sql.connect(config);
+    const result = await sql.query(`
+      SELECT * FROM Users WHERE FirebaseUID = '${firebaseUID}'
+    `);
+    
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json(result.recordset[0]);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    try {
+      await sql.close();
+    } catch {}
+  }
+});
+
+// Complete Orders API
+app.post('/api/orders', async (req, res) => {
+  const { recipient, items, paymentMethod = 'COD', note } = req.body || {};
+  if (!recipient || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: 'Missing recipient or items' });
+  }
+
+  try {
+    await sql.connect(config);
+    
+    // Create order
+    const orderResult = await sql.query(`
+      INSERT INTO Orders (CustomerName, Email, Address, Phone, PaymentMethod, Status, TotalAmount, CreatedAt)
+      OUTPUT INSERTED.OrderID
+      VALUES ('${recipient.name}', '${recipient.email}', '${recipient.address}', '${recipient.phone}', '${paymentMethod}', 'PENDING', ${items.reduce((sum, item) => sum + (item.price * item.quantity), 0)}, GETDATE())
+    `);
+    
+    const orderId = orderResult.recordset[0].OrderID;
+    
+    // Create order items
+    for (const item of items) {
+      await sql.query(`
+        INSERT INTO OrderItems (OrderID, ProductID, ProductName, Quantity, UnitPrice, Image)
+        VALUES (${orderId}, ${item.id}, '${item.name}', ${item.quantity}, ${item.price}, '${item.image}')
+      `);
+    }
+    
+    res.json({ 
+      success: true, 
+      orderId,
+      message: 'Order created successfully' 
+    });
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ error: 'Failed to create order' });
+  } finally {
+    try {
+      await sql.close();
+    } catch {}
+  }
+});
+
 const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
@@ -272,4 +457,7 @@ app.listen(PORT, () => {
   console.log(`   GET /api/test - Test server`);
   console.log(`   GET /api/products - Get all products`);
   console.log(`   GET /api/products/:id - Get product by ID`);
+  console.log(`   POST /api/users - Create/Update user`);
+  console.log(`   GET /api/users/:firebaseUID - Get user info`);
+  console.log(`   POST /api/orders - Create order`);
 }); 

@@ -1,12 +1,12 @@
 .filters-sidebar {
-  width: 260px;
   background: #fff;
   color: #111827;
   padding: 16px;
+  margin-top: 55px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
   position: sticky;
-  top: 84px;
+  top: 140px; /* keep below promo banner + header; avoid overlapping title */
   height: fit-content;
 }
 

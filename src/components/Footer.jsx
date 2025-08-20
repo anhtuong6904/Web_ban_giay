@@ -1,5 +1,5 @@
 import React from 'react';
-import { IoMail, IoCall, IoLocation, IoTime, IoLogoFacebook, IoLogoInstagram, IoLogoTwitter } from 'react-icons/io5';
+import { IoMail, IoCall, IoLocation, IoTime, IoLogoFacebook, IoLogoInstagram, IoLogoLinkedin } from 'react-icons/io5';
 import './Footer.css';
 
 export default function Footer() {
@@ -41,14 +41,14 @@ export default function Footer() {
           <div className="footer-section">
             <h3>Kết nối với chúng tôi</h3>
             <div className="social-media">
-              <a href="https://facebook.com" className="social-link" aria-label="Facebook">
+              <a href="https://www.facebook.com/giakiet1803/" className="social-link" aria-label="Facebook">
                 <IoLogoFacebook size={20} />
               </a>
-              <a href="https://instagram.com" className="social-link" aria-label="Instagram">
+              <a href="https://www.instagram.com/lf.vgkiwt_03/" className="social-link" aria-label="Instagram">
                 <IoLogoInstagram size={20} />
               </a>
-              <a href="https://twitter.com" className="social-link" aria-label="Twitter">
-                <IoLogoTwitter size={20} />
+              <a href="https://www.linkedin.com/in/gia-kiet-it-337342365/" className="social-link" aria-label="Linkedln">
+                <IoLogoLinkedin size={20} />
               </a>
             </div>
           </div>
@@ -64,7 +64,7 @@ export default function Footer() {
               </div>
               <div className="contact-details">
                 <h4>Hotline</h4>
-                <p>0966 158 666 (8h - 21h30)</p>
+                <p>0905 884 303 (8h - 21h30)</p>
               </div>
             </div>
             
@@ -74,7 +74,7 @@ export default function Footer() {
               </div>
               <div className="contact-details">
                 <h4>Email</h4>
-                <p>chamsockhachhang@uthshoes.com</p>
+                <p>chamsockhachhanguthshoes@gmail.com</p>
               </div>
             </div>
             
@@ -84,7 +84,7 @@ export default function Footer() {
               </div>
               <div className="contact-details">
                 <h4>Địa chỉ</h4>
-                <p>22 Lý Chiêu Hoàng, P.10, Q.6, TP.HCM</p>
+                <p>36/65 Nguyễn Gia Trí, P25, Quận Bình Thạnh, TP Hồ Chí Minh</p>
               </div>
             </div>
             
