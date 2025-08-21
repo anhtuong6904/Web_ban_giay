@@ -11,6 +11,7 @@ import ProductDetail from './components/ProductDetail';
 import ProductList from './components/ProductList';
 import Cart from './components/Cart';
 import PaymentPage from './Pages/PaymentPage';
+import OrderTracker from './Pages/OrderTracker';
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase";
 import { useEffect } from "react";
@@ -41,6 +42,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<PersonalInformationPage />} />
             <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/order-tracker" element={<OrderTracker />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
           </Routes>

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../services/productService';
+import { addToCart } from '../services/cartService';
+import { useAuth } from '../contexts/AuthContext';
 import './NewProducts.css';
 
 export default function NewProducts() {
   const [newProducts, setNewProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     const fetchNewProducts = async () => {
@@ -59,6 +62,37 @@ export default function NewProducts() {
 
   const formatPrice = (price) => {
     return price.toLocaleString('vi-VN') + ' ₫';
+  };
+
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(<i key={i} className="fas fa-star filled"></i>);
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(<i key={i} className="fas fa-star-half-alt half-filled"></i>);
+      } else {
+        stars.push(<i key={i} className="fas fa-star empty"></i>);
+      }
+    }
+    return stars;
+  };
+
+  const handleAddToCart = (e, product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!currentUser) {
+      alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.');
+      return;
+    }
+    const res = addToCart(product, { quantity: 1 });
+    if (product && product.Name) {
+      alert(`Đã thêm \"${product.Name}\" vào giỏ hàng!`);
+    } else {
+      alert('Đã thêm sản phẩm vào giỏ hàng!');
+    }
   };
 
   if (loading) {
@@ -134,6 +168,13 @@ export default function NewProducts() {
                   <h3 className="new-product-name">{product.Name}</h3>
                   <div className="new-product-brand">{product.Brand}</div>
 
+                  <div className="new-product-rating">
+                    <div className="stars">
+                      {renderStars(product.Rating || 4.5)}
+                    </div>
+                    <span className="rating-text">{(product.Rating || 4.5).toFixed(1)}</span>
+                  </div>
+
                   <div className="new-product-price">
                     <span className="current-price">{formatPrice(product.Price)}</span>
                     {product.OriginalPrice > product.Price && (
@@ -141,7 +182,17 @@ export default function NewProducts() {
                     )}
                   </div>
 
-                  <div className="new-product-stats">
+                  <div className="feature-chips">
+                    <span className="chip"><i className="fas fa-shipping-fast"></i> Giao nhanh</span>
+                    <span className="chip"><i className="fas fa-undo"></i> Đổi trả 7 ngày</span>
+                    <span className="chip"><i className="fas fa-shield-alt"></i> Bảo hành 12 tháng</span>
+                  </div>
+
+                  <div className="actions-row">
+                    <button className="add-to-cart-btn" onClick={(e) => handleAddToCart(e, product)}>
+                      <i className="fas fa-cart-plus"></i>
+                      Thêm vào giỏ
+                    </button>
                     <span className="new-indicator">
                       <i className="fas fa-clock"></i>
                       Mới về

@@ -1,21 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { RiDeleteBinLine } from "react-icons/ri";
 import './Cart.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { GiCancel } from "react-icons/gi";
 import { formatPrice } from '../utils/formatPrice';
-import { readCart, updateQuantity, removeItem, getCheckoutItems } from '../services/cartService';
+import { readCart, updateQuantity, removeItem, getCheckoutItems, setCheckoutItems, onCartChange } from '../services/cartService';
 
-export default function Cart({ onClose, isPopup = false }) {
+export default function Cart({ onClose, isPopup = false, useCheckoutItems = false }) {
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState(readCart());
+  const [selectedKeys, setSelectedKeys] = useState(new Set());
 
   useEffect(() => {
-    // If one-click checkout items exist, show those; else show full cart
-    const instant = getCheckoutItems();
-    setCartItems((instant && instant.length > 0) ? instant : readCart());
-  }, []);
+    const load = () => {
+      if (useCheckoutItems) {
+        const instant = getCheckoutItems();
+        setCartItems((instant && instant.length > 0) ? instant : readCart());
+      } else {
+        setCartItems(readCart());
+      }
+    };
+    load();
+    const unsub = onCartChange(load);
+    return () => { if (typeof unsub === 'function') unsub(); };
+  }, [useCheckoutItems]);
+
+  useEffect(() => {
+    // Auto-select all items when list changes
+    setSelectedKeys(new Set((cartItems || []).map(it => it.key)));
+  }, [cartItems]);
 
   const totalPrice = (cartItems || []).reduce((total, item) => total + (item.price || 0) * (item.quantity || 0), 0);
+  const selectedItems = (cartItems || []).filter(it => selectedKeys.has(it.key));
+  const selectedTotal = selectedItems.reduce((sum, it) => sum + (it.price || 0) * (it.quantity || 0), 0);
 
   const handleQuantityChange = (key, newQuantity) => {
     if (newQuantity < 1) return;
@@ -31,6 +48,31 @@ export default function Cart({ onClose, isPopup = false }) {
   const handleClearAll = () => {
     localStorage.removeItem('cartItems');
     setCartItems([]);
+  };
+
+  const toggleSelect = (key) => {
+    setSelectedKeys(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedKeys(prev => {
+      const allKeys = new Set((cartItems || []).map(it => it.key));
+      const allSelected = (prev && allKeys.size > 0) && [...allKeys].every(k => prev.has(k));
+      return allSelected ? new Set() : allKeys;
+    });
+  };
+
+  const handleCheckoutSelected = () => {
+    if (selectedItems.length === 0) {
+      alert('Vui lòng chọn ít nhất một sản phẩm để đặt hàng.');
+      return;
+    }
+    setCheckoutItems(selectedItems);
+    navigate('/payment');
   };
 
   if (!cartItems || cartItems.length === 0) {
@@ -71,6 +113,12 @@ export default function Cart({ onClose, isPopup = false }) {
       <div className="cart-items">
         {(cartItems || []).map(item => (
           <div key={item.key} className="cart-item">
+            <input
+              type="checkbox"
+              className="item-checkbox"
+              checked={selectedKeys.has(item.key)}
+              onChange={() => toggleSelect(item.key)}
+            />
             <div className="item-image">
               <img src={item.image} alt={item.name} />
             </div>
@@ -120,7 +168,14 @@ export default function Cart({ onClose, isPopup = false }) {
       {/* Cart Summary */}
       <div className="cart-summary">
         <div className="cart-total">
-          <h3>Tổng cộng: <span className="total-amount">{formatPrice(totalPrice)}</span></h3>
+          <div className="select-all">
+            <label>
+              <input type="checkbox" onChange={toggleSelectAll} checked={(cartItems || []).length > 0 && selectedItems.length === (cartItems || []).length} />
+              Chọn tất cả
+            </label>
+          </div>
+          <h3>Tổng đã chọn: <span className="total-amount">{formatPrice(selectedTotal)}</span></h3>
+          <div className="note">(Tổng giỏ hàng: {formatPrice(totalPrice)})</div>
         </div>
 
         {/* Cart actions */}
@@ -128,9 +183,9 @@ export default function Cart({ onClose, isPopup = false }) {
           <button className="clear-all-btn" onClick={handleClearAll}>
             Xóa tất cả
           </button>
-          <Link to="/payment" className="checkout-btn">
-            Đặt hàng ngay
-          </Link>
+          <button className="checkout-btn" onClick={handleCheckoutSelected}>
+            Đặt hàng (chỉ mục đã chọn)
+          </button>
         </div>
       </div>
     </div>

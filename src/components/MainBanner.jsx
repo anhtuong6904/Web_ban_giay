@@ -46,7 +46,7 @@ export default function MainBanner() {
           <CategoryChips showTitle={false} />
         </div>
 
-        <a href="#products" className="banner-cta">
+        <a href="http://localhost:3000/products" className="banner-cta">
           Shop Now
         </a>
       </div>

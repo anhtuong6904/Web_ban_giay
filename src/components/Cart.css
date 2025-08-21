@@ -78,6 +78,12 @@
   position: relative;
 }
 
+.item-checkbox {
+  margin-right: 15px;
+  width: 18px;
+  height: 18px;
+}
+
 .cart-item:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
@@ -237,6 +243,15 @@
   margin-bottom: 25px;
   padding-bottom: 20px;
   border-bottom: 2px solid #e9ecef;
+}
+
+.cart-total .select-all {
+  float: left;
+}
+
+.cart-total .note {
+  color: #6c757d;
+  font-size: 0.9rem;
 }
 
 .cart-total h3 {

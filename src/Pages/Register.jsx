@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../services/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useAuth } from '../contexts/AuthContext';
 import './Login.css';
 
 export default function Register() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setAddress] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -29,30 +30,28 @@ export default function Register() {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      
-      // Sử dụng username người dùng nhập hoặc lấy từ email
-      const displayName = username || email.split('@')[0];
-      
-      const userInfo = {
-        uid: user.uid,
-        email: user.email,
-        displayName: displayName,
-        photoURL: user.photoURL
-      };
-      
-              await login(userInfo);
-        alert('Đăng ký thành công!');
-        navigate('/home');
-    } catch (error) {
-      if (error.code === 'auth/email-already-in-use') {
-        setError('Email này đã được sử dụng!');
-      } else if (error.code === 'auth/weak-password') {
-        setError('Mật khẩu quá yếu!');
-      } else {
-        setError('Có lỗi xảy ra: ' + error.message);
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, fullName, email, phoneNumber, address })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Đăng ký thất bại');
       }
+
+      // Auto login local
+      await login({
+        uid: `local:${username}`,
+        email: email || '',
+        displayName: fullName || username,
+        photoURL: null
+      });
+
+      alert('Đăng ký thành công!');
+      navigate('/home');
+    } catch (error) {
+      setError(error.message || 'Có lỗi xảy ra');
     }
   };
 
@@ -63,9 +62,9 @@ export default function Register() {
           <h1>Đăng Ký Tài Khoản</h1>
           <p>Tạo tài khoản mới để mua sắm</p>
         </div>
-        
+
         {error && <div className="error-message">{error}</div>}
-        
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">Tên người dùng</label>
@@ -80,6 +79,17 @@ export default function Register() {
           </div>
 
           <div className="form-group">
+            <label htmlFor="fullName">Họ và tên</label>
+            <input
+              type="text"
+              id="fullName"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Nhập họ và tên"
+            />
+          </div>
+
+          <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
               type="email"
@@ -87,7 +97,28 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Nhập email của bạn"
-              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="phone">Số điện thoại</label>
+            <input
+              type="text"
+              id="phone"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="Nhập số điện thoại"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="address">Địa chỉ</label>
+            <input
+              type="text"
+              id="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Nhập địa chỉ"
             />
           </div>
 
@@ -122,7 +153,7 @@ export default function Register() {
 
         <div className="auth-footer">
           <p>
-            Đã có tài khoản? 
+            Đã có tài khoản?
             <button
               type="button"
               onClick={() => navigate('/login')}

@@ -1,11 +1,17 @@
+import React from 'react';
 import Recipient from '../components/Recipient';
-import Header from '../components/Header'; // Giả sử bạn có Header trong components
-import Footer from '../components/Footer'; // Giả sử bạn có Footer trong components
+import './PaymentPage.css';
+
 function PaymentPage() {
   return (
-    <div>
-        <Recipient/>
-        <Footer/>
+    <div className="payment-page">
+      <div className="payment-container">
+        <div className="payment-header">
+          <h1>Thanh Toán Đơn Hàng</h1>
+          <p>Vui lòng điền thông tin nhận hàng và chọn phương thức thanh toán</p>
+        </div>
+        <Recipient />
+      </div>
     </div>
   );
 }

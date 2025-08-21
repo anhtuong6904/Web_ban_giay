@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { auth } from '../services/firebase';
 import { updateProfile } from 'firebase/auth';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import './PersonalInformation.css';
 
 export default function PersonalInformation() {
@@ -30,11 +30,47 @@ export default function PersonalInformation() {
   const [imageError, setImageError] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
+  // Dùng lưu ảnh local (base64) để tránh giới hạn Firebase Storage trên gói miễn phí
+  const USE_LOCAL_IMAGE_STORAGE = true;
+
+  const getUserIdentity = (user) => {
+    return (
+      user?.uid ||
+      user?.email ||
+      user?.Username ||
+      user?.username ||
+      user?.id ||
+      'guest'
+    );
+  };
+  const getLocalPhotoKey = (identity) => `userPhotoBase64:${identity}`;
+  const loadLocalPhoto = (identity) => {
+    try {
+      return localStorage.getItem(getLocalPhotoKey(identity));
+    } catch {
+      return null;
+    }
+  };
+  const saveLocalPhoto = (identity, dataUrl) => {
+    try {
+      localStorage.setItem(getLocalPhotoKey(identity), dataUrl);
+      // Emit event để header cập nhật ảnh
+      window.dispatchEvent(new CustomEvent('profileImageChanged'));
+    } catch {}
+  };
+
   useEffect(() => {
     if (!currentUser) {
       navigate('/login');
       return;
     }
+
+    console.log('👤 Current user loaded:', {
+      uid: currentUser.uid,
+      email: currentUser.email,
+      displayName: currentUser.displayName,
+      photoURL: currentUser.photoURL
+    });
 
     // Load current user data
     setFormData({
@@ -46,14 +82,22 @@ export default function PersonalInformation() {
       country: currentUser.country || 'Việt Nam'
     });
 
-    // Set image preview
-    if (currentUser.photoURL) {
+    // Ưu tiên ảnh base64 lưu cục bộ nếu có
+    const identity = getUserIdentity(currentUser);
+    const localPhoto = loadLocalPhoto(identity);
+    if (localPhoto) {
+      setImagePreview(localPhoto);
+      setImageError(false);
+      console.log('🖼️ Using local profile image (base64)');
+    } else if (currentUser.photoURL) {
       setImagePreview(currentUser.photoURL);
       setImageError(false);
+      console.log('🖼️ User has profile image:', currentUser.photoURL);
     } else {
       // Use default avatar SVG
       setImagePreview('');
       setImageError(false);
+      console.log('🖼️ No profile image, using default avatar');
     }
   }, [currentUser, navigate]);
 
@@ -157,20 +201,46 @@ export default function PersonalInformation() {
 
   const uploadProfileImage = async (file) => {
     try {
+      console.log('🚀 Bắt đầu upload ảnh...');
+      // Nếu dùng chế độ miễn phí, bỏ qua Firebase và lưu base64 ngay
+      if (true) {
+        return await new Promise((resolve, reject) => {
+          try {
+            setUploadProgress(1);
+            const reader = new FileReader();
+            reader.onload = () => {
+              setUploadProgress(100);
+              const base64Image = reader.result;
+              console.log('✅ Đã tạo base64 thành công');
+              // Lưu cục bộ để tái sử dụng
+              const identity = getUserIdentity(currentUser);
+              saveLocalPhoto(identity, base64Image);
+              resolve(base64Image);
+            };
+            reader.onerror = () => reject(new Error('Không đọc được file ảnh'));
+            reader.readAsDataURL(file);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
+
       const storage = getStorage();
-      console.log('Storage initialized:', storage);
       
-      // Tạo tên file ngắn gọn hơn
+      // Kiểm tra kết nối Firebase
+      if (!storage) {
+        throw new Error('Không thể kết nối Firebase Storage');
+      }
+      
       const timestamp = Date.now();
       const fileExtension = file.name.split('.').pop();
       const fileName = `profile_${timestamp}.${fileExtension}`;
-      
       const imageRef = ref(storage, `profile-images/${currentUser.uid}/${fileName}`);
-      console.log('Image reference created:', imageRef);
       
-      // Upload với metadata tối ưu
+      console.log('📁 Đường dẫn ảnh:', `profile-images/${currentUser.uid}/${fileName}`);
+
       const metadata = {
-        cacheControl: 'public, max-age=31536000', // Cache 1 năm
+        cacheControl: 'public, max-age=31536000',
         contentType: file.type,
         customMetadata: {
           uploadedBy: currentUser.uid,
@@ -178,30 +248,69 @@ export default function PersonalInformation() {
           size: file.size.toString()
         }
       };
-      
-      console.log('Starting upload with metadata:', metadata);
-      const snapshot = await uploadBytes(imageRef, file, metadata);
-      console.log('Upload completed:', snapshot);
-      
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      console.log('Download URL:', downloadURL);
-      
-      return downloadURL;
+
+      return await new Promise((resolve, reject) => {
+        console.log('📤 Bắt đầu upload task...');
+        const uploadTask = uploadBytesResumable(imageRef, file, metadata);
+
+        // Auto-timeout sau 30s để tránh kẹt
+        const timeoutId = setTimeout(() => {
+          try { 
+            console.log('⏰ Timeout - hủy upload');
+            uploadTask.cancel(); 
+          } catch {}
+          reject(new Error('Quá thời gian tải ảnh (30s). Vui lòng thử lại.'));
+        }, 30000);
+
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+            const percent = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            console.log(`📊 Upload progress: ${percent}%`);
+            setUploadProgress(Math.min(99, Math.max(1, percent)));
+          }, 
+          (error) => {
+            clearTimeout(timeoutId);
+            console.error('❌ Upload error:', error);
+            
+            // Xử lý các lỗi cụ thể
+            switch (error.code) {
+              case 'storage/unauthorized':
+                reject(new Error('Không có quyền upload ảnh. Vui lòng đăng nhập lại.'));
+                break;
+              case 'storage/quota-exceeded':
+                reject(new Error('Dung lượng lưu trữ đã hết. Vui lòng thử lại sau.'));
+                break;
+              case 'storage/network-request-failed':
+                reject(new Error('Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.'));
+                break;
+              case 'storage/canceled':
+                reject(new Error('Upload đã bị hủy.'));
+                break;
+              case 'storage/unauthenticated':
+                reject(new Error('Chưa đăng nhập. Vui lòng đăng nhập lại.'));
+                break;
+              default:
+                reject(new Error(`Lỗi upload: ${error.message || 'Không xác định'}`));
+            }
+          }, 
+          async () => {
+            try {
+              clearTimeout(timeoutId);
+              console.log('✅ Upload hoàn thành, đang lấy download URL...');
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              console.log('🔗 Download URL:', downloadURL);
+              setUploadProgress(100);
+              resolve(downloadURL);
+            } catch (downloadError) {
+              console.error('❌ Download URL error:', downloadError);
+              reject(new Error('Lỗi khi lấy URL ảnh: ' + downloadError.message));
+            }
+          }
+        );
+      });
     } catch (error) {
-      console.error('Upload error details:', error);
-      
-      // Xử lý các loại lỗi cụ thể
-      if (error.code === 'storage/unauthorized') {
-        throw new Error('Không có quyền upload ảnh. Vui lòng đăng nhập lại.');
-      } else if (error.code === 'storage/quota-exceeded') {
-        throw new Error('Dung lượng lưu trữ đã hết. Vui lòng thử lại sau.');
-      } else if (error.code === 'storage/network-request-failed') {
-        throw new Error('Lỗi kết nối mạng. Vui lòng kiểm tra internet và thử lại.');
-      } else if (error.code === 'storage/unauthorized' || error.message.includes('CORS')) {
-        throw new Error('Lỗi CORS: Vui lòng kiểm tra Firebase Storage Rules hoặc thử lại sau.');
-      } else {
-        throw new Error('Lỗi khi tải ảnh lên: ' + error.message);
-      }
+      console.error('❌ Upload function error:', error);
+      throw error;
     }
   };
 
@@ -220,91 +329,65 @@ export default function PersonalInformation() {
         setMessage('Đang tải ảnh lên...');
         setMessageType('success');
         
-        // Progress simulation với timing tốt hơn
-        const progressInterval = setInterval(() => {
-          setUploadProgress(prev => {
-            const newProgress = prev + 10;
-            console.log(`Progress: ${prev}% → ${newProgress}%`);
-            if (newProgress >= 70) {
-              clearInterval(progressInterval);
-              console.log('Progress interval cleared at 70%');
-              return 70;
-            }
-            return newProgress;
-          });
-        }, 150);
-        
         try {
+          // Thử upload lên Firebase Storage
           newPhotoURL = await uploadProfileImage(profileImage);
-          console.log('Upload completed successfully');
           setMessage('Ảnh đã tải lên thành công! 🎉');
           setMessageType('success');
-        } catch (error) {
-          console.error('Upload failed, but continuing with progress animation:', error);
-          // Vẫn tiếp tục animation ngay cả khi upload thất bại
-          // Sử dụng ảnh hiện tại nếu upload thất bại
-          newPhotoURL = currentUser.photoURL;
           
-          // Hiển thị thông báo lỗi upload cụ thể
-          if (error.message.includes('CORS')) {
-            setMessage('Lỗi CORS: Vui lòng kiểm tra Firebase Storage Rules. Vẫn cập nhật thông tin khác.');
-          } else {
-            setMessage(`Lỗi khi upload ảnh: ${error.message}. Vẫn cập nhật thông tin khác.`);
-          }
-          setMessageType('error');
-        }
-        
-        clearInterval(progressInterval);
-        console.log('Starting smooth animation to 100%');
-        
-        // Chạy mượt mà đến 100% sau khi upload xong (hoặc thất bại)
-        const animateProgress = (start, end, duration) => {
-          const startTime = performance.now();
-          const animate = (currentTime) => {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const currentProgress = start + (end - start) * progress;
-            const roundedProgress = Math.round(currentProgress);
-            
-            setUploadProgress(roundedProgress);
-            console.log(`Animation progress: ${roundedProgress}%`);
-            
-            if (progress < 1) {
-              requestAnimationFrame(animate);
-            } else {
-              console.log('Animation completed at 100%');
+          // Cập nhật preview ngay lập tức
+          setImagePreview(newPhotoURL);
+          setImageError(false);
+          
+        } catch (error) {
+          console.error('Image upload failed:', error);
+          
+          // Fallback: Lưu ảnh dưới dạng base64 vào localStorage
+          if (error.message.includes('CORS') || error.message.includes('network')) {
+            try {
+              const reader = new FileReader();
+              reader.onload = () => {
+                const base64Image = reader.result;
+                newPhotoURL = base64Image;
+                setImagePreview(base64Image);
+                setMessage('Ảnh đã lưu tạm thời (offline mode). Vẫn cập nhật thông tin khác.');
+                setMessageType('warning');
+              };
+              reader.readAsDataURL(profileImage);
+            } catch (fallbackError) {
+              console.error('Fallback failed:', fallbackError);
+              newPhotoURL = currentUser.photoURL;
+              setMessage(`Lỗi khi upload ảnh: ${error.message}. Vẫn cập nhật thông tin khác.`);
+              setMessageType('error');
             }
-          };
-          requestAnimationFrame(animate);
-        };
-        
-        // Animate từ 70% đến 100%
-        setTimeout(() => {
-          console.log('Starting animation from 70% to 100%');
-          animateProgress(70, 100, 800);
-        }, 100);
-        
-        setTimeout(() => {
+          } else {
+            newPhotoURL = currentUser.photoURL;
+            setMessage(`Lỗi khi upload ảnh: ${error.message}. Vẫn cập nhật thông tin khác.`);
+            setMessageType('error');
+          }
+        } finally {
           setUploadingImage(false);
-        }, 1000);
-        
-        // Delay để hiển thị thông báo và animation
-        setTimeout(() => {
-          setMessage('Đang cập nhật thông tin...');
-        }, 1500);
+        }
       }
 
-      // Update Firebase profile
-      setMessage('Đang cập nhật thông tin...');
-      await updateProfile(auth.currentUser, {
-        displayName: formData.displayName,
-        photoURL: newPhotoURL
-      });
+      // Update Firebase profile (chỉ cập nhật displayName để tránh lỗi photoURL quá dài)
+      try {
+        setMessage('Đang cập nhật thông tin Firebase...');
+        await updateProfile(auth.currentUser, {
+          displayName: formData.displayName
+          // Không set photoURL vì base64 quá dài sẽ gây auth/invalid-profile-attribute
+        });
+        console.log('Firebase profile updated successfully (displayName only)');
+      } catch (firebaseError) {
+        console.error('Firebase profile update failed:', firebaseError);
+        // Không throw để không chặn luồng khi ảnh lưu local
+      }
 
       // Update local user info
       const updatedUserInfo = {
         ...currentUser,
         displayName: formData.displayName,
+        // Lưu photoURL vào local profile (không push lên Firebase nếu là base64)
         photoURL: newPhotoURL,
         phone: formData.phone,
         address: formData.address,
@@ -313,10 +396,16 @@ export default function PersonalInformation() {
       };
 
       // Update localStorage and context
-      localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
-      login(updatedUserInfo);
+      try {
+        localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
+        login(updatedUserInfo);
+        console.log('Local user info updated successfully');
+      } catch (localError) {
+        console.error('Local update failed:', localError);
+        // Không throw error vì Firebase đã update thành công
+      }
 
-      setMessage('Cập nhật thông tin thành công!');
+      setMessage('Cập nhật thông tin thành công! 🎉');
       setMessageType('success');
       
       // Clear image selection
@@ -324,6 +413,7 @@ export default function PersonalInformation() {
       setUploadProgress(0);
       
     } catch (error) {
+      console.error('Profile update failed:', error);
       setMessage('Lỗi khi cập nhật thông tin: ' + error.message);
       setMessageType('error');
       setUploadProgress(0);

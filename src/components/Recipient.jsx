@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Cart from './Cart';
 import './Recipient.css';
-import { readCart, clearCart, getCheckoutItems, clearCheckoutItems } from '../services/cartService';
+import { readCart, clearCart, getCheckoutItems, clearCheckoutItems, removeItems } from '../services/cartService';
 import { createOrder } from '../services/orderService';
 import { useNavigate } from 'react-router-dom';
 
@@ -60,12 +60,39 @@ export default function Recipient() {
   // Momo: tạo đơn qua backend (demo lưu DB), rồi điều hướng
   const handlePaymentMomo = async () => {
     try {
+      // Validate form data
+      if (!formData.name || !formData.email || !formData.address || !formData.phone) {
+        alert('Vui lòng điền đầy đủ thông tin nhận hàng!');
+        return;
+      }
+
       setLoading(true);
-      const cart = readCart();
-      const result = await createOrder(formData, cart, 'MOMO');
+      const itemsToBuy = getCheckoutItems();
+      const items = (itemsToBuy && itemsToBuy.length > 0) ? itemsToBuy : readCart();
+      
+      if (!items || items.length === 0) {
+        alert('Không có sản phẩm nào để đặt hàng!');
+        return;
+      }
+
+      console.log('Creating order with:', { formData, items, paymentMethod: 'MOMO' });
+      
+      const result = await createOrder(formData, items, 'MOMO');
+      
+      // Lưu đơn hàng vào localStorage để Order Tracker hiển thị
+      saveOrderToLocalStorage(result, items, 'MOMO');
+      
       alert(`Đã tạo đơn hàng #${result.orderId}. Vui lòng tiếp tục thanh toán trên ứng dụng MoMo.`);
-      clearCart();
-      navigate('/');
+      if (itemsToBuy && itemsToBuy.length > 0) {
+        removeItems(itemsToBuy.map(it => it.key));
+        clearCheckoutItems();
+      } else {
+        clearCart();
+      }
+      navigate('/order-tracker');
+    } catch (error) {
+      console.error('Payment MOMO failed:', error);
+      alert('Lỗi khi đặt hàng: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -73,20 +100,92 @@ export default function Recipient() {
 
   // COD: xác nhận và tạo đơn nội bộ
   const handlePaymentCOD = () => {
+    // Validate form data
+    if (!formData.name || !formData.email || !formData.address || !formData.phone) {
+      alert('Vui lòng điền đầy đủ thông tin nhận hàng!');
+      return;
+    }
+
     const ok = window.confirm('Xác nhận đặt hàng và thanh toán khi nhận hàng (COD)?');
     if (!ok) return;
+    
     (async () => {
       setLoading(true);
       try {
-        const cart = readCart();
-        const result = await createOrder(formData, cart, 'COD');
+        const itemsToBuy = getCheckoutItems();
+        const items = (itemsToBuy && itemsToBuy.length > 0) ? itemsToBuy : readCart();
+        
+        if (!items || items.length === 0) {
+          alert('Không có sản phẩm nào để đặt hàng!');
+          return;
+        }
+
+        console.log('Creating order with:', { formData, items, paymentMethod: 'COD' });
+        
+        const result = await createOrder(formData, items, 'COD');
+        
+        // Lưu đơn hàng vào localStorage để Order Tracker hiển thị
+        saveOrderToLocalStorage(result, items, 'COD');
+        
         alert(`Đặt hàng thành công! Mã đơn #${result.orderId}.`);
-        clearCart();
-        navigate('/');
+        if (itemsToBuy && itemsToBuy.length > 0) {
+          removeItems(itemsToBuy.map(it => it.key));
+          clearCheckoutItems();
+        } else {
+          clearCart();
+        }
+        navigate('/order-tracker');
+      } catch (error) {
+        console.error('Payment COD failed:', error);
+        alert('Lỗi khi đặt hàng: ' + error.message);
       } finally {
         setLoading(false);
       }
     })();
+  };
+
+  // Hàm lưu đơn hàng vào localStorage
+  const saveOrderToLocalStorage = (orderResult, items, paymentMethod) => {
+    try {
+      // Lấy user identity để lưu đơn hàng theo user
+      const userIdentity = localStorage.getItem('userInfo');
+      let userId = 'guest';
+      
+      if (userIdentity) {
+        try {
+          const userInfo = JSON.parse(userIdentity);
+          userId = userInfo.uid || userInfo.email || userInfo.Username || userInfo.username || 'guest';
+        } catch {}
+      }
+
+      const orderKey = `userOrders:${userId}`;
+      const existingOrders = localStorage.getItem(orderKey);
+      const orders = existingOrders ? JSON.parse(existingOrders) : [];
+
+      const newOrder = {
+        orderId: orderResult.orderId,
+        orderDate: new Date().toISOString(),
+        status: 'pending',
+        paymentMethod: paymentMethod,
+        customerInfo: formData,
+        items: items.map(item => ({
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image,
+          size: item.size,
+          color: item.color
+        })),
+        total: items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      };
+
+      orders.unshift(newOrder); // Thêm đơn hàng mới vào đầu
+      localStorage.setItem(orderKey, JSON.stringify(orders));
+      
+      console.log('Đã lưu đơn hàng vào localStorage:', newOrder);
+    } catch (error) {
+      console.error('Lỗi khi lưu đơn hàng:', error);
+    }
   };
 
   return (

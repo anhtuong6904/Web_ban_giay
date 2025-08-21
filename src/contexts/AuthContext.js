@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth } from '../services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { readCart, clearCart } from '../services/cartService';
 
 const AuthContext = createContext();
 
@@ -43,14 +44,15 @@ export function AuthProvider({ children }) {
   const login = async (userInfo) => {
     setCurrentUser(userInfo);
     localStorage.setItem('userInfo', JSON.stringify(userInfo));
-    
-    // Lưu thông tin user vào database
+
+    // Nếu là user local (không dùng Firebase), bỏ qua lưu /api/users
+    const isLocal = !userInfo?.uid || String(userInfo.uid).startsWith('local:');
+    if (isLocal) return;
+
     try {
       const response = await fetch('/api/users', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           firebaseUID: userInfo.uid,
           email: userInfo.email,
@@ -58,7 +60,6 @@ export function AuthProvider({ children }) {
           photoURL: userInfo.photoURL
         }),
       });
-      
       if (!response.ok) {
         console.error('Failed to save user to database');
       }
@@ -68,8 +69,16 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    try {
+      const raw = localStorage.getItem('userInfo');
+      const parsed = raw ? JSON.parse(raw) : null;
+      // Không xóa ảnh base64 đã lưu theo identity
+      // Chỉ xóa thông tin đăng nhập
+    } catch {}
     setCurrentUser(null);
     localStorage.removeItem('userInfo');
+    // Clear guest cart when logging out to enforce per-user cart isolation
+    try { clearCart(); } catch (e) {}
   };
 
   const value = {

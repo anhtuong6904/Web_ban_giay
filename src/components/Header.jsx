@@ -16,12 +16,69 @@ export default function Header() {
   const [closing, setClosing] = useState(false);
   const location = useLocation();
   const [cartCount, setCartCount] = useState(getCartCount());
+  const [searchTerm, setSearchTerm] = useState('');
+  const [profileImageVersion, setProfileImageVersion] = useState(0);
   const base = process.env.PUBLIC_URL || '';
+
+  // Hàm để lấy ảnh profile từ localStorage (base64) hoặc từ currentUser
+  const getProfileImage = () => {
+    if (!currentUser) return null;
+    
+    // Ưu tiên ảnh base64 từ localStorage
+    const getUserIdentity = (user) => {
+      return (
+        user?.uid ||
+        user?.email ||
+        user?.Username ||
+        user?.username ||
+        user?.id ||
+        'guest'
+      );
+    };
+    
+    const identity = getUserIdentity(currentUser);
+    const localPhotoKey = `userPhotoBase64:${identity}`;
+    
+    try {
+      const localPhoto = localStorage.getItem(localPhotoKey);
+      if (localPhoto) {
+        return localPhoto;
+      }
+    } catch {}
+    
+    // Fallback về photoURL từ currentUser
+    return currentUser.photoURL;
+  };
+
+  const profileImage = getProfileImage();
 
   React.useEffect(() => {
     setCartCount(getCartCount());
     const off = onCartChange(() => setCartCount(getCartCount()));
     return off;
+  }, []);
+
+  // Lắng nghe thay đổi ảnh profile từ localStorage
+  React.useEffect(() => {
+    const handleStorageChange = () => {
+      // Force re-render khi localStorage thay đổi
+      setProfileImageVersion(prev => prev + 1);
+    };
+
+    // Lắng nghe sự kiện storage change
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Lắng nghe sự kiện custom khi ảnh profile thay đổi
+    const handleProfileImageChange = () => {
+      setProfileImageVersion(prev => prev + 1);
+    };
+    
+    window.addEventListener('profileImageChanged', handleProfileImageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('profileImageChanged', handleProfileImageChange);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -40,6 +97,13 @@ export default function Header() {
     setTimeout(() => {
       setCartVisible(false);
     }, 300); // khớp thời gian CSS
+  };
+
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm(''); // Clear search after navigation
+    }
   };
 
   return (
@@ -99,8 +163,12 @@ export default function Header() {
               <div className="user-section">
                 <Link to="/profile" className="user-profile">
                   <div className="user-avatar">
-                    {currentUser.photoURL ? (
-                      <img src={currentUser.photoURL} alt="Avatar" />
+                    {profileImage ? (
+                      <img 
+                        src={profileImage} 
+                        alt="Avatar" 
+                        key={profileImageVersion} // Force re-render khi ảnh thay đổi
+                      />
                     ) : (
                       <IoPerson size={20} />
                     )}
@@ -128,8 +196,20 @@ export default function Header() {
                 type="text" 
                 className="search-input" 
                 placeholder="Bạn cần tìm gì..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearch();
+                  }
+                }}
               />
-              <IoSearch className="search-icon" size={18} />
+              <IoSearch 
+                className="search-icon" 
+                size={18} 
+                onClick={handleSearch}
+                style={{ cursor: 'pointer' }}
+              />
             </div>
 
             {/* Language Selector */}

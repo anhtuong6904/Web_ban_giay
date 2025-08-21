@@ -18,7 +18,85 @@
 
 .filters-sidebar select { width: 100%; padding: 10px 12px; border-radius: 6px; background: #fff; color: #111827; border: 1px solid #e5e7eb; font-size: 13px; }
 
-.price-chip { display: block; width: 100%; text-align: left; background: #fff; color: #111827; border: 1px solid #e5e7eb; padding: 10px 12px; border-radius: 6px; margin-bottom: 8px; cursor: pointer; font-size: 13px; }
-.price-chip.active { background: #111827; color: #fff; border-color: #111827; }
+.price-chip, .discount-chip, .rating-chip { 
+  display: block; 
+  width: 100%; 
+  text-align: left; 
+  background: #fff; 
+  color: #111827; 
+  border: 1px solid #e5e7eb; 
+  padding: 10px 12px; 
+  border-radius: 6px; 
+  margin-bottom: 8px; 
+  cursor: pointer; 
+  font-size: 13px; 
+  transition: all 0.2s ease;
+}
+
+.price-chip:hover, .discount-chip:hover, .rating-chip:hover {
+  border-color: #3498db;
+  background: #f8fafc;
+}
+
+.price-chip.active, .discount-chip.active, .rating-chip.active { 
+  background: #111827; 
+  color: #fff; 
+  border-color: #111827; 
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.price-filters, .discount-filters, .rating-filters {
+  margin-bottom: 12px;
+}
+
+.clear-btn { 
+  background: none; 
+  border: 0; 
+  color: #2563eb; 
+  cursor: pointer; 
+  margin-top: 6px; 
+  font-size: 12px; 
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.clear-btn:hover {
+  color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.clear-btn i {
+  font-size: 10px;
+}
+
+.quick-filter-btn {
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.quick-filter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.quick-filter-btn i {
+  font-size: 12px;
+}
 
 
