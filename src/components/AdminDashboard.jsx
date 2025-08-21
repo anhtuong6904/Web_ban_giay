@@ -24,7 +24,7 @@ const salesData = [
 const Dashboard = () => {
   return (
     <div className="dashboard">
-      <h1 className="dashboard-title">📊 Admin Dashboard</h1>
+      <h1 className="dashboard-title">Admin Dashboard</h1>
       <p className="dashboard-subtitle">Tổng quan tình hình kinh doanh cửa hàng giày</p>
 
       {/* Thống kê nhanh */}

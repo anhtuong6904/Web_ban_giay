@@ -29,9 +29,6 @@ export default function Admin() {
           <Route path="manage-users" element={<ManageUsers />} />
           <Route path="reports" element={<Reports />} />
           <Route path="home" element={<Home />} />
-
-          {/* Nếu path không khớp, redirect về dashboard */}
-          <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Routes>
       </div>
     </div>

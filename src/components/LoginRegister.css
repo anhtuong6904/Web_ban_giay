@@ -48,4 +48,19 @@
 .login-register-form button:hover:not(:disabled) {
     background-color: #0056b3;
 }
+
+.toggle-auth-btn {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: underline;
+    padding: 0;
+    margin-left: 5px;
+}
+
+.toggle-auth-btn:hover {
+    color: #0056b3;
+}
     

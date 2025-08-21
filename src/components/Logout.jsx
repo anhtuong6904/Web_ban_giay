@@ -1,4 +1,4 @@
-export default function AdminDashboard() {
+export default function Logout() {
   return (
     <div className="p-4">
       <h1>Admin Dashboard</h1>

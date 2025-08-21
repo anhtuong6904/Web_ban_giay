@@ -467,6 +467,7 @@ export default function ProductDetail() {
   const handleAddToCart = () => {
     const quantityToAdd = Math.max(1, quantity || 1);
     addToCart(product, { size: selectedSize || null, color: selectedColor || null, quantity: quantityToAdd });
+    
     alert(`Đã thêm ${product.Name}${selectedSize ? ` - Size ${selectedSize}` : ''} vào giỏ hàng!`);
   };
 

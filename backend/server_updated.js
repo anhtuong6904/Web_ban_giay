@@ -93,6 +93,24 @@ app.get('/api/genders', async (req, res) => {
   }
 });
 
+app.get('/api/billing', (req, res) => {
+  try{
+    // Giả lập dữ liệu thanh toán
+    const billingData = {
+      total: 1000000,
+      currency: 'VND',
+      paymentMethods: ['VNPay', 'Momo', 'COD'],
+      orderId: '12345',
+      orderInfo: 'Thanh toán đơn hàng #12345'
+    };
+    
+    res.json(billingData);
+  } catch (err) {
+    console.error('Lỗi lấy dữ liệu thanh toán:', err);
+    res.status(500).json({ error: 'Không thể lấy dữ liệu thanh toán' });
+  }
+});
+
 // API lấy tất cả sản phẩm với filter linh hoạt
 app.get('/api/products', async (req, res) => {
   try {

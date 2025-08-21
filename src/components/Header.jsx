@@ -17,8 +17,8 @@ export default function Header() {
   const [closing, setClosing] = useState(false);
   const location = useLocation();
   const [cartCount, setCartCount] = useState(getCartCount());
-  const isAdmin = currentUser && currentUser.role === 'admin';
-  
+
+  const base = process.env.PUBLIC_URL || '';
 
   React.useEffect(() => {
     setCartCount(getCartCount());
@@ -68,7 +68,7 @@ export default function Header() {
         <div className="header-container">
           {/* Logo */}
           <Link to="/home" className="logo">
-            <div className="logo-icon">U</div>
+            <img className="logo-img" src={`${base}/images/logo.png`} alt="Logo" />
             UTH Shoes
           </Link>
 
@@ -106,16 +106,32 @@ export default function Header() {
 
             {/* Profile Link */}
             
+            {/* User Authentication Section */}
             {currentUser ? (
-              <Link to="/profile" className="profile-link">
-                <IoPerson size={20} />
-                <span className="profile-text">Profile</span>
-              </Link>
+              <div className="user-section">
+                <Link to="/profile" className="user-profile">
+                  <div className="user-avatar">
+                    {currentUser.photoURL ? (
+                      <img src={currentUser.photoURL} alt="Avatar" />
+                    ) : (
+                      <IoPerson size={20} />
+                    )}
+                  </div>
+                  <span className="user-name">{currentUser.displayName}</span>
+                </Link>
+                <button className="header-logout-btn" onClick={handleLogout}>
+                  Đăng xuất
+                </button>
+              </div>
             ) : (
-              <Link to="/login" className="profile-link">
-                <IoPerson size={20} />
-                <span className="profile-text">Login</span>
-              </Link>
+              <div className="auth-buttons">
+                <Link to="/login" className="auth-btn signin-btn">
+                  Sign In
+                </Link>
+                <Link to="/register" className="auth-btn signup-btn">
+                  Sign Up
+                </Link>
+              </div>
             )}
 
             {/* Search Bar */}
@@ -127,17 +143,12 @@ export default function Header() {
               />
               <IoSearch className="search-icon" size={18} />
             </div>
-            
-
-           
 
             {/* Language Selector */}
             <div className="language-selector">
               <IoFlag size={16} />
               <span>VN</span>
             </div>
-            
-
           </div>
         </div>
       </div>

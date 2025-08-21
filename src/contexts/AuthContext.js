@@ -40,9 +40,31 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  const login = (userInfo) => {
+  const login = async (userInfo) => {
     setCurrentUser(userInfo);
     localStorage.setItem('userInfo', JSON.stringify(userInfo));
+    
+    // Lưu thông tin user vào database
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firebaseUID: userInfo.uid,
+          email: userInfo.email,
+          displayName: userInfo.displayName,
+          photoURL: userInfo.photoURL
+        }),
+      });
+      
+      if (!response.ok) {
+        console.error('Failed to save user to database');
+      }
+    } catch (error) {
+      console.error('Error saving user to database:', error);
+    }
   };
 
   const logout = () => {
