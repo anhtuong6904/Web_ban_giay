@@ -28,6 +28,7 @@ export default function LoginRegister() {
         uid: `local:${u.username}`,
         email: u.email || '',
         displayName: u.fullName || u.username,
+        fullName: u.fullName || u.username, // Thêm trường này để đảm bảo
         photoURL: u.imageUrl || null
       });
       alert('Đăng nhập thành công!');

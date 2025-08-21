@@ -10,6 +10,7 @@ import PersonalInformationPage from './Pages/PersonalInformation';
 import ProductDetail from './components/ProductDetail';
 import ProductList from './components/ProductList';
 import Cart from './components/Cart';
+import CartTest from './components/CartTest';
 import PaymentPage from './Pages/PaymentPage';
 import OrderTracker from './Pages/OrderTracker';
 import { onAuthStateChanged } from "firebase/auth";
@@ -48,6 +49,7 @@ function AppContent() {
         <Route path="/order-tracker" element={<OrderTracker />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/cart-test" element={<CartTest />} />
 
         {/* Admin routes */}
         <Route path="/admin/*" element={<Admin />} />

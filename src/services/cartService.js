@@ -49,25 +49,34 @@ export function addToCart(product, options = {}) {
 	if (!uid) {
 		return { success: false, requiresLogin: true };
 	}
-	const items = readCart();
-	const id = product.ProductID || product.id;
-	const key = `${id}|${options.size || ''}|${options.color || ''}`;
-	const existing = items.find((it) => it.key === key);
-	if (existing) {
-		existing.quantity += options.quantity || 1;
-	} else {
-		items.push({
-			key,
-			productId: id,
-			name: product.Name,
-			price: product.Price || 0,
-			image: product.MainImage || product.ImageURL || '/images/products/giay-the-thao-1.jpg',
-			quantity: options.quantity || 1,
-			size: options.size || null,
-			color: options.color || null
-		});
+	
+	try {
+		const items = readCart();
+		const id = product.ProductID || product.id;
+		const key = `${id}|${options.size || ''}|${options.color || ''}`;
+		const existing = items.find((it) => it.key === key);
+		
+		if (existing) {
+			existing.quantity += options.quantity || 1;
+		} else {
+			items.push({
+				key,
+				productId: id,
+				name: product.Name,
+				price: product.Price || 0,
+				image: product.MainImage || product.ImageURL || '/images/products/giay-the-thao-1.jpg',
+				quantity: options.quantity || 1,
+				size: options.size || null,
+				color: options.color || null
+			});
+		}
+		
+		writeCart(items);
+		return { success: true, requiresLogin: false };
+	} catch (error) {
+		console.error('Error adding to cart:', error);
+		return { success: false, requiresLogin: false, error: error.message };
 	}
-	writeCart(items);
 }
 
 export function updateQuantity(key, quantity) {

@@ -45,6 +45,7 @@ export default function Register() {
         uid: `local:${username}`,
         email: email || '',
         displayName: fullName || username,
+        fullName: fullName || username, // Thêm trường này để đảm bảo
         photoURL: null
       });
 
@@ -86,6 +87,7 @@ export default function Register() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Nhập họ và tên"
+              required
             />
           </div>
 

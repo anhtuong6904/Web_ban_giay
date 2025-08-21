@@ -88,13 +88,21 @@ export default function HotPicks() {
   const handleAddToCart = (e, product) => {
     e.preventDefault();
     e.stopPropagation();
+    
     if (!currentUser) {
       alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.');
       return;
     }
-    const res = addToCart(product, { quantity: 1 });
+    
+    const result = addToCart(product, { quantity: 1 });
+    
+    if (result && result.requiresLogin) {
+      alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.');
+      return;
+    }
+    
     if (product && product.Name) {
-      alert(`Đã thêm \"${product.Name}\" vào giỏ hàng!`);
+      alert(`Đã thêm "${product.Name}" vào giỏ hàng!`);
     } else {
       alert('Đã thêm sản phẩm vào giỏ hàng!');
     }

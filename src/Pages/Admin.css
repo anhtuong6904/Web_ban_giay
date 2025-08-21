@@ -1,28 +1,60 @@
-/* Layout tổng cho admin */
-.admin-layout {
+/* Admin Page - Modern DashboardKit Style */
+.admin-page {
   display: flex;
   min-height: 100vh;
-  background: #f9fafb;
-  font-family: Arial, sans-serif;
+  background: #f8fafc;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-
-/* Sidebar không thay đổi và vị trí khi scorll*/
 
 .admin-sidebar {
-  width: 240px;
-  background: #111827; /* màu tối */
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  padding: 20px 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: sticky;
+  width: 280px;
+  flex-shrink: 0;
+  position: fixed;
+  left: 0;
   top: 0;
-  height: 100%;
-  overflow-y: auto;
+  height: 100vh;
+  z-index: 100;
 }
 
+.admin-main {
+  flex: 1;
+  margin-left: 280px;
+  min-height: 100vh;
+  background: #f8fafc;
+}
 
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    width: 260px;
+  }
+  
+  .admin-main {
+    margin-left: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+  
+  .admin-main {
+    margin-left: 0;
+  }
+  
+  .admin-page {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-sidebar {
+    width: 100%;
+  }
+}
 
 /* Logo / tiêu đề trên sidebar */
 .admin-sidebar h2 {
@@ -52,13 +84,6 @@
 .admin-link.active {
   background: #2563eb;
   color: #fff;
-}
-
-/* Nội dung chính */
-.admin-content {
-  flex: 1;
-  padding: 24px;
-  background: #f3f4f6;
 }
 
 /* Tiêu đề trang */

@@ -38,6 +38,7 @@ export default function OrderTracker() {
       case 'processing': return '#17a2b8';
       case 'shipped': return '#28a745';
       case 'delivered': return '#28a745';
+      case 'completed': return '#28a745';
       case 'cancelled': return '#dc3545';
       default: return '#6c757d';
     }
@@ -49,6 +50,7 @@ export default function OrderTracker() {
       case 'processing': return 'Đang xử lý';
       case 'shipped': return 'Đã gửi hàng';
       case 'delivered': return 'Đã giao hàng';
+      case 'completed': return 'Hoàn tất';
       case 'cancelled': return 'Đã hủy';
       default: return 'Không xác định';
     }
@@ -67,6 +69,13 @@ export default function OrderTracker() {
       <div className="order-tracker-header">
         <h1>Theo Dõi Đơn Hàng</h1>
         <p>Kiểm tra trạng thái đơn hàng của bạn</p>
+        <button 
+          className="refresh-btn"
+          onClick={loadOrders}
+          disabled={loading}
+        >
+          🔄 {loading ? 'Đang tải...' : 'Làm mới'}
+        </button>
       </div>
 
       {orders.length === 0 ? (
