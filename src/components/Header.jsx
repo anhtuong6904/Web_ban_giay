@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { IoPerson, IoSearch, IoFlag } from 'react-icons/io5';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { getCartCount, onCartChange } from '../services/cartService';
-import AdminDashboard from './AdminDashboard';
 import Cart from './Cart';
 import './Header.css';
 
