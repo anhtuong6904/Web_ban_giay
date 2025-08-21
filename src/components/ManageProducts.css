@@ -1,0 +1,218 @@
+/* ===== Overlay che nền ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.6); /* nền đen trong suốt */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+}
+
+/* ===== Hộp modal ===== */
+.modal {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  width: 450px;
+  max-width: 95%;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.15);
+  animation: scaleIn 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal h2 {
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.modal input,
+.modal textarea {
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.modal input:focus,
+.modal textarea:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.modal textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* ===== Nút trong modal ===== */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #e5e7eb;
+}
+
+/* ===== Trang quản lý sản phẩm ===== */
+.products-page {
+  padding: 24px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ===== Form thêm sản phẩm ===== */
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 550px;
+  margin-bottom: 24px;
+}
+
+.product-form input,
+.product-form textarea {
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.product-form input:focus,
+.product-form textarea:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.product-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* ===== Buttons ===== */
+.btn-add,
+.btn-save {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.25s, transform 0.15s;
+}
+
+.btn-add:hover,
+.btn-save:hover {
+  background: #1e40af;
+  transform: translateY(-1px);
+}
+
+.btn-add:active,
+.btn-save:active {
+  transform: translateY(0);
+}
+
+/* ===== Bảng sản phẩm ===== */
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+}
+
+.products-table th,
+.products-table td {
+  padding: 14px 16px;
+  text-align: center;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+}
+
+.products-table th {
+  background: #1f2937;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.products-table tr:hover td {
+  background: #f9fafb;
+}
+
+/* ===== Nút hành động ===== */
+.btn-edit {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-right: 6px;
+  transition: background 0.25s;
+}
+
+.btn-edit:hover {
+  background: #d97706;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.25s;
+}
+
+.btn-delete:hover {
+  background: #b91c1c;
+}

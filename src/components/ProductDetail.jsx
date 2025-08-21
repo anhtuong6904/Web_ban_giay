@@ -5,7 +5,6 @@ import { getProductById, getProducts } from '../services/productService';
 import './ProductDetail.css';
 import { addToCart, setCheckoutItems } from '../services/cartService';
 import { useNavigate as useNav } from 'react-router-dom';
-import SmartImage from './SmartImage';
 
 export default function ProductDetail() {
   const nav2 = useNav();
@@ -274,17 +273,8 @@ export default function ProductDetail() {
   const buildProductImages = (p) => {
     const images = [];
 
-    const normalizePath = (v) => {
-      if (!v) return null;
-      let path = String(v).replace(/\\/g, '/');
-      if (path.startsWith('images/')) path = '/' + path;
-      if (!path.startsWith('/')) path = '/' + path;
-      return path;
-    };
-
-    if (p.MainImage || p.ImageURL) {
-      const main = normalizePath(p.ImageURL || p.MainImage);
-      if (main) images.push(main);
+    if (p.MainImage) {
+      images.push(p.MainImage);
     }
 
     const addFromField = (fieldValue) => {
@@ -302,9 +292,8 @@ export default function ProductDetail() {
         }
       }
       arr.forEach((uri) => {
-        const norm = normalizePath(uri);
-        if (norm && !images.includes(norm)) {
-          images.push(norm);
+        if (uri && !images.includes(uri)) {
+          images.push(uri);
         }
       });
     };
@@ -328,23 +317,7 @@ export default function ProductDetail() {
     }
 
     if (images.length === 0) {
-      // Fallback: try slug folder 1-3.png
-                    const slugCandidate = (p.Name || '').trim()
-          .replace(/[^a-zA-Z0-9\s-]/g, '') // Loại bỏ ký tự đặc biệt
-          .replace(/\s+/g, '-') // Thay khoảng trắng bằng dấu gạch ngang
-          .replace(/-+/g, '-') // Thay nhiều dấu gạch ngang liên tiếp bằng một dấu
-          .replace(/^-|-$/g, ''); // Loại bỏ dấu gạch ngang ở đầu và cuối
-      if (slugCandidate) {
-        // Thử cả .png và .jpg cho mỗi ảnh
-        images.push(`/images/products/${slugCandidate}/1.png`);
-        images.push(`/images/products/${slugCandidate}/1.jpg`);
-        images.push(`/images/products/${slugCandidate}/2.png`);
-        images.push(`/images/products/${slugCandidate}/2.jpg`);
-        images.push(`/images/products/${slugCandidate}/3.png`);
-        images.push(`/images/products/${slugCandidate}/3.jpg`);
-      } else {
-        images.push('/images/products/giay-the-thao-1.jpg');
-      }
+      images.push('/images/products/giay-the-thao-1.jpg');
     }
 
     return images;
@@ -517,6 +490,7 @@ export default function ProductDetail() {
   const handleAddToCart = () => {
     const quantityToAdd = Math.max(1, quantity || 1);
     addToCart(product, { size: selectedSize || null, color: selectedColor || null, quantity: quantityToAdd });
+    
     alert(`Đã thêm ${product.Name}${selectedSize ? ` - Size ${selectedSize}` : ''} vào giỏ hàng!`);
   };
 
@@ -620,12 +594,12 @@ export default function ProductDetail() {
         <div className="product-main">
           {/* Left Column - Product Images */}
           <div className="product-images">
-                         <div className="main-image">
-               <SmartImage
-                 src={productImages[selectedImageIndex] || productImages[0]}
-                 alt={`${product.Name} - Ảnh ${selectedImageIndex + 1}`}
-                 className="main-product-image"
-               />
+            <div className="main-image">
+              <img
+                src={productImages[selectedImageIndex] || productImages[0]}
+                alt={`${product.Name} - Ảnh ${selectedImageIndex + 1}`}
+                className="main-product-image"
+              />
               {product.IsNew && <div className="image-badge">Mới</div>}
               {discount > 0 && (
                 <div className="discount-badge">-{discount}%</div>
@@ -645,11 +619,11 @@ export default function ProductDetail() {
                     className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
                     onClick={() => handleThumbnailClick(index)}
                   >
-                                         <SmartImage
-                       src={image}
-                       alt={`${product.Name} ${index + 1}`}
-                       className="thumbnail-image"
-                     />
+                    <img
+                      src={image}
+                      alt={`${product.Name} ${index + 1}`}
+                      className="thumbnail-image"
+                    />
                   </div>
                 ))}
               </div>
@@ -960,7 +934,7 @@ export default function ProductDetail() {
                     onClick={() => handleRelatedProductClick(relatedProduct)}
                   >
                     <div className="related-product-image">
-                                             <SmartImage src={imageUrl} alt={relatedProduct.Name} />
+                      <img src={imageUrl} alt={relatedProduct.Name} />
                       {discount > 0 && (
                         <div className="related-discount-badge">-{discount}%</div>
                       )}

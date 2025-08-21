@@ -1,0 +1,71 @@
+/* Layout tổng cho admin */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f9fafb;
+  font-family: Arial, sans-serif;
+}
+
+/* Sidebar không thay đổi và vị trí khi scorll*/
+
+.admin-sidebar {
+  width: 240px;
+  background: #111827; /* màu tối */
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  height: 100%;
+  overflow-y: auto;
+}
+
+
+
+/* Logo / tiêu đề trên sidebar */
+.admin-sidebar h2 {
+  color: #fff;
+  font-size: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* Menu item */
+.admin-link {
+  color: #d1d5db;
+  text-decoration: none;
+  display: block;
+  padding: 12px 16px;
+  margin: 4px 0;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.admin-link:hover {
+  background: #374151;
+  color: #fff;
+}
+
+/* Active link */
+.admin-link.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Nội dung chính */
+.admin-content {
+  flex: 1;
+  padding: 24px;
+  background: #f3f4f6;
+}
+
+/* Tiêu đề trang */
+.admin-content h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+}
+/* Modal */

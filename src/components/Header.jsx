@@ -16,8 +16,12 @@ export default function Header() {
   const [closing, setClosing] = useState(false);
   const location = useLocation();
   const [cartCount, setCartCount] = useState(getCartCount());
+<<<<<<< HEAD
   const [searchTerm, setSearchTerm] = useState('');
   const [profileImageVersion, setProfileImageVersion] = useState(0);
+=======
+
+>>>>>>> c572b428d96d97607803cba24798ece03f17e312
   const base = process.env.PUBLIC_URL || '';
 
   // Hàm để lấy ảnh profile từ localStorage (base64) hoặc từ currentUser
@@ -157,6 +161,16 @@ export default function Header() {
               <MdOutlineShoppingCart />
               <span className="cart-count">{cartCount}</span>
             </button> 
+
+            {/* Admin Links */}
+            {/* {isAdmin && ( */}
+              <button className="admin-btn" onClick={() => navigate('/admin')}>
+                Admin Dashboard
+              </button>
+
+            {/* )} */}
+
+            {/* Profile Link */}
             
             {/* User Authentication Section */}
             {currentUser ? (

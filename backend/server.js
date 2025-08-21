@@ -78,6 +78,7 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend server is running!' });
 });
 
+<<<<<<< HEAD
 // Ensure Orders tables exist
 async function ensureOrderTables() {
   // assumes a connection is already open
@@ -315,10 +316,15 @@ app.post('/api/auth/login', async (req, res) => {
 
 // API lấy tất cả sản phẩm, có filter và search
 app.get('/api/products', async (req, res) => {
+=======
+// API lấy tất cả sản phẩm, có filter
+app.get('/api/products', async (req, res) =>{
+>>>>>>> c572b428d96d97607803cba24798ece03f17e312
   try {
     console.log('Connecting to database...');
     await sql.connect(config);
     console.log('Database connected successfully');
+<<<<<<< HEAD
 
     // Supported query params:
     // - gender: men|women|kids|sports
@@ -451,6 +457,20 @@ app.get('/api/products', async (req, res) => {
       });
     }
 
+=======
+    
+    let query = 'SELECT * FROM Products WHERE 1=1';
+    const { gender, brand, category, sale } = req.query;
+    if (gender) query += ` AND Gender LIKE '%${gender}%'`;
+    if (brand) query += ` AND BrandID = ${parseInt(brand)}`;
+    if (category) query += ` AND CategoryID = ${parseInt(category)}`;
+    if (sale === 'true') query += ` AND Discount > 0`;
+    
+    console.log('Executing query:', query);
+    const result = await sql.query(query);
+    console.log(`Found ${result.recordset.length} products`);
+    
+>>>>>>> c572b428d96d97607803cba24798ece03f17e312
     res.json(result.recordset);
   } catch (err) {
     console.error('Lỗi truy vấn SQL:', err);
@@ -476,12 +496,11 @@ app.get('/api/products/:id', async (req, res) => {
     const { id } = req.params;
     
     // Query đơn giản hơn, không join với bảng khác
-    const query = `SELECT * FROM Products WHERE ProductID = ${parseInt(id)}`;
+    const query = 'SELECT * FROM Products WHERE ProductID = @ProductID';
     console.log('Executing query:', query);
     
-    const result = await sql.query(query);
+    const result = await sql.query(query, { ProductID: parseInt(id) });
     console.log(`Found ${result.recordset.length} products with ID ${id}`);
-    
     if (result.recordset.length === 0) {
       console.log(`Product with ID ${id} not found`);
       return res.status(404).json({ error: 'Sản phẩm không tồn tại' });
@@ -511,9 +530,12 @@ app.listen(PORT, () => {
   console.log(`   GET /api/test - Test server`);
   console.log(`   GET /api/products - Get all products (with search & sort)`);
   console.log(`   GET /api/products/:id - Get product by ID`);
+<<<<<<< HEAD
   console.log(`   POST /api/users - Create/Update user`);
   console.log(`   GET /api/users/:firebaseUID - Get user info`);
   console.log(`   POST /api/auth/register - Register local user`);
   console.log(`   POST /api/auth/login - Login local user`);
   console.log(`   POST /api/orders - Create order`);
+=======
+>>>>>>> c572b428d96d97607803cba24798ece03f17e312
 }); 

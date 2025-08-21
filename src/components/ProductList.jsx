@@ -1,15 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import FiltersSidebar from './FiltersSidebar';
-import { getProducts } from '../services/productService';
-import { formatPrice } from '../utils/formatPrice';
-import Pagination from './Pagination';
-import SmartImage from './SmartImage';
-import './ProductList.css';
+ import { useEffect, useState } from "react";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
+<<<<<<< HEAD
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('default');
@@ -293,6 +287,37 @@ function ProductList() {
         </div>
       </div>
     </section>
+=======
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/products")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Server error: " + res.status);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          setError("API did not return an array");
+        }
+        console.log("Products fetched:", data);
+      })
+      .catch((err) => setError(err.message));
+  }, []);
+
+  if (error) return <div style={{color: "red"}}>Error: {error}</div>;
+
+  return (
+    <ul>
+      {products.map(p => (
+        <li key={p.ProductID}>{p.Name} - {p.Price} {}</li>
+               
+      ))}
+    </ul>
+>>>>>>> c572b428d96d97607803cba24798ece03f17e312
   );
 }
 
