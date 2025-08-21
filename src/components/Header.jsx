@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { IoPerson, IoSearch, IoFlag } from 'react-icons/io5';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { getCartCount, onCartChange } from '../services/cartService';
+import AdminDashboard from './AdminDashboard';
 import Cart from './Cart';
 import './Header.css';
 
@@ -16,6 +17,8 @@ export default function Header() {
   const [closing, setClosing] = useState(false);
   const location = useLocation();
   const [cartCount, setCartCount] = useState(getCartCount());
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  
 
   React.useEffect(() => {
     setCartCount(getCartCount());
@@ -92,6 +95,16 @@ export default function Header() {
               <MdOutlineShoppingCart />
               <span className="cart-count">{cartCount}</span>
             </button> 
+
+            {/* Admin Links */}
+            {/* {isAdmin && ( */}
+              <button className="admin-btn" onClick={() => navigate('/admin')}>
+                Admin Dashboard
+              </button>
+
+            {/* )} */}
+
+            {/* Profile Link */}
             
             {currentUser ? (
               <Link to="/profile" className="profile-link">

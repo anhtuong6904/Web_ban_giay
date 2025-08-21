@@ -1,0 +1,48 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 24px;
+  background: #f3f4f6;
+}
+.taskbar-admin {
+  width: 240px;
+  background: #111827; /* màu tối */
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 10px;
+}
+.admin-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.admin-link {
+  color: #d1d5db;
+  text-decoration: none;
+  display: block;
+  padding: 12px 16px;
+  margin: 4px 0;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.admin-link:hover {
+  background: #374151;
+  color: #fff;
+}
+.admin-link.active {
+  background: #2563eb;
+  color: #fff;
+}
+.taskbar-admin h2 {
+  color: #fff;
+  font-size: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+}
