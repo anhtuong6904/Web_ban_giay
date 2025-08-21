@@ -1,9 +1,14 @@
- import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { getProducts } from "../services/productService";
+import ProductCard from "./ProductCard";
+import Pagination from "./Pagination";
+import FiltersSidebar from "./FiltersSidebar";
+import "./ProductList.css";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
-<<<<<<< HEAD
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('default');
@@ -99,225 +104,104 @@ function ProductList() {
     }
   };
 
-  const handleSort = (newSortBy, newSortOrder = 'asc') => {
-    const searchParams = new URLSearchParams(location.search);
+  const handleSort = (newSortBy) => {
+    let newSortOrder = 'asc';
     
-    if (newSortBy === 'default') {
-      searchParams.delete('sortBy');
-      searchParams.delete('sortOrder');
-    } else {
-      searchParams.set('sortBy', newSortBy);
-      searchParams.set('sortOrder', newSortOrder);
+    // If clicking the same sort field, toggle order
+    if (newSortBy === sortBy) {
+      newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
     }
     
-    // Reset to first page when sorting
-    searchParams.delete('page');
+    // Update URL params
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set('sortBy', newSortBy);
+    searchParams.set('sortOrder', newSortOrder);
     
+    // Navigate to update URL
     navigate(`${location.pathname}?${searchParams.toString()}`);
   };
 
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-
-    for (let i = 0; i < 5; i++) {
-      if (i < fullStars) {
-        stars.push(<i key={i} className="fas fa-star filled"></i>);
-      } else if (i === fullStars && hasHalfStar) {
-        stars.push(<i key={i} className="fas fa-star-half-alt half-filled"></i>);
-      } else {
-        stars.push(<i key={i} className="fas fa-star empty"></i>);
-      }
-    }
-    return stars;
-  };
-
-  const normalizePath = (p) => {
-    if (!p) return null;
-    let path = String(p).replace(/\\/g, '/');
-    if (path.startsWith('images/')) path = '/' + path;
-    if (!path.startsWith('/')) path = '/' + path;
-    return path;
-  };
-
-  const slugify = (name) => {
-    if (!name) return '';
-    return String(name)
-      .trim()
-      .replace(/[^a-zA-Z0-9\s-]/g, '') // Loại bỏ ký tự đặc biệt
-      .replace(/\s+/g, '-') // Thay khoảng trắng bằng dấu gạch ngang
-      .replace(/-+/g, '-') // Thay nhiều dấu gạch ngang liên tiếp bằng một dấu
-      .replace(/^-|-$/g, ''); // Loại bỏ dấu gạch ngang ở đầu và cuối
-  };
-
-  const getMainImage = (product) => {
-    const direct = normalizePath(product.ImageURL || product.MainImage);
-    if (direct) return direct;
-    const slug = slugify(product.Name || product.ProductName || '');
-    if (slug) {
-      const path = `/images/products/${slug}/1.png`;
-      console.log('Product:', product.Name, 'Generated slug:', slug, 'Image path:', path);
-      console.log('Available folders:', [
-        'Nike-Air-Zoom-Pegasus-40',
-        'Adidas-Ultraboost-21',
-        'Puma-Cell-King',
-        'New-Balance-574'
-      ]);
-      return path;
-    }
-    return '/images/products/placeholder.jpg';
-  };
-
   return (
-    <section className="products-section" id="products">
-      <div className="products-container" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '28px' }}>
-        <div style={{ marginTop: 6 }}>
-          <FiltersSidebar products={products} />
-        </div>
-        <div>
-          <div className="products-header">
-            {searchTerm ? (
-              <div className="search-results-header">
-                <h2>Kết quả tìm kiếm cho "{searchTerm}"</h2>
-                <p>Tìm thấy {products.length} sản phẩm</p>
-                <button 
-                  className="view-all-btn"
-                  onClick={() => navigate('/products')}
-                >
-                  <i className="fas fa-arrow-left"></i>
-                  Xem tất cả sản phẩm
-                </button>
-              </div>
-            ) : (
-              <h2>TẤT CẢ SẢN PHẨM</h2>
-            )}
-            <div className="products-stats">
-              <span>Tổng số sản phẩm: {products.length}</span>
-              <span>Trang {currentPage} / {totalPages}</span>
-            </div>
-            <div className="sort-controls">
-              <select 
-                className="sort-select"
-                value={sortBy}
-                onChange={(e) => handleSort(e.target.value, sortOrder)}
-              >
-                <option value="default">Sắp xếp mặc định</option>
-                <option value="price">Theo giá</option>
-                <option value="discount">Theo giảm giá</option>
-                <option value="name">Theo tên</option>
-                <option value="rating">Theo đánh giá</option>
-              </select>
-              {sortBy !== 'default' && (
-                <button 
-                  className="sort-order-btn"
-                  onClick={() => handleSort(sortBy, sortOrder === 'asc' ? 'desc' : 'asc')}
-                  title={sortOrder === 'asc' ? 'Tăng dần' : 'Giảm dần'}
-                >
-                  {sortOrder === 'asc' ? '↑' : '↓'}
-                </button>
-              )}
-            </div>
+    <div className="product-list-container">
+      <div className="product-list-header">
+        <h1>Sản phẩm</h1>
+        
+        {/* Search Results Header */}
+        {showSearchHeader && (
+          <div className="search-results-header">
+            <h2>Kết quả tìm kiếm cho "{searchTerm}"</h2>
+            <p>Tìm thấy {products.length} sản phẩm</p>
+            <Link to="/products" className="view-all-btn">Xem tất cả sản phẩm</Link>
           </div>
+        )}
+
+        {/* Sort Controls */}
+        <div className="sort-controls">
+          <select 
+            value={sortBy} 
+            onChange={(e) => handleSort(e.target.value)}
+            className="sort-select"
+          >
+            <option value="default">Sắp xếp mặc định</option>
+            <option value="price">Theo giá</option>
+            <option value="discount">Theo giảm giá</option>
+            <option value="name">Theo tên</option>
+            <option value="rating">Theo đánh giá</option>
+          </select>
           
+          <button 
+            onClick={() => handleSort(sortBy)}
+            className="sort-order-btn"
+            title={`Sắp xếp ${sortOrder === 'asc' ? 'tăng dần' : 'giảm dần'}`}
+          >
+            {sortOrder === 'asc' ? '↑' : '↓'}
+          </button>
+        </div>
+      </div>
+
+      <div className="product-list-content">
+        <FiltersSidebar />
+        
+        <div className="products-section">
           {products.length === 0 ? (
             <div className="no-results">
               {searchTerm ? (
                 <>
-                  <div className="no-results-icon">🔍</div>
-                  <h3>Không tìm thấy sản phẩm nào</h3>
-                  <p>Không có sản phẩm nào khớp với từ khóa "{searchTerm}"</p>
-                  <button 
-                    className="view-all-btn"
-                    onClick={() => navigate('/products')}
-                  >
-                    <i className="fas fa-arrow-left"></i>
-                    Xem tất cả sản phẩm
-                  </button>
+                  <h3>Không tìm thấy sản phẩm</h3>
+                  <p>Không có sản phẩm nào phù hợp với từ khóa "{searchTerm}"</p>
+                  <Link to="/products" className="view-all-btn">Xem tất cả sản phẩm</Link>
                 </>
               ) : (
                 <>
-                  <div className="no-results-icon">📦</div>
-                  <h3>Không có sản phẩm nào</h3>
-                  <p>Vui lòng thử lại sau hoặc liên hệ hỗ trợ</p>
+                  <h3>Không có sản phẩm</h3>
+                  <p>Không có sản phẩm nào phù hợp với bộ lọc hiện tại</p>
                 </>
               )}
             </div>
           ) : (
-            <div className="products-grid">
-              {pageItems.map(product => (
-                <div key={product.ProductID || product.id} className="product-card" onClick={() => handleProductClick(product)}>
-                  <div className="product-image">
-                    <SmartImage 
-                      src={getMainImage(product)} 
-                      alt={product.Name}
-                      className="product-image"
-                    />
-                    {product.Discount > 0 && (
-                      <div className="discount-badge">
-                        -{product.Discount}%
-                      </div>
-                    )}
-                  </div>
-                  <div className="product-info">
-                    <h3 className="product-name">{product.Name}</h3>
-                    <div className="product-rating">
-                      {renderStars(product.Rating || 4.5)}
-                      <span className="rating-text">({product.Rating || 4.5})</span>
-                    </div>
-                    <div className="product-price">
-                      <span className="current-price">{formatPrice(product.Price)}</span>
-                      {product.OriginalPrice > product.Price && (
-                        <span className="original-price">{formatPrice(product.OriginalPrice)}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {products.length > 0 && totalPages > 1 && (
-            <Pagination 
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            <>
+              <div className="products-grid">
+                {pageItems.map((product) => (
+                  <ProductCard
+                    key={product.ProductID || product.id}
+                    product={product}
+                    onClick={() => handleProductClick(product)}
+                  />
+                ))}
+              </div>
+              
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              )}
+            </>
           )}
         </div>
       </div>
-    </section>
-=======
-
-  useEffect(() => {
-    fetch("http://localhost:5000/api/products")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Server error: " + res.status);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else {
-          setError("API did not return an array");
-        }
-        console.log("Products fetched:", data);
-      })
-      .catch((err) => setError(err.message));
-  }, []);
-
-  if (error) return <div style={{color: "red"}}>Error: {error}</div>;
-
-  return (
-    <ul>
-      {products.map(p => (
-        <li key={p.ProductID}>{p.Name} - {p.Price} {}</li>
-               
-      ))}
-    </ul>
->>>>>>> c572b428d96d97607803cba24798ece03f17e312
+    </div>
   );
 }
 
