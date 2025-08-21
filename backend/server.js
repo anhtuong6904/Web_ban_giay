@@ -1,84 +1,35 @@
 const express = require('express');
 const cors = require('cors');
-const { sql, config } = require('./db');
+const sql = require('mssql');
 const bcrypt = require('bcryptjs');
-
-// Ensure Users table has local auth columns
-async function ensureUsersLocalColumns(pool) {
-  const ddl = `
-IF COL_LENGTH('dbo.Users','Username')     IS NULL ALTER TABLE dbo.Users ADD Username NVARCHAR(100) NULL;
-IF COL_LENGTH('dbo.Users','PasswordHash') IS NULL ALTER TABLE dbo.Users ADD PasswordHash NVARCHAR(255) NULL;
-IF COL_LENGTH('dbo.Users','ImageUrl')     IS NULL ALTER TABLE dbo.Users ADD ImageUrl NVARCHAR(500) NULL;
-IF COL_LENGTH('dbo.Users','FullName')     IS NULL ALTER TABLE dbo.Users ADD FullName NVARCHAR(150) NULL;
-IF COL_LENGTH('dbo.Users','PhoneNumber')  IS NULL ALTER TABLE dbo.Users ADD PhoneNumber NVARCHAR(20) NULL;
-IF COL_LENGTH('dbo.Users','Email')        IS NULL ALTER TABLE dbo.Users ADD Email NVARCHAR(255) NULL;
-IF COL_LENGTH('dbo.Users','Address')      IS NULL ALTER TABLE dbo.Users ADD Address NVARCHAR(500) NULL;
-IF COL_LENGTH('dbo.Users','IsActive')     IS NULL ALTER TABLE dbo.Users ADD IsActive BIT NOT NULL CONSTRAINT DF_Users_IsActive DEFAULT(1);
-IF COL_LENGTH('dbo.Users','CreatedAt')    IS NULL ALTER TABLE dbo.Users ADD CreatedAt DATETIME2 NOT NULL CONSTRAINT DF_Users_CreatedAt DEFAULT SYSUTCDATETIME();
-IF COL_LENGTH('dbo.Users','UpdatedAt')    IS NULL ALTER TABLE dbo.Users ADD UpdatedAt DATETIME2 NOT NULL CONSTRAINT DF_Users_UpdatedAt DEFAULT SYSUTCDATETIME();
-
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UX_Users_Username' AND object_id = OBJECT_ID('dbo.Users'))
-  CREATE UNIQUE INDEX UX_Users_Username ON dbo.Users(Username) WHERE Username IS NOT NULL;
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'UX_Users_Email' AND object_id = OBJECT_ID('dbo.Users'))
-  CREATE UNIQUE INDEX UX_Users_Email ON dbo.Users(Email) WHERE Email IS NOT NULL;
-IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_Users_Phone' AND object_id = OBJECT_ID('dbo.Users'))
-  CREATE INDEX IX_Users_Phone ON dbo.Users(PhoneNumber);
-`;
-  await pool.request().query(ddl);
-}
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-const { VNPay } = require('vnpay');
 require('dotenv').config();
 
-const vnpay = new VNPay({
-  tmnCode: process.env.VNP_TMNCODE,
-  secureSecret: process.env.VNP_HASHSECRET,
-  testMode: true
-});
+const app = express();
+const PORT = process.env.PORT || 5000;
 
-// API tạo thanh toán
-app.post('/api/payments/create', (req, res) => {
-  try {
-    const { amount, orderInfo } = req.body;
+// Middleware
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-    const paymentUrl = vnpay.buildPaymentUrl({
-      vnp_Amount: amount * 100, // VNPay yêu cầu nhân 100
-      vnp_IpAddr: req.ip,
-      vnp_ReturnUrl: `${process.env.APP_URL}/api/payments/verify`,
-      vnp_TxnRef: `ORDER_${Date.now()}`,
-      vnp_OrderInfo: orderInfo,
-    });
-
-    res.json({ success: true, paymentUrl });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+// Database configuration
+const config = {
+  user: process.env.DB_USER || 'sa',
+  password: process.env.DB_PASSWORD || '123456',
+  server: process.env.DB_SERVER || 'localhost',
+  database: process.env.DB_NAME || 'WebShoes',
+  options: {
+    encrypt: false,
+    trustServerCertificate: true,
+    enableArithAbort: true
   }
-});
-
-// API xác thực thanh toán từ VNPay trả về
-app.get('/api/payments/verify', (req, res) => {
-  try {
-    const verification = vnpay.verifyReturnUrl(req.query);
-    if (verification.isVerified) {
-      res.json({ success: true, data: verification });
-    } else {
-      res.status(400).json({ success: false, message: 'Invalid signature' });
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
+};
 
 // Test endpoint để kiểm tra server
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend server is running!' });
 });
 
-<<<<<<< HEAD
 // Ensure Orders tables exist
 async function ensureOrderTables() {
   // assumes a connection is already open
@@ -172,212 +123,152 @@ app.post('/api/users', async (req, res) => {
     const { firebaseUID, email, displayName, photoURL } = req.body;
     
     if (!firebaseUID || !email) {
-      return res.status(400).json({ error: 'FirebaseUID và Email là bắt buộc' });
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const pool = await sql.connect(config);
     
-    // Kiểm tra user đã tồn tại chưa
-    const checkUser = await pool.request()
-      .input('firebaseUID', sql.NVarChar, firebaseUID)
-      .query('SELECT UserID FROM Users WHERE FirebaseUID = @firebaseUID');
+    // Ensure Users table exists with correct structure
+    await ensureUsersLocalColumns(pool);
     
-    if (checkUser.recordset.length > 0) {
-      // Cập nhật thông tin user
+    // Check if user already exists
+    const existingUser = await pool.request()
+      .input('firebaseUID', sql.NVarChar(200), firebaseUID)
+      .query('SELECT * FROM Users WHERE FirebaseUID = @firebaseUID');
+    
+    if (existingUser.recordset.length > 0) {
+      // Update existing user
       await pool.request()
-        .input('firebaseUID', sql.NVarChar, firebaseUID)
-        .input('email', sql.NVarChar, email)
-        .input('displayName', sql.NVarChar, displayName || null)
-        .input('photoURL', sql.NVarChar, photoURL || null)
-        .input('lastLoginAt', sql.DateTime2, new Date())
+        .input('firebaseUID', sql.NVarChar(200), firebaseUID)
+        .input('email', sql.NVarChar(200), email)
+        .input('displayName', sql.NVarChar(200), displayName || '')
+        .input('photoURL', sql.NVarChar(500), photoURL || '')
         .query(`
           UPDATE Users 
-          SET Email = @email, 
-              DisplayName = @displayName, 
-              PhotoURL = @photoURL, 
-              LastLoginAt = @lastLoginAt,
-              UpdatedAt = GETDATE()
+          SET Email = @email, DisplayName = @displayName, PhotoURL = @photoURL, UpdatedAt = GETDATE()
           WHERE FirebaseUID = @firebaseUID
         `);
       
-      return res.json({ message: 'User updated successfully' });
+      res.json({ success: true, message: 'User updated successfully' });
     } else {
-      // Tạo user mới
-      const result = await pool.request()
-        .input('firebaseUID', sql.NVarChar, firebaseUID)
-        .input('email', sql.NVarChar, email)
-        .input('displayName', sql.NVarChar, displayName || null)
-        .input('photoURL', sql.NVarChar, photoURL || null)
+      // Create new user
+      await pool.request()
+        .input('firebaseUID', sql.NVarChar(200), firebaseUID)
+        .input('email', sql.NVarChar(200), email)
+        .input('displayName', sql.NVarChar(200), displayName || '')
+        .input('photoURL', sql.NVarChar(500), photoURL || '')
         .query(`
-          INSERT INTO Users (FirebaseUID, Email, DisplayName, PhotoURL, LastLoginAt)
-          VALUES (@firebaseUID, @email, @displayName, @photoURL, @lastLoginAt)
+          INSERT INTO Users (FirebaseUID, Email, DisplayName, PhotoURL, CreatedAt, UpdatedAt)
+          VALUES (@firebaseUID, @email, @displayName, @photoURL, GETDATE(), GETDATE())
         `);
       
-      return res.json({ message: 'User created successfully' });
+      res.json({ success: true, message: 'User created successfully' });
     }
-  } catch (error) {
-    console.error('Error creating/updating user:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  } finally {
-    try { await sql.close(); } catch {}
-  }
-});
-
-app.get('/api/users/:firebaseUID', async (req, res) => {
-  try {
-    const { firebaseUID } = req.params;
-    
-    const pool = await sql.connect(config);
-    const result = await pool.request()
-      .input('firebaseUID', sql.NVarChar, firebaseUID)
-      .query('SELECT * FROM Users WHERE FirebaseUID = @firebaseUID');
-    
-    if (result.recordset.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    res.json(result.recordset[0]);
-  } catch (error) {
-    console.error('Error fetching user:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  } finally {
-    try { await sql.close(); } catch {}
-  }
-});
-
-// Local Users (username/password) APIs
-// Register: { username, password, fullName?, email?, phoneNumber?, address?, imageUrl? }
-app.post('/api/auth/register', async (req, res) => {
-  const { username, password, fullName, email, phoneNumber, address, imageUrl } = req.body || {};
-  if (!username || !password) return res.status(400).json({ error: 'Username và password là bắt buộc' });
-
-  try {
-    const pool = await sql.connect(config);
-    await ensureUsersLocalColumns(pool);
-    const exists = await pool.request().input('Username', sql.NVarChar(100), username)
-      .query('SELECT 1 FROM Users WHERE Username = @Username');
-    if (exists.recordset.length > 0) return res.status(409).json({ error: 'Username đã tồn tại' });
-
-    const hash = await bcrypt.hash(password, 10);
-    await pool.request()
-      .input('Username', sql.NVarChar(100), username)
-      .input('PasswordHash', sql.NVarChar(255), hash)
-      .input('FullName', sql.NVarChar(150), fullName || null)
-      .input('Email', sql.NVarChar(255), email || null)
-      .input('PhoneNumber', sql.NVarChar(20), phoneNumber || null)
-      .input('Address', sql.NVarChar(500), address || null)
-      .input('ImageUrl', sql.NVarChar(500), imageUrl || null)
-      .query(`
-        INSERT INTO Users (Username, PasswordHash, FullName, Email, PhoneNumber, Address, ImageUrl, IsActive, CreatedAt, UpdatedAt)
-        VALUES (@Username, @PasswordHash, @FullName, @Email, @PhoneNumber, @Address, @ImageUrl, 1, SYSUTCDATETIME(), SYSUTCDATETIME())
-      `);
-
-    res.json({ success: true, message: 'Đăng ký thành công' });
   } catch (err) {
-    console.error('Register error:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  } finally { try { await sql.close(); } catch {} }
+    console.error('User API error:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    try { await sql.close(); } catch {}
+  }
 });
 
-// Login: { username, password }
-app.post('/api/auth/login', async (req, res) => {
-  const { username, password } = req.body || {};
-  if (!username || !password) return res.status(400).json({ error: 'Thiếu username hoặc password' });
+// Ensure Users table has all required columns
+async function ensureUsersLocalColumns(pool) {
   try {
-    const pool = await sql.connect(config);
-    await ensureUsersLocalColumns(pool);
-    const userRes = await pool.request().input('Username', sql.NVarChar(100), username)
-      .query('SELECT TOP 1 UserID, Username, PasswordHash, FullName, Email, PhoneNumber, Address, ImageUrl, IsActive FROM Users WHERE Username = @Username');
-    if (userRes.recordset.length === 0) return res.status(401).json({ error: 'Sai tài khoản hoặc mật khẩu, vui lòng đăng nhập lại' });
+    // Add missing columns if they don't exist
+    const columnsToAdd = [
+      { name: 'FirebaseUID', type: 'NVARCHAR(200)', nullable: 'NULL' },
+      { name: 'DisplayName', type: 'NVARCHAR(200)', nullable: 'NULL' },
+      { name: 'PhotoURL', type: 'NVARCHAR(500)', nullable: 'NULL' },
+      { name: 'CreatedAt', type: 'DATETIME', nullable: 'NOT NULL DEFAULT GETDATE()' },
+      { name: 'UpdatedAt', type: 'DATETIME', nullable: 'NOT NULL DEFAULT GETDATE()' }
+    ];
 
-    const user = userRes.recordset[0];
-    if (!user.IsActive) return res.status(403).json({ error: 'Tài khoản đã bị khóa' });
-    const ok = await bcrypt.compare(password, user.PasswordHash || '');
-    if (!ok) return res.status(401).json({ error: 'Sai tài khoản hoặc mật khẩu, vui lòng đăng nhập lại' });
-
-    // Trả về thông tin cơ bản (không trả PasswordHash)
-    res.json({
-      success: true,
-      user: {
-        userId: user.UserID,
-        username: user.Username,
-        fullName: user.FullName,
-        email: user.Email,
-        phoneNumber: user.PhoneNumber,
-        address: user.Address,
-        imageUrl: user.ImageUrl
+    for (const column of columnsToAdd) {
+      try {
+        await pool.request().query(`
+          IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND name = '${column.name}')
+          BEGIN
+            ALTER TABLE Users ADD ${column.name} ${column.type} ${column.nullable === 'NOT NULL' ? 'NOT NULL' : ''} ${column.nullable === 'NOT NULL' ? 'DEFAULT GETDATE()' : ''}
+          END
+        `);
+      } catch (addColumnError) {
+        console.log(`Column ${column.name} might already exist or error:`, addColumnError.message);
       }
-    });
+    }
+
+    // Add unique index for FirebaseUID if it doesn't exist
+    try {
+      await pool.request().query(`
+        IF NOT EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND name = 'IX_Users_FirebaseUID')
+        BEGIN
+          CREATE UNIQUE INDEX IX_Users_FirebaseUID ON Users(FirebaseUID)
+        END
+      `);
+    } catch (indexError) {
+      console.log('FirebaseUID index might already exist:', indexError.message);
+    }
+
+    // Add trigger for UpdatedAt if it doesn't exist
+    try {
+      await pool.request().query(`
+        IF NOT EXISTS (SELECT * FROM sys.triggers WHERE object_id = OBJECT_ID(N'[dbo].[TR_Users_UpdatedAt]'))
+        BEGIN
+          EXEC('CREATE TRIGGER TR_Users_UpdatedAt ON Users AFTER UPDATE AS BEGIN UPDATE Users SET UpdatedAt = GETDATE() FROM Users u INNER JOIN inserted i ON u.UserID = i.UserID END')
+        END
+      `);
+    } catch (triggerError) {
+      console.log('UpdatedAt trigger might already exist:', triggerError.message);
+    }
+
   } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  } finally { try { await sql.close(); } catch {} }
-});
+    console.error('Error ensuring Users table columns:', err);
+  }
+}
 
-// API lấy tất cả sản phẩm, có filter và search
+// Products API with search, sort, and filters
 app.get('/api/products', async (req, res) => {
-=======
-// API lấy tất cả sản phẩm, có filter
-app.get('/api/products', async (req, res) =>{
->>>>>>> c572b428d96d97607803cba24798ece03f17e312
   try {
-    console.log('Connecting to database...');
-    await sql.connect(config);
-    console.log('Database connected successfully');
-<<<<<<< HEAD
+    const {
+      search,
+      gender,
+      tag,
+      sortBy,
+      sortOrder,
+      priceMin,
+      priceMax,
+      discountMin,
+      discountMax,
+      ratingMin,
+      ratingMax
+    } = req.query;
 
-    // Supported query params:
-    // - gender: men|women|kids|sports
-    // - brand: BrandID (number)
-    // - brandName: string
-    // - category: CategoryID (number)
-    // - categoryName: string
-    // - tag: shoes|men|women|kids|sports|brands
-    // - sale: true
-    // - search: string (tìm kiếm theo tên hoặc mô tả)
-    // - sortBy: price|discount|name|rating
-    // - sortOrder: asc|desc
-    // - priceMin, priceMax: filter theo giá
-    // - discountMin, discountMax: filter theo % giảm giá
-    // - ratingMin, ratingMax: filter theo đánh giá sao
-    const { gender, brand, category, brandName, categoryName, tag, sale, priceMin, priceMax, discountMin, discountMax, ratingMin, ratingMax, search, sortBy, sortOrder } = req.query;
+    console.log('🔍 API Products called with params:', req.query);
 
-    const conditions = ['1=1'];
-
-    // Tag mapping
-    if (tag) {
-      const t = String(tag).toLowerCase();
-      if (t === 'men') conditions.push("Gender = 'MEN'");
-      if (t === 'women') conditions.push("Gender = 'WOMEN'");
-      if (t === 'kids') conditions.push("Gender = 'KIDS'");
-      if (t === 'sports') conditions.push("Gender = 'SPORTS'");
-      // shoes => no extra filter; brands => needs brand/brandName to be effective
+    const pool = await sql.connect(config);
+    
+    // Build WHERE conditions
+    const conditions = ['1=1']; // Always true condition as base
+    
+    // Search by name or description
+    if (search) {
+      const searchTerm = search.trim();
+      console.log('🔍 Search term received:', searchTerm);
+      if (searchTerm) {
+        const searchCondition = `(Name LIKE '%${searchTerm}%' OR Description LIKE '%${searchTerm}%')`;
+        conditions.push(searchCondition);
+        console.log('🔍 Search condition added:', searchCondition);
+      }
     }
 
-    if (gender) {
-      const g = String(gender).toUpperCase();
-      conditions.push(`Gender = '${g}'`);
+    // Gender filter
+    if (gender && gender !== 'all') {
+      conditions.push(`Gender = '${gender}'`);
     }
 
-    if (brand && !Number.isNaN(parseInt(brand))) {
-      conditions.push(`BrandID = ${parseInt(brand)}`);
-    }
-
-    if (brandName) {
-      conditions.push(`BrandID IN (SELECT BrandID FROM Brands WHERE Name LIKE '%${brandName}%')`);
-    }
-
-    if (category && !Number.isNaN(parseInt(category))) {
-      conditions.push(`CategoryID = ${parseInt(category)}`);
-    }
-
-    if (categoryName) {
-      conditions.push(`CategoryID IN (SELECT CategoryID FROM Categories WHERE Name LIKE '%${categoryName}%')`);
-    }
-
-    if (sale === 'true') {
-      // Only add if column exists; many schemas have Discount
-      conditions.push('ISNULL(Discount, 0) > 0');
+    // Tag filter
+    if (tag && tag !== 'all') {
+      conditions.push(`Tag = '${tag}'`);
     }
 
     // Price range
@@ -396,24 +287,21 @@ app.get('/api/products', async (req, res) =>{
       conditions.push(`ISNULL(Discount, 0) <= ${parseFloat(discountMax)}`);
     }
 
-    // Search by name or description
-    if (search) {
-      const searchTerm = search.trim();
-      console.log('🔍 Search term received:', searchTerm);
-      if (searchTerm) {
-        const searchCondition = `(Name LIKE '%${searchTerm}%' OR Description LIKE '%${searchTerm}%')`;
-        conditions.push(searchCondition);
-        console.log('🔍 Search condition added:', searchCondition);
-      }
+    // Rating range
+    if (ratingMin && !Number.isNaN(parseFloat(ratingMin))) {
+      conditions.push(`ISNULL(Rating, 0) >= ${parseFloat(ratingMin)}`);
+    }
+    if (ratingMax && !Number.isNaN(parseFloat(ratingMax))) {
+      conditions.push(`ISNULL(Rating, 0) <= ${parseFloat(ratingMax)}`);
     }
 
     // Xử lý sắp xếp
     let orderBy = 'ProductID'; // Mặc định sắp xếp theo ID
-    
+
     if (sortBy) {
       const sortByLower = sortBy.toLowerCase();
       const sortOrderLower = (sortOrder || 'asc').toLowerCase();
-      
+
       // Validate sortBy parameter
       const allowedSortFields = ['price', 'discount', 'name', 'rating'];
       if (allowedSortFields.includes(sortByLower)) {
@@ -434,54 +322,28 @@ app.get('/api/products', async (req, res) =>{
           default:
             fieldName = 'ProductID';
         }
-        
+
         // Validate sortOrder
         const validOrder = ['asc', 'desc'].includes(sortOrderLower) ? sortOrderLower : 'asc';
         orderBy = `${fieldName} ${validOrder.toUpperCase()}`;
-        
+
         console.log(`🔍 Sorting by: ${fieldName} ${validOrder.toUpperCase()}`);
       }
     }
-    
+
     const query = `SELECT * FROM Products WHERE ${conditions.join(' AND ')} ORDER BY ${orderBy}`;
     console.log('🔍 Final SQL Query:', query);
     console.log('🔍 All conditions:', conditions);
+    
     const result = await sql.query(query);
     console.log(`✅ Found ${result.recordset.length} products`);
     
-    // Log first few products for debugging
-    if (result.recordset.length > 0) {
-      console.log('🔍 First 3 products found:');
-      result.recordset.slice(0, 3).forEach((product, index) => {
-        console.log(`  ${index + 1}. ${product.Name || product.ProductName || 'Unknown'}`);
-      });
-    }
-
-=======
-    
-    let query = 'SELECT * FROM Products WHERE 1=1';
-    const { gender, brand, category, sale } = req.query;
-    if (gender) query += ` AND Gender LIKE '%${gender}%'`;
-    if (brand) query += ` AND BrandID = ${parseInt(brand)}`;
-    if (category) query += ` AND CategoryID = ${parseInt(category)}`;
-    if (sale === 'true') query += ` AND Discount > 0`;
-    
-    console.log('Executing query:', query);
-    const result = await sql.query(query);
-    console.log(`Found ${result.recordset.length} products`);
-    
->>>>>>> c572b428d96d97607803cba24798ece03f17e312
     res.json(result.recordset);
   } catch (err) {
-    console.error('Lỗi truy vấn SQL:', err);
+    console.error('Products API error:', err);
     res.status(500).json({ error: err.message });
   } finally {
-    try {
-      await sql.close();
-      console.log('Database connection closed');
-    } catch (closeErr) {
-      console.error('Error closing connection:', closeErr);
-    }
+    try { await sql.close(); } catch {}
   }
 });
 
@@ -523,19 +385,96 @@ app.get('/api/products/:id', async (req, res) => {
   }
 });
 
-const PORT = 5000;
+// Authentication endpoints
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, password, email, fullName, phone, address } = req.body;
+    
+    if (!username || !password || !email) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const pool = await sql.connect(config);
+    
+    // Ensure Users table exists
+    await ensureUsersLocalColumns(pool);
+    
+    // Check if username already exists
+    const existingUser = await pool.request()
+      .input('username', sql.NVarChar(100), username)
+      .query('SELECT * FROM Users WHERE Username = @username');
+    
+    if (existingUser.recordset.length > 0) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+
+    // Hash password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    
+    // Create new user
+    await pool.request()
+      .input('username', sql.NVarChar(100), username)
+      .input('passwordHash', sql.NVarChar(255), hashedPassword)
+      .input('email', sql.NVarChar(200), email)
+      .input('fullName', sql.NVarChar(200), fullName || '')
+      .input('phone', sql.NVarChar(50), phone || '')
+      .input('address', sql.NVarChar(400), address || '')
+      .query(`
+        INSERT INTO Users (Username, PasswordHash, Email, FullName, Phone, Address, CreatedAt, UpdatedAt)
+        VALUES (@username, @passwordHash, @email, @fullName, @phone, @address, GETDATE(), GETDATE())
+      `);
+    
+    res.json({ success: true, message: 'User registered successfully' });
+  } catch (err) {
+    console.error('Registration error:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    try { await sql.close(); } catch {}
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Missing username or password' });
+    }
+
+    const pool = await sql.connect(config);
+    
+    // Find user by username
+    const user = await pool.request()
+      .input('username', sql.NVarChar(100), username)
+      .query('SELECT * FROM Users WHERE Username = @username');
+    
+    if (user.recordset.length === 0) {
+      return res.status(401).json({ error: 'Sai tài khoản hoặc mật khẩu, vui lòng đăng nhập lại' });
+    }
+
+    const userData = user.recordset[0];
+    
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, userData.PasswordHash);
+    
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Sai tài khoản hoặc mật khẩu, vui lòng đăng nhập lại' });
+    }
+
+    // Return user data (without password)
+    const { PasswordHash, ...userInfo } = userData;
+    res.json({ success: true, user: userInfo });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    try { await sql.close(); } catch {}
+  }
+});
+
+// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 API endpoints:`);
-  console.log(`   GET /api/test - Test server`);
-  console.log(`   GET /api/products - Get all products (with search & sort)`);
-  console.log(`   GET /api/products/:id - Get product by ID`);
-<<<<<<< HEAD
-  console.log(`   POST /api/users - Create/Update user`);
-  console.log(`   GET /api/users/:firebaseUID - Get user info`);
-  console.log(`   POST /api/auth/register - Register local user`);
-  console.log(`   POST /api/auth/login - Login local user`);
-  console.log(`   POST /api/orders - Create order`);
-=======
->>>>>>> c572b428d96d97607803cba24798ece03f17e312
+  console.log(`🚀 Backend server running on port ${PORT}`);
+  console.log(`📊 Test endpoint: http://localhost:${PORT}/api/test`);
 }); 

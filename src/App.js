@@ -11,17 +11,14 @@ import ProductDetail from './components/ProductDetail';
 import ProductList from './components/ProductList';
 import Cart from './components/Cart';
 import PaymentPage from './Pages/PaymentPage';
-<<<<<<< HEAD
 import OrderTracker from './Pages/OrderTracker';
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase";
 import { useEffect } from "react";
-=======
 
 // Admin
 import Admin from './Pages/Admin';
 
->>>>>>> c572b428d96d97607803cba24798ece03f17e312
 import './App.css';
 
 function AppContent() {
@@ -45,8 +42,10 @@ function AppContent() {
         <Route path="/brands" element={<Navigate to="/products?tag=brands" replace />} />
         <Route path="/shoes" element={<Navigate to="/products?tag=shoes" replace />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<PersonalInformationPage />} />
         <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/order-tracker" element={<OrderTracker />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
 
@@ -63,33 +62,7 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
-<<<<<<< HEAD
-        <div className="App">
-          <Header />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/products" element={<ProductList />} />
-            {/* Friendly tag routes */}
-            <Route path="/men" element={<Navigate to="/products?tag=men" replace />} />
-            <Route path="/women" element={<Navigate to="/products?tag=women" replace />} />
-            <Route path="/kids" element={<Navigate to="/products?tag=kids" replace />} />
-            <Route path="/sports" element={<Navigate to="/products?tag=sports" replace />} />
-            <Route path="/brands" element={<Navigate to="/products?tag=brands" replace />} />
-            <Route path="/shoes" element={<Navigate to="/products?tag=shoes" replace />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/profile" element={<PersonalInformationPage />} />
-            <Route path="/payment" element={<PaymentPage />} />
-            <Route path="/order-tracker" element={<OrderTracker />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<Cart />} />
-          </Routes>
-          <Footer />
-        </div>
-=======
         <AppContent />
->>>>>>> c572b428d96d97607803cba24798ece03f17e312
       </Router>
     </AuthProvider>
   );
