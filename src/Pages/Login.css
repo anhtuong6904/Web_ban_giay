@@ -3,38 +3,44 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #ecf0f1, #f5f5f5);
   padding: 20px;
 }
 
 .auth-card {
   background: white;
-  border-radius: 0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .auth-header {
-  background: #2c3e50;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
   color: white;
   text-align: center;
-  padding: 30px 20px;
+  padding: 35px 20px;
   margin: 0;
 }
 
 .auth-header h1 {
   color: white;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .auth-header p {
-  color: #bdc3c7;
+  color: #ecf0f1;
   font-size: 14px;
   margin: 0;
   font-weight: 400;
@@ -44,7 +50,7 @@
   background: #fee;
   color: #c0392b;
   padding: 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   margin-bottom: 20px;
   text-align: center;
   border: 1px solid #fadbd8;
@@ -53,8 +59,8 @@
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 30px 20px;
+  gap: 18px;
+  padding: 30px 24px;
 }
 
 .form-group {
@@ -65,14 +71,14 @@
 .form-group label {
   color: #2c3e50;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-size: 14px;
 }
 
 .form-group input {
   padding: 12px 16px;
   border: 1px solid #ddd;
-  border-radius: 0;
+  border-radius: 8px;
   font-size: 14px;
   transition: all 0.3s ease;
   background: #fafafa;
@@ -82,7 +88,7 @@
   outline: none;
   border-color: #3498db;
   background: white;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
 }
 
 .auth-btn {
@@ -90,8 +96,8 @@
   color: white;
   border: none;
   padding: 14px;
-  border-radius: 0;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -102,8 +108,8 @@
 
 .auth-btn:hover {
   background: #2980b9;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(52, 152, 219, 0.35);
 }
 
 .auth-btn:active {
@@ -145,7 +151,7 @@
   color: #333;
   border: 1px solid #ddd;
   padding: 12px 16px;
-  border-radius: 0;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -156,8 +162,8 @@
 .google-btn:hover {
   background: #f8f9fa;
   border-color: #cbd3da;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 .google-btn:active {
@@ -195,18 +201,19 @@
 /* Responsive */
 @media (max-width: 480px) {
   .auth-card {
-    padding: 30px 20px;
+    max-width: 100%;
+    margin: 0 10px;
   }
-  
+
   .auth-header h1 {
-    font-size: 24px;
+    font-size: 22px;
   }
-  
+
   .form-group input {
     padding: 10px 14px;
     font-size: 14px;
   }
-  
+
   .auth-btn {
     padding: 12px;
     font-size: 14px;

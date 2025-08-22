@@ -1,0 +1,307 @@
+/* Category Showcase Section */
+.category-showcase-section {
+  background: #ffffff;
+  padding: 40px 0;
+  color: #2c3e50;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 15px;
+  margin: 20px;
+  position: relative;
+}
+
+.category-showcase-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Category Showcase Header */
+.category-showcase-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.category-showcase-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #2c3e50;
+  letter-spacing: 1px;
+}
+
+.category-showcase-header p {
+  font-size: 1rem;
+  color: #7f8c8d;
+  font-weight: 400;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Category Showcase Layout - Không đồng đều */
+.category-showcase-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+/* Large Category Banner - Left Side */
+.large-category-banner {
+  grid-column: 1;
+}
+
+.large-card {
+  height: 100%;
+  min-height: 400px;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  position: relative;
+}
+
+/* Small Categories Container - Right Side */
+.small-categories-container {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.small-card {
+  height: calc(50% - 10px);
+  min-height: 190px;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  position: relative;
+}
+
+/* Category Showcase Card - Base Styles */
+.category-showcase-card {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid #f0f0f0;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.category-showcase-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  border-color: var(--category-color);
+}
+
+/* Category Content Overlay - Base Styles */
+.category-content-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0.95) 100%);
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+/* Large Overlay - Specific Styles */
+.large-card .category-content-overlay {
+  padding: 30px;
+}
+
+/* Small Overlay - Specific Styles */
+.small-card .category-content-overlay {
+  padding: 20px;
+}
+
+/* Category Name - Base Styles */
+.category-name {
+  font-weight: 700;
+  color: var(--category-color);
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Large Name - Specific Styles */
+.large-card .category-name {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+/* Small Name - Specific Styles */
+.small-card .category-name {
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+
+/* Category Description - Base Styles */
+.category-description {
+  color: #666;
+  line-height: 1.4;
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+/* Large Description - Specific Styles */
+.large-card .category-description {
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+}
+
+/* Small Description - Specific Styles */
+.small-card .category-description {
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+}
+
+/* Category Action - Base Styles */
+.category-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--category-color);
+  color: white;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Large Action - Specific Styles */
+.large-card .category-action {
+  padding: 15px 25px;
+  font-size: 14px;
+}
+
+/* Small Action - Specific Styles */
+.small-card .category-action {
+  padding: 10px 18px;
+  font-size: 12px;
+}
+
+.category-showcase-card:hover .category-action {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.explore-text {
+  font-weight: 600;
+}
+
+.category-action i {
+  transition: transform 0.3s ease;
+}
+
+.category-showcase-card:hover .category-action i {
+  transform: translateX(3px);
+}
+
+/* Category Hover Effect */
+.category-hover-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+
+.category-showcase-card:hover .category-hover-effect {
+  transform: translateX(100%);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .category-showcase-layout {
+    gap: 20px;
+  }
+  
+  .large-card .category-name {
+    font-size: 2rem;
+  }
+  
+  .small-card .category-name {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .category-showcase-section {
+    padding: 30px 0;
+    margin: 15px 10px;
+  }
+  
+  .category-showcase-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .category-showcase-header p {
+    font-size: 0.9rem;
+  }
+  
+  .category-showcase-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .large-card {
+    min-height: 300px;
+  }
+  
+  .small-card {
+    min-height: 150px;
+  }
+  
+  .large-card .category-content-overlay {
+    padding: 25px;
+  }
+  
+  .small-card .category-content-overlay {
+    padding: 15px;
+  }
+  
+  .large-card .category-name {
+    font-size: 1.8rem;
+  }
+  
+  .small-card .category-name {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-showcase-section {
+    padding: 25px 0;
+  }
+  
+  .large-card {
+    min-height: 250px;
+  }
+  
+  .small-card {
+    min-height: 120px;
+  }
+  
+  .large-card .category-content-overlay {
+    padding: 20px;
+  }
+  
+  .small-card .category-content-overlay {
+    padding: 12px;
+  }
+  
+  .large-card .category-name {
+    font-size: 1.5rem;
+  }
+  
+  .small-card .category-name {
+    font-size: 1rem;
+  }
+}

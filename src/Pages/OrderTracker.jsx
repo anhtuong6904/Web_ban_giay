@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import OrderTracking from '../components/OrderTracking';
 import './OrderTracker.css';
 
 export default function OrderTracker() {
@@ -8,6 +9,8 @@ export default function OrderTracker() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
 
   useEffect(() => {
     if (!currentUser) {
@@ -30,6 +33,16 @@ export default function OrderTracker() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleTrackOrder = (order) => {
+    setSelectedOrder(order);
+    setIsTrackingModalOpen(true);
+  };
+
+  const closeTrackingModal = () => {
+    setIsTrackingModalOpen(false);
+    setSelectedOrder(null);
   };
 
   const getStatusColor = (status) => {
@@ -131,7 +144,12 @@ export default function OrderTracker() {
                   <strong>Tổng cộng: {order.total?.toLocaleString('vi-VN')} ₫</strong>
                 </div>
                 <div className="order-actions">
-                  <button className="track-btn">Theo dõi chi tiết</button>
+                  <button 
+                    className="track-btn"
+                    onClick={() => handleTrackOrder(order)}
+                  >
+                    Theo dõi chi tiết
+                  </button>
                   <button className="cancel-btn">Hủy đơn hàng</button>
                 </div>
               </div>
@@ -139,6 +157,13 @@ export default function OrderTracker() {
           ))}
         </div>
       )}
+
+      {/* Order Tracking Modal */}
+      <OrderTracking
+        order={selectedOrder}
+        isOpen={isTrackingModalOpen}
+        onClose={closeTrackingModal}
+      />
     </div>
   );
 }

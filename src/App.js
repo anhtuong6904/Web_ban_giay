@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './Pages/Home';
 import Login from './Pages/Login';
 import Register from './Pages/Register';
@@ -13,6 +14,8 @@ import Cart from './components/Cart';
 import CartTest from './components/CartTest';
 import PaymentPage from './Pages/PaymentPage';
 import OrderTracker from './Pages/OrderTracker';
+import Brands from './Pages/Brands';
+import Help from './Pages/Help';
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase";
 import { useEffect } from "react";
@@ -28,6 +31,9 @@ function AppContent() {
 
   return (
     <div className="App">
+      {/* ScrollToTop component - tự động scroll lên đầu khi chuyển route */}
+      <ScrollToTop />
+      
       {/* Hiển thị Header và Footer chỉ với người dùng thường */}
       {!isAdminRoute && <Header className="App-header" />}
 
@@ -40,13 +46,14 @@ function AppContent() {
         <Route path="/women" element={<Navigate to="/products?tag=women" replace />} />
         <Route path="/kids" element={<Navigate to="/products?tag=kids" replace />} />
         <Route path="/sports" element={<Navigate to="/products?tag=sports" replace />} />
-        <Route path="/brands" element={<Navigate to="/products?tag=brands" replace />} />
+        <Route path="/brands" element={<Brands />} />
         <Route path="/shoes" element={<Navigate to="/products?tag=shoes" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<PersonalInformationPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/order-tracker" element={<OrderTracker />} />
+        <Route path="/help" element={<Help />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/cart-test" element={<CartTest />} />

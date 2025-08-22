@@ -1,0 +1,370 @@
+/* Order Tracking Modal */
+.order-tracking-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.order-tracking-modal {
+  background: white;
+  border-radius: 16px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.tracking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px;
+  border-bottom: 2px solid #f1f3f4;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 16px 16px 0 0;
+}
+
+.tracking-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Order Info */
+.order-info {
+  padding: 25px 30px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.order-summary h3 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.order-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.order-details p {
+  margin: 5px 0;
+  color: #5a6c7d;
+  font-size: 0.95rem;
+}
+
+.order-details strong {
+  color: #2c3e50;
+}
+
+/* Tracking Steps */
+.tracking-steps {
+  padding: 25px 30px;
+}
+
+.tracking-steps h3 {
+  margin: 0 0 25px 0;
+  color: #2c3e50;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.steps-container {
+  position: relative;
+}
+
+.tracking-step {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.step-icon {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.tracking-step.completed .step-icon {
+  border-color: #27ae60;
+  background: #27ae60;
+}
+
+.tracking-step.current .step-icon {
+  border-color: #f39c12;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.2);
+}
+
+.tracking-step.pending .step-icon {
+  border-color: #bdc3c7;
+  background: white;
+}
+
+.step-content {
+  flex: 1;
+  padding-top: 5px;
+}
+
+.step-title {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.step-description {
+  margin: 0 0 8px 0;
+  color: #7f8c8d;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.step-time {
+  font-size: 0.85rem;
+  color: #95a5a6;
+  font-weight: 500;
+}
+
+.step-connector {
+  position: absolute;
+  left: 25px;
+  top: 50px;
+  width: 3px;
+  height: 30px;
+  background: #e9ecef;
+  z-index: 1;
+}
+
+.step-connector.completed {
+  background: #27ae60;
+}
+
+/* Delivery Details */
+.delivery-details {
+  padding: 25px 30px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.delivery-details h3 {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.delivery-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.delivery-address h4,
+.delivery-status h4 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.delivery-address p {
+  margin: 5px 0;
+  color: #5a6c7d;
+  font-size: 0.95rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-badge.processing {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.status-badge.shipped {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-badge.in_transit {
+  background: #e2e3e5;
+  color: #383d41;
+  border: 1px solid #d6d8db;
+}
+
+.status-badge.delivered,
+.status-badge.completed {
+  background: #d1f2eb;
+  color: #0e6251;
+  border: 1px solid #a8e6cf;
+}
+
+/* Action Buttons */
+.tracking-actions {
+  padding: 25px 30px;
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+  border-radius: 0 0 16px 16px;
+}
+
+.btn-secondary,
+.btn-primary {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .order-tracking-modal {
+    margin: 10px;
+    max-height: 95vh;
+  }
+  
+  .tracking-header {
+    padding: 20px;
+  }
+  
+  .tracking-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .order-info,
+  .tracking-steps,
+  .delivery-details,
+  .tracking-actions {
+    padding: 20px;
+  }
+  
+  .delivery-info {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .order-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .tracking-actions {
+    flex-direction: column;
+  }
+  
+  .btn-secondary,
+  .btn-primary {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .tracking-step {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .step-icon {
+    margin: 0 auto 15px auto;
+  }
+  
+  .step-connector {
+    display: none;
+  }
+}

@@ -4,10 +4,8 @@ import { IoHeart, IoHeartOutline, IoShareSocial, IoLocation, IoTime, IoCall, IoM
 import { getProductById, getProducts } from '../services/productService';
 import './ProductDetail.css';
 import { addToCart, setCheckoutItems } from '../services/cartService';
-import { useNavigate as useNav } from 'react-router-dom';
 
 export default function ProductDetail() {
-  const nav2 = useNav();
   const { id } = useParams();
   const navigate = useNavigate();
   const [selectedSize, setSelectedSize] = useState('');
@@ -495,19 +493,36 @@ export default function ProductDetail() {
   };
 
   const handleBuyNow = () => {
+    // Kiểm tra xem user đã chọn size và color chưa
+    if (!selectedSize) {
+      alert('⚠️ Vui lòng chọn kích thước trước khi mua!');
+      return;
+    }
+    
+    if (!selectedColor) {
+      alert('⚠️ Vui lòng chọn màu sắc trước khi mua!');
+      return;
+    }
+
     const quantityToAdd = Math.max(1, quantity || 1);
     const item = {
-      key: `${product.ProductID || product.id}|${selectedSize || ''}|${selectedColor || ''}`,
+      key: `${product.ProductID || product.id}|${selectedSize}|${selectedColor}`,
       productId: product.ProductID || product.id,
       name: product.Name,
       price: product.Price || 0,
       image: product.MainImage,
       quantity: quantityToAdd,
-      size: selectedSize || null,
-      color: selectedColor || null
+      size: selectedSize,
+      color: selectedColor
     };
+    
+    // Lưu item vào checkout và chuyển đến trang thanh toán
     setCheckoutItems([item]);
-    nav2('/payment');
+    
+    // Thông báo thành công
+    alert(`✅ Đã thêm ${product.Name} vào đơn hàng!\n\n📋 Thông tin đơn hàng:\n• Size: ${selectedSize}\n• Màu: ${selectedColor}\n• Số lượng: ${quantityToAdd}\n• Giá: ${(product.Price * quantityToAdd).toLocaleString('vi-VN')} ₫\n\n🔄 Đang chuyển đến trang thanh toán...`);
+    
+    navigate('/payment');
   };
 
 

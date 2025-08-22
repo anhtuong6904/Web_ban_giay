@@ -1,158 +1,98 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { IoPerson, IoCart, IoSearch, IoMenu, IoClose } from 'react-icons/io5';
+import { IoCart, IoSearch, IoPerson, IoClose, IoHelpCircle, IoDocumentText } from 'react-icons/io5';
 import { useAuth } from '../contexts/AuthContext';
 import { onCartChange, getCartCount } from '../services/cartService';
 import Cart from './Cart';
 import './Header.css';
 
-const Header = () => {
+export default function Header() {
   const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
+  const [cartCount, setCartCount] = useState(getCartCount());
   const [cartVisible, setCartVisible] = useState(false);
   const [closing, setClosing] = useState(false);
-  const location = useLocation();
-  const [cartCount, setCartCount] = useState(getCartCount());
   const [searchTerm, setSearchTerm] = useState('');
   const [profileImageVersion, setProfileImageVersion] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const base = process.env.PUBLIC_URL;
 
-  const base = process.env.PUBLIC_URL || '';
+  useEffect(() => {
+    if (currentUser) {
+      loadOrderCount();
+    }
+    
+    // Lắng nghe sự thay đổi trong localStorage để cập nhật order count
+    const handleStorageChange = () => {
+      if (currentUser) {
+        loadOrderCount();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Custom event để cập nhật order count khi có đơn hàng mới
+    window.addEventListener('orderUpdated', loadOrderCount);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('orderUpdated', loadOrderCount);
+    };
+  }, [currentUser]);
+
+  useEffect(() => {
+    // Lắng nghe thay đổi giỏ hàng
+    const unsubscribe = onCartChange((newCount) => {
+      setCartCount(newCount);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const loadOrderCount = () => {
+    try {
+      if (currentUser) {
+        const savedOrders = localStorage.getItem(`userOrders:${currentUser.uid || currentUser.email}`);
+        if (savedOrders) {
+          const orders = JSON.parse(savedOrders);
+          setOrderCount(orders.length);
+        } else {
+          setOrderCount(0);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading order count:', error);
+      setOrderCount(0);
+    }
+  };
+
+  // Function để refresh order count (có thể gọi từ bên ngoài)
+  const refreshOrderCount = () => {
+    loadOrderCount();
+  };
+
+  // Expose function để component khác có thể gọi
+  useEffect(() => {
+    window.refreshHeaderOrderCount = refreshOrderCount;
+    return () => {
+      delete window.refreshHeaderOrderCount;
+    };
+  }, []);
 
   // Debug logging để kiểm tra currentUser
   useEffect(() => {
-    console.log('🔍 Header - currentUser changed:', currentUser);
-    if (currentUser) {
-      console.log('📝 User details:', {
-        displayName: currentUser.displayName,
-        email: currentUser.email,
-        Username: currentUser.Username,
-        username: currentUser.username,
-        uid: currentUser.uid
-      });
-    }
+    console.log('Current user in Header:', currentUser);
   }, [currentUser]);
 
-  // Hàm để lấy ảnh profile từ localStorage (base64) hoặc từ currentUser
-  const getProfileImage = () => {
-    if (!currentUser) return null;
-    
-    // Ưu tiên ảnh base64 từ localStorage
-    const getUserIdentity = (user) => {
-      return (
-        user?.uid ||
-        user?.email ||
-        user?.Username ||
-        user?.username ||
-        user?.id ||
-        'guest'
-      );
-    };
-    
-    const identity = getUserIdentity(currentUser);
-    const localPhotoKey = `userPhotoBase64:${identity}`;
-    
+  const handleLogout = async () => {
     try {
-      const localPhoto = localStorage.getItem(localPhotoKey);
-      if (localPhoto) {
-        return localPhoto;
-      }
-    } catch {}
-    
-    // Fallback về photoURL từ currentUser
-    if (currentUser.photoURL) {
-      return currentUser.photoURL;
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
     }
-    
-    // Nếu không có ảnh nào, trả về null để hiển thị icon mặc định
-    return null;
-  };
-
-  const profileImage = getProfileImage();
-
-  // Hàm để lấy tên hiển thị của user
-  const getUserDisplayName = () => {
-    if (!currentUser) {
-      console.log('👤 No currentUser found');
-      return '';
-    }
-    
-    console.log('👤 Current user object:', currentUser);
-    console.log('👤 fullName:', currentUser.fullName);
-    console.log('👤 displayName:', currentUser.displayName);
-    console.log('👤 Username:', currentUser.Username);
-    console.log('👤 username:', currentUser.username);
-    console.log('👤 email:', currentUser.email);
-    
-    const displayName = currentUser.fullName || 
-                       currentUser.displayName || 
-                       currentUser.Username || 
-                       currentUser.username || 
-                       currentUser.email;
-    
-    console.log('👤 Final display name:', displayName);
-    return displayName;
-  };
-
-  React.useEffect(() => {
-    setCartCount(getCartCount());
-    const off = onCartChange(() => setCartCount(getCartCount()));
-    return off;
-  }, []);
-
-  // Lắng nghe thay đổi ảnh profile từ localStorage
-  React.useEffect(() => {
-    const handleStorageChange = () => {
-      // Force re-render khi localStorage thay đổi
-      setProfileImageVersion(prev => prev + 1);
-    };
-
-    // Lắng nghe sự kiện storage change
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Lắng nghe sự kiện custom khi ảnh profile thay đổi
-    const handleProfileImageChange = () => {
-      setProfileImageVersion(prev => prev + 1);
-    };
-    
-    window.addEventListener('profileImageChanged', handleProfileImageChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('profileImageChanged', handleProfileImageChange);
-    };
-  }, []);
-
-  // Cập nhật profile image khi currentUser thay đổi
-  React.useEffect(() => {
-    if (currentUser) {
-      console.log('🔄 Force updating profile image version');
-      setProfileImageVersion(prev => prev + 1);
-    }
-  }, [currentUser]);
-
-  // Force re-render khi currentUser thay đổi
-  useEffect(() => {
-    console.log('🔄 Header re-rendering due to currentUser change');
-  }, [currentUser]);
-
-  // Force re-render khi localStorage thay đổi
-  useEffect(() => {
-    const handleStorageChange = () => {
-      console.log('🔄 Storage changed, forcing re-render');
-      setProfileImageVersion(prev => prev + 1);
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/home');
   };
 
   const handleCartOpen = () => {
@@ -164,27 +104,52 @@ const Header = () => {
     setClosing(true);
     setTimeout(() => {
       setCartVisible(false);
-    }, 300); // khớp thời gian CSS
+      setClosing(false);
+    }, 300);
   };
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
       navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
-      setSearchTerm(''); // Clear search after navigation
     }
+  };
+
+  const getUserDisplayName = () => {
+    if (currentUser) {
+      return currentUser.displayName || currentUser.email || currentUser.Username || 'User';
+    }
+    return 'Guest';
+  };
+
+  const getProfileImage = () => {
+    if (currentUser) {
+      return currentUser.photoURL || currentUser.profileImage;
+    }
+    return null;
+  };
+
+  const handleProfileImageClick = () => {
+    setProfileImageVersion(prev => prev + 1);
   };
 
   return (
     <header className="header">
-      {/* User Info Bar - Thanh nhỏ hiển thị thông tin user */}
+      {/* Top Promo Banner */}
+      <div className="promo-banner">
+        <Link to="/sale">
+          🎉 BACK TO SCHOOL SALE - Giảm giá lên đến 50% cho tất cả giày thể thao! 🎉
+        </Link>
+      </div>
+
+      {/* User Info Bar */}
       {currentUser && (
         <div className="user-info-bar">
           <div className="user-info-container">
             <div className="user-info-item">
-              <Link to="/profile" className="user-info-avatar">
-                {profileImage ? (
+              <Link to="/profile" className="user-info-avatar" onClick={handleProfileImageClick}>
+                {getProfileImage() ? (
                   <img 
-                    src={profileImage} 
+                    src={getProfileImage()} 
                     alt="Avatar" 
                     key={profileImageVersion}
                   />
@@ -220,15 +185,24 @@ const Header = () => {
               <Link to="/products?category=women">WOMEN</Link>
               <Link to="/products?category=kids">KIDS</Link>
               <Link to="/products?category=sports">SPORTS</Link>
-              <Link to="/products?category=brands">BRANDS</Link>
+              <Link to="/brands">BRANDS</Link>
               <Link to="/sale" className="sale-link">BACK TO SCHOOL SALE</Link>
             </nav>
           </div>
 
           <div className="header-right">
             <div className="header-links">
-              <Link to="/help">Help</Link>
-              <Link to="/order-tracker">Order Tracker</Link>
+              <Link to="/help" className="help-link">
+                <IoHelpCircle size={18} />
+                <span>Help</span>
+              </Link>
+              <Link to="/order-tracker" className="order-tracker-link">
+                <IoDocumentText size={18} />
+                <span>Order Tracker</span>
+                {orderCount > 0 && (
+                  <span className="order-count-badge">{orderCount}</span>
+                )}
+              </Link>
             </div>
 
             <button className="cart-btn" onClick={handleCartOpen}>
@@ -281,6 +255,4 @@ const Header = () => {
       )}
     </header>
   );
-};
-
-export default Header;
+}

@@ -113,7 +113,7 @@ export default function HotPicks() {
       <section className="hot-picks-section">
         <div className="hot-picks-container">
           <div className="hot-picks-header">
-            <h2>🔥 HOT PICKS</h2>
+            <h2>HOT PICKS</h2>
             <p>Sản phẩm bán chạy nhất tuần này</p>
           </div>
           <div className="loading-spinner">

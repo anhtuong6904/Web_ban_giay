@@ -11,7 +11,8 @@
 
 /* Top Promo Banner - Biti's style */
 .promo-banner {
-  background: linear-gradient(135deg, #000000, #86abd4);
+  background: linear-gradient(135deg, #000000 0%, #084101 100%);
+
   color: white;
   padding: 10px 0;
   min-height: 44px;
@@ -74,7 +75,7 @@
 
 /* User Info Bar - Thanh nhỏ hiển thị thông tin user */
 .user-info-bar {
-  background: linear-gradient(135deg, #f8f9fa 0%, #312f2f 100%);
+  background: linear-gradient(180deg, #746c6c 0%, #000000 100%);
   padding: 8px 0;
   border-bottom: 1px solid #e9ecef;
   font-size: 12px;
@@ -513,17 +514,201 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  flex-wrap: wrap;
+}
+
+/* Header Links - Help & Order Tracker */
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.help-link,
+.order-tracker-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.help-link {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.help-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+  background: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
+}
+
+.help-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.help-link:hover::before {
+  left: 100%;
+}
+
+.order-tracker-link {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+  position: relative;
+  overflow: visible;
+}
+
+.order-tracker-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+  background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+}
+
+.order-tracker-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.order-tracker-link:hover::before {
+  left: 100%;
+}
+
+/* Order Count Badge */
+.order-count-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+  animation: pulse 2s infinite;
+  z-index: 10;
+  min-width: 22px;
+  min-height: 22px;
+  line-height: 1;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+  }
+}
+
+.help-link svg,
+.order-tracker-link svg {
+  transition: transform 0.3s ease;
+}
+
+.help-link:hover svg,
+.order-tracker-link:hover svg {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.help-link span,
+.order-tracker-link span {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive cho header links */
+@media (max-width: 768px) {
+  .header-links {
+    gap: 8px;
+  }
+  
+  .help-link,
+  .order-tracker-link {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .help-link span,
+  .order-tracker-link span {
+    display: none;
+  }
+  
+  .help-link svg,
+  .order-tracker-link svg {
+    size: 20px;
+  }
+  
+  .order-count-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    top: -8px;
+    right: -8px;
+    min-width: 20px;
+    min-height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-links {
+    gap: 6px;
+  }
+  
+  .help-link,
+  .order-tracker-link {
+    padding: 6px 10px;
+  }
+  
+  .order-count-badge {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    top: -7px;
+    right: -7px;
+    min-width: 18px;
+    min-height: 18px;
+  }
 }
 
 .search-container {
   position: relative;
-  width: 100%;
-  max-width: 200px;
+  max-width: 150px;
 }
 
 .search-container input {
-  width: 100%;
   padding: 12px 48px 12px 18px;
   border: 2px solid #e9ecef;
   border-radius: 25px;

@@ -1,62 +1,136 @@
 import React from 'react';
-import { IoMail, IoCall, IoLocation, IoTime, IoLogoFacebook, IoLogoInstagram, IoLogoLinkedin } from 'react-icons/io5';
+import { IoMail, IoCall, IoLocation, IoTime, IoLogoFacebook, IoLogoInstagram, IoLogoLinkedin, IoHome, IoSearch, IoPerson, IoCart, IoShirt, IoHeart } from 'react-icons/io5';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Footer.css';
 
 export default function Footer() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Hàm scroll to top với smooth behavior
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // Hàm xử lý click vào các link danh mục
+  const handleCategoryClick = (tag) => {
+    // Nếu đang ở trang products với tag khác, chỉ cần scroll to top
+    if (location.pathname === '/products') {
+      scrollToTop();
+      // Có thể thêm logic để filter sản phẩm theo tag nếu cần
+    } else {
+      // Nếu đang ở trang khác, navigate về products và scroll to top
+      navigate(`/products?tag=${tag}`);
+      setTimeout(scrollToTop, 100); // Delay nhỏ để đảm bảo navigation hoàn thành
+    }
+  };
+
+  // Hàm xử lý click vào các link trang chính
+  const handlePageClick = (path) => {
+    if (location.pathname === path) {
+      // Nếu đang ở trang đó rồi, chỉ scroll to top
+      scrollToTop();
+    } else {
+      // Nếu đang ở trang khác, navigate và scroll to top
+      navigate(path);
+      setTimeout(scrollToTop, 100);
+    }
+  };
+
   return (
     <footer className="footer">
       <div className="footer-container">
         {/* Footer Top */}
         <div className="footer-top">
           <div className="footer-section">
-            <h3>Về UTH Shoes</h3>
+            <h3>🎯 Danh mục sản phẩm</h3>
             <ul>
-              <li><a href="/about">Giới thiệu</a></li>
-              <li><a href="/careers">Tuyển dụng</a></li>
-              <li><a href="/press">Báo chí</a></li>
-              <li><a href="/contact">Liên hệ</a></li>
+              <li><button onClick={() => handleCategoryClick('shoes')} className="footer-link-btn">👟 Tất cả giày</button></li>
+              <li><button onClick={() => handleCategoryClick('men')} className="footer-link-btn">👨 Giày nam</button></li>
+              <li><button onClick={() => handleCategoryClick('women')} className="footer-link-btn">👩 Giày nữ</button></li>
+              <li><button onClick={() => handleCategoryClick('kids')} className="footer-link-btn">👶 Giày trẻ em</button></li>
+              <li><button onClick={() => handleCategoryClick('sports')} className="footer-link-btn">⚽ Giày thể thao</button></li>
+              <li><button onClick={() => handlePageClick('/brands')} className="footer-link-btn">🏷️ Thương hiệu nổi tiếng</button></li>
             </ul>
           </div>
           
           <div className="footer-section">
-            <h3>Hỗ trợ khách hàng</h3>
+            <h3>🔗 Trang chính</h3>
             <ul>
-              <li><a href="/help">Trung tâm trợ giúp</a></li>
-              <li><a href="/shipping">Vận chuyển & Giao hàng</a></li>
-              <li><a href="/returns">Đổi trả & Hoàn tiền</a></li>
-              <li><a href="/size-guide">Hướng dẫn chọn size</a></li>
+              <li><button onClick={() => handlePageClick('/')} className="footer-link-btn"><IoHome size={16} /> Trang chủ</button></li>
+              <li><button onClick={() => handlePageClick('/products')} className="footer-link-btn"><IoSearch size={16} /> Tất cả sản phẩm</button></li>
+              <li><button onClick={() => handlePageClick('/about')} className="footer-link-btn">📖 Giới thiệu</button></li>
+              <li><button onClick={() => handlePageClick('/login')} className="footer-link-btn"><IoPerson size={16} /> Đăng nhập</button></li>
+              <li><button onClick={() => handlePageClick('/register')} className="footer-link-btn"><IoPerson size={16} /> Đăng ký</button></li>
+              <li><button onClick={() => handlePageClick('/cart')} className="footer-link-btn"><IoCart size={16} /> Giỏ hàng</button></li>
             </ul>
           </div>
           
           <div className="footer-section">
-            <h3>Chính sách</h3>
+            <h3>💼 Dịch vụ khách hàng</h3>
             <ul>
-              <li><a href="/privacy">Chính sách bảo mật</a></li>
-              <li><a href="/terms">Điều khoản sử dụng</a></li>
-              <li><a href="/warranty">Chính sách bảo hành</a></li>
-              <li><a href="/loyalty">Chương trình khách hàng thân thiết</a></li>
+              <li><button onClick={() => handlePageClick('/profile')} className="footer-link-btn"><IoPerson size={16} /> Thông tin cá nhân</button></li>
+              <li><button onClick={() => handlePageClick('/order-tracker')} className="footer-link-btn">📦 Theo dõi đơn hàng</button></li>
+              <li><button onClick={() => handlePageClick('/payment')} className="footer-link-btn">💳 Thanh toán</button></li>
+              <li><button onClick={() => handlePageClick('/cart')} className="footer-link-btn">🛒 Quản lý giỏ hàng</button></li>
+              <li><button onClick={() => handleCategoryClick('sports')} className="footer-link-btn">⚽ Hướng dẫn chọn giày thể thao</button></li>
+              <li><button onClick={() => handleCategoryClick('brands')} className="footer-link-btn">🏷️ So sánh thương hiệu</button></li>
             </ul>
           </div>
           
           <div className="footer-section">
-            <h3>Kết nối với chúng tôi</h3>
+            <h3>📱 Kết nối với chúng tôi</h3>
             <div className="social-media">
-              <a href="https://www.facebook.com/giakiet1803/" className="social-link" aria-label="Facebook">
+              <a href="https://www.facebook.com/profile.php?id=61579607527088" className="social-link" aria-label="Facebook">
                 <IoLogoFacebook size={20} />
               </a>
               <a href="https://www.instagram.com/lf.vgkiwt_03/" className="social-link" aria-label="Instagram">
                 <IoLogoInstagram size={20} />
               </a>
-              <a href="https://www.linkedin.com/in/gia-kiet-it-337342365/" className="social-link" aria-label="Linkedln">
+              <a href="https://www.linkedin.com/in/gia-kiet-it-337342365/" className="social-link" aria-label="LinkedIn">
                 <IoLogoLinkedin size={20} />
               </a>
             </div>
+            <div className="contact-quick">
+              <p><IoCall size={16} /> 0905 884 303</p>
+              <p><IoMail size={16} /> chamsockhachhanguthshoes@gmail.com</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Featured Categories */}
+        <div className="featured-categories">
+          <h3>⭐ Danh mục nổi bật</h3>
+          <div className="category-links">
+            <button onClick={() => handleCategoryClick('nike')} className="category-link">
+              <IoShirt size={20} />
+              <span>Nike</span>
+            </button>
+            <button onClick={() => handleCategoryClick('adidas')} className="category-link">
+              <IoShirt size={20} />
+              <span>Adidas</span>
+            </button>
+            <button onClick={() => handleCategoryClick('converse')} className="category-link">
+              <IoShirt size={20} />
+              <span>Converse</span>
+            </button>
+            <button onClick={() => handleCategoryClick('newbalance')} className="category-link">
+              <IoShirt size={20} />
+              <span>New Balance</span>
+            </button>
+            <button onClick={() => handleCategoryClick('puma')} className="category-link">
+              <IoShirt size={20} />
+              <span>Puma</span>
+            </button>
           </div>
         </div>
 
         {/* Footer Contact */}
         <div className="footer-contact">
-          <h3 className="contact-title">Thông tin liên hệ</h3>
+          <h3 className="contact-title">📍 Thông tin liên hệ</h3>
           <div className="contact-info">
             <div className="contact-item">
               <div className="contact-icon">
@@ -102,7 +176,8 @@ export default function Footer() {
 
         {/* Newsletter */}
         <div className="newsletter">
-          <h3>Đăng ký nhận tin tức</h3>
+          <h3>📧 Đăng ký nhận tin tức</h3>
+          <p>Nhận thông tin về sản phẩm mới, khuyến mãi và xu hướng giày mới nhất</p>
           <form className="newsletter-form">
             <input 
               type="email" 
@@ -111,6 +186,7 @@ export default function Footer() {
               required
             />
             <button type="submit" className="newsletter-btn">
+              <IoHeart size={16} />
               Đăng ký
             </button>
           </form>
@@ -119,14 +195,15 @@ export default function Footer() {
         {/* Footer Bottom */}
         <div className="footer-bottom">
           <div className="footer-links">
-            <a href="/terms">Điều khoản</a>
-            <a href="/privacy">Chính sách bảo mật</a>
-            <a href="/sitemap">Sitemap</a>
-            <a href="/accessibility">Khả năng tiếp cận</a>
+            <button onClick={() => handlePageClick('/about')} className="footer-link-btn">Về chúng tôi</button>
+            <button onClick={() => handlePageClick('/products')} className="footer-link-btn">Sản phẩm</button>
+            <button onClick={() => handlePageClick('/cart')} className="footer-link-btn">Giỏ hàng</button>
+            <button onClick={() => handlePageClick('/profile')} className="footer-link-btn">Tài khoản</button>
+            <button onClick={() => handlePageClick('/order-tracker')} className="footer-link-btn">Đơn hàng</button>
           </div>
           
           <div className="copyright">
-            © 2025 UTH Shoes. Tất cả quyền được bảo lưu.
+            © 2025 UTH Shoes - Chuyên cung cấp giày thể thao chính hãng. Tất cả quyền được bảo lưu.
           </div>
         </div>
       </div>

@@ -127,6 +127,44 @@ app.get('/api/users/structure', async (req, res) => {
   }
 });
 
+// Test Users table with sample insert
+app.post('/api/users/test-insert', async (req, res) => {
+  try {
+    const pool = await sql.connect(config);
+    
+    // Try to insert a test user with minimal data
+    const result = await pool.request()
+      .input('username', sql.VarChar(100), 'testuser')
+      .input('password', sql.VarChar(255), 'testpass')
+      .input('fullName', sql.NVarChar(200), 'Test User')
+      .input('email', sql.VarChar(200), 'test@test.com')
+      .query(`
+        INSERT INTO Users (username, password, fullName, email, createdAt)
+        VALUES (@username, @password, @fullName, @email, GETDATE());
+        SELECT SCOPE_IDENTITY() AS id;
+      `);
+    
+    // Delete the test user immediately
+    await pool.request()
+      .input('id', sql.Int, result.recordset[0].id)
+      .query('DELETE FROM Users WHERE id = @id');
+    
+    await sql.close();
+    
+    res.json({
+      message: 'Test insert successful - Users table structure is correct',
+      testId: result.recordset[0].id
+    });
+  } catch (err) {
+    console.error('❌ Test insert failed:', err);
+    res.status(500).json({
+      error: err.message,
+      details: err.stack,
+      message: 'Users table structure has issues'
+    });
+  }
+});
+
 // Ensure Orders tables exist
 async function ensureOrderTables() {
   // assumes a connection is already open
@@ -138,7 +176,7 @@ async function ensureOrderTables() {
         [CustomerName] NVARCHAR(200) NOT NULL,
         [Email] NVARCHAR(200) NULL,
         [Address] NVARCHAR(400) NULL,
-        [Phone] NVARCHAR(50) NULL,
+        [PhoneNumber] NVARCHAR(50) NULL,
         [PaymentMethod] NVARCHAR(50) NOT NULL,
         [Status] NVARCHAR(50) NOT NULL DEFAULT 'PENDING',
         [TotalAmount] DECIMAL(18,2) NOT NULL DEFAULT 0,
@@ -179,14 +217,14 @@ app.post('/api/orders', async (req, res) => {
       .input('CustomerName', sql.NVarChar(200), recipient.name || '')
       .input('Email', sql.NVarChar(200), recipient.email || '')
       .input('Address', sql.NVarChar(400), recipient.address || '')
-      .input('Phone', sql.NVarChar(50), recipient.phone || '')
+      .input('PhoneNumber', sql.NVarChar(50), recipient.phone || '')
       .input('PaymentMethod', sql.NVarChar(50), paymentMethod)
       .input('Status', sql.NVarChar(50), paymentMethod === 'COD' ? 'CONFIRMED' : 'PENDING')
       .input('TotalAmount', sql.Decimal(18, 2), total)
       .query(`
-        INSERT INTO Orders (CustomerName, Email, Address, Phone, PaymentMethod, Status, TotalAmount)
+        INSERT INTO Orders (CustomerName, Email, Address, PhoneNumber, PaymentMethod, Status, TotalAmount)
         OUTPUT INSERTED.OrderID
-        VALUES (@CustomerName, @Email, @Address, @Phone, @PaymentMethod, @Status, @TotalAmount)
+        VALUES (@CustomerName, @Email, @Address, @PhoneNumber, @PaymentMethod, @Status, @TotalAmount)
       `);
 
     // Kiểm tra kết quả insert
@@ -567,7 +605,7 @@ app.post('/api/auth/register', async (req, res) => {
       .input('phoneNumber', sql.NVarChar(50), phoneNumber || '')
       .input('address', sql.NVarChar(400), address || '')
       .query(`
-        INSERT INTO Users (Username, PasswordHash, Email, FullName, Phone, Address, CreatedAt, UpdatedAt)
+        INSERT INTO Users (Username, PasswordHash, Email, FullName, PhoneNumber, Address, CreatedAt, UpdatedAt)
         VALUES (@username, @passwordHash, @email, @fullName, @phoneNumber, @address, GETDATE(), GETDATE())
       `);
     
@@ -647,7 +685,7 @@ app.get('/api/users', async (req, res) => {
       username: user.username || user.Username || '',
       fullName: user.fullName || user.FullName || '',
       email: user.email || user.Email || '',
-      phoneNumber: user.phoneNumber || user.Phone || user.PhoneNumber || '',
+      phoneNumber: user.phoneNumber || user.PhoneNumber || '',
       address: user.address || user.Address || '',
       image: user.image || user.Image || null,
       createdAt: user.createdAt || user.CreatedAt || null,
@@ -717,7 +755,7 @@ app.post('/api/users', async (req, res) => {
       .input('address', sql.NVarChar, address || null)
       .input('image', sql.VarChar(1000), processedImage)
       .query(`
-        INSERT INTO Users (username, password, fullName, phoneNumber, email, address, image, createdAt)
+        INSERT INTO Users (username, password, fullName, PhoneNumber, email, address, image, createdAt)
         VALUES (@username, @password, @fullName, @phoneNumber, @email, @address, @image, GETDATE());
         SELECT SCOPE_IDENTITY() AS id;
       `);
@@ -785,7 +823,7 @@ app.put('/api/users/:id', async (req, res) => {
     let updateQuery = `
       UPDATE Users 
       SET fullName = @fullName, 
-          phoneNumber = @phoneNumber, 
+          PhoneNumber = @phoneNumber, 
           email = @email, 
           address = @address`;
     

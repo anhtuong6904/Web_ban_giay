@@ -95,6 +95,27 @@ export default function ManageUsers() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validation
+    if (!formData.username.trim()) {
+      alert('Vui lòng nhập tên người dùng!');
+      return;
+    }
+    
+    if (!editingUser && !formData.password.trim()) {
+      alert('Vui lòng nhập mật khẩu!');
+      return;
+    }
+    
+    if (!formData.fullName.trim()) {
+      alert('Vui lòng nhập họ và tên!');
+      return;
+    }
+    
+    if (!formData.email.trim()) {
+      alert('Vui lòng nhập email!');
+      return;
+    }
+    
     try {
       const url = editingUser 
         ? `http://localhost:5000/api/users/${editingUser.id}`
@@ -127,8 +148,14 @@ export default function ManageUsers() {
         resetForm();
         alert(editingUser ? 'Cập nhật người dùng thành công!' : 'Thêm người dùng thành công!');
       } else {
-        const error = await response.json();
-        alert(`Lỗi: ${error.message}`);
+        let errorMessage = 'Không xác định';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || 'Không xác định';
+        } catch (parseError) {
+          errorMessage = `${response.status} ${response.statusText}`;
+        }
+        alert(`Lỗi: ${errorMessage}`);
       }
     } catch (error) {
       console.error('Error saving user:', error);
@@ -166,8 +193,14 @@ export default function ManageUsers() {
         await loadUsers();
         alert('Xóa người dùng thành công!');
       } else {
-        const error = await response.json();
-        alert(`Lỗi: ${error.message}`);
+        let errorMessage = 'Không xác định';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || 'Không xác định';
+        } catch (parseError) {
+          errorMessage = `${response.status} ${response.statusText}`;
+        }
+        alert(`Lỗi: ${errorMessage}`);
       }
     } catch (error) {
       console.error('Error deleting user:', error);

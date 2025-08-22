@@ -1,0 +1,353 @@
+/* Modern Two-Column Register Design - Mirrored from Login */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.auth-card {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  height: 600px;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Left Column - Sign Up Form (Red Gradient) */
+.signup-section {
+  flex: 1;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.signup-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.signup-section:hover::before {
+  transform: translateX(100%);
+}
+
+.signup-content {
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+  color: white;
+  z-index: 1;
+  position: relative;
+}
+
+.signup-content h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -0.5px;
+}
+
+/* Social Login Buttons */
+.social-login {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.social-btn {
+  width: 45px;
+  height: 45px;
+  border: 2px solid white;
+  background: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
+}
+
+.social-btn:hover {
+  background: white;
+  color: #e74c3c;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+}
+
+.social-btn.facebook span {
+  font-family: 'Arial', sans-serif;
+}
+
+.social-btn.google span {
+  font-family: 'Arial', sans-serif;
+}
+
+.social-btn.linkedin span {
+  font-family: 'Arial', sans-serif;
+}
+
+/* Separator */
+.separator {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 25%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.separator::before {
+  left: 0;
+}
+
+.separator::after {
+  right: 0;
+}
+
+/* Form - Tối ưu spacing */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  backdrop-filter: blur(10px);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: white;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+/* Sign Up Button */
+.signup-btn {
+  background: white;
+  color: #e74c3c;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+.signup-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+}
+
+.signup-btn:active {
+  transform: translateY(0);
+}
+
+/* Right Column - Sign In (White Background) */
+.signin-section {
+  flex: 1;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+
+.signin-content {
+  text-align: center;
+  color: #2c3e50;
+  max-width: 280px;
+}
+
+.signin-content h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  letter-spacing: -0.5px;
+}
+
+.signin-content p {
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+  color: #7f8c8d;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Sign In Button */
+.signin-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 35px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.signin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.signin-btn:active {
+  transform: translateY(0);
+}
+
+/* Error Message */
+.error-message {
+  background: rgba(255, 107, 107, 0.9);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 15px;
+  border: 1px solid rgba(255, 82, 82, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+/* Success Message */
+.success-message {
+  background: rgba(46, 204, 113, 0.9);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 15px;
+  border: 1px solid rgba(39, 174, 96, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .auth-card {
+    flex-direction: column;
+    height: auto;
+    max-width: 400px;
+  }
+  
+  .signin-section,
+  .signup-section {
+    padding: 25px 20px;
+  }
+  
+  .signin-content h2,
+  .signup-content h1 {
+    font-size: 1.8rem;
+  }
+  
+  .social-login {
+    gap: 10px;
+  }
+  
+  .social-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .form-group input {
+    padding: 9px 12px;
+    font-size: 12px;
+  }
+  
+  .auth-form {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 10px;
+  }
+  
+  .auth-card {
+    border-radius: 15px;
+  }
+  
+  .signin-section,
+  .signup-section {
+    padding: 20px 15px;
+  }
+  
+  .signin-content h2,
+  .signup-content h1 {
+    font-size: 1.6rem;
+  }
+  
+  .form-group input {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  
+  .signin-btn,
+  .signup-btn {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+  
+  .auth-form {
+    gap: 8px;
+  }
+}

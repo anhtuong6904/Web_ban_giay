@@ -19,7 +19,7 @@ export default function NewProducts() {
         setNewProducts(latestProducts);
       } catch (error) {
         console.error('Lỗi khi tải sản phẩm mới:', error);
-        // Fallback: tạo 3 sản phẩm mẫu từ database mới
+        // Fallback: tạo 3 sản phẩm mẫu từ database mới với rating
         setNewProducts([
           {
             ProductID: 1,
@@ -29,7 +29,8 @@ export default function NewProducts() {
             OriginalPrice: 1145380,
             Discount: 12,
             Category: "Running",
-            Brand: "Nike"
+            Brand: "Nike",
+            Rating: 4.8
           },
           {
             ProductID: 2,
@@ -39,7 +40,8 @@ export default function NewProducts() {
             OriginalPrice: 2936885,
             Discount: 12,
             Category: "Casual",
-            Brand: "Nike"
+            Brand: "Nike",
+            Rating: 4.9
           },
           {
             ProductID: 3,
@@ -49,7 +51,8 @@ export default function NewProducts() {
             OriginalPrice: 2619049,
             Discount: 20,
             Category: "Lifestyle",
-            Brand: "Nike"
+            Brand: "Nike",
+            Rating: 4.7
           }
         ]);
       } finally {
@@ -125,7 +128,7 @@ export default function NewProducts() {
       <div className="new-products-container">
         <div className="new-products-header">
           <h2>NEW PRODUCTS</h2>
-          <p>Step into the Future – Discover Our New Arrivals!</p>
+          <p>Style That Sizzles – Our Newest Arrivals!</p>
         </div>
 
         <div className="new-products-grid">
@@ -191,9 +194,9 @@ export default function NewProducts() {
                   </div>
 
                   <div className="feature-chips">
-                    <span className="chip"><i className="fas fa-shipping-fast"></i> Giao nhanh</span>
-                    <span className="chip"><i className="fas fa-undo"></i> Đổi trả 7 ngày</span>
-                    <span className="chip"><i className="fas fa-shield-alt"></i> Bảo hành 12 tháng</span>
+                    <span className="chip"><i className="fas fa-bolt"></i> Bán chạy</span>
+                    <span className="chip"><i className="fas fa-box-open"></i> Còn hàng</span>
+                    <span className="chip"><i className="fas fa-shield-alt"></i> Chính hãng</span>
                   </div>
 
                   <div className="actions-row">
@@ -201,9 +204,9 @@ export default function NewProducts() {
                       <i className="fas fa-cart-plus"></i>
                       Thêm vào giỏ
                     </button>
-                    <span className="new-indicator">
-                      <i className="fas fa-clock"></i>
-                      Mới về
+                    <span className="sales-count">
+                      <i className="fas fa-chart-line"></i>
+                      Rating: {(product.Rating || 4.5).toFixed(1)}
                     </span>
                   </div>
                 </div>

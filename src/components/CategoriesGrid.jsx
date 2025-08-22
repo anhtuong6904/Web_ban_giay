@@ -47,7 +47,7 @@ function CategoriesGrid() {
       name: 'BRANDS',
       icon: '🏷️',
       description: 'Top brands',
-      route: '/products?tag=brands'
+      route: '/brands'
     }
   ];
 

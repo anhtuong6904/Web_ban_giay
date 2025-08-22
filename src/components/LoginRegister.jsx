@@ -28,7 +28,7 @@ export default function LoginRegister() {
         uid: `local:${u.username}`,
         email: u.email || '',
         displayName: u.fullName || u.username,
-        fullName: u.fullName || u.username, // Thêm trường này để đảm bảo
+        fullName: u.fullName || u.username,
         photoURL: u.imageUrl || null
       });
       alert('Đăng nhập thành công!');
@@ -41,52 +41,72 @@ export default function LoginRegister() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <div className="auth-header">
-          <h1>Đăng Nhập</h1>
-          <p>Đăng nhập để mua sắm</p>
+        {/* Left Column - Sign In */}
+        <div className="signin-section">
+          <div className="signin-content">
+            <h1>Sign in</h1>
+            
+            {/* Social Login Buttons */}
+            <div className="social-login">
+              <button className="social-btn facebook">
+                <span>f</span>
+              </button>
+              <button className="social-btn google">
+                <span>G+</span>
+              </button>
+              <button className="social-btn linkedin">
+                <span>in</span>
+              </button>
+            </div>
+            
+            <p className="separator">or use your account</p>
+            
+            {error && <div className="error-message">{error}</div>}
+            
+            <form className="auth-form" onSubmit={handleSubmit}>
+              <div className="form-group">
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Email"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  required
+                />
+              </div>
+
+              <a href="#" className="forgot-password">Forgot your password?</a>
+
+              <button className="signin-btn" type="submit">
+                SIGN IN
+              </button>
+            </form>
+          </div>
         </div>
-        {error && <div className="error-message">{error}</div>}
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Tên đăng nhập</label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Nhập tên đăng nhập"
-              required
-            />
-          </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Mật khẩu</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Nhập mật khẩu"
-              required
-            />
-          </div>
-
-          <button className="auth-btn" type="submit">
-            Đăng Nhập
-          </button>
-        </form>
-
-        <div className="auth-footer">
-          <p>
-            Chưa có tài khoản?
-            <button
-              type="button"
+        {/* Right Column - Sign Up */}
+        <div className="signup-section">
+          <div className="signup-content">
+            <h2>Hello, Friend!</h2>
+            <p>Welcome to our UTH SHOES. Login to your account to continue</p>
+            <button 
+              className="signup-btn" 
               onClick={() => navigate('/register')}
-              className="toggle-auth-btn"
             >
-              Đăng Ký
+              SIGN UP
             </button>
-          </p>
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,39 @@
+/* Home Background Image */
 .home-wrapper {
+  position: relative;
   min-height: 100vh;
-  background: linear-gradient(180deg, #0f1116 0%, #171a21 40%, #111418 100%);
+}
+
+.home-background-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Sử dụng CSS variable để tránh vấn đề đường dẫn */
+  background-image: var(--home-bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  opacity: 0.8;
+  z-index: -2;
+}
+
+.home-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 249, 250, 0.5) 50%, rgba(255, 255, 255, 0.6) 100%);
+  z-index: -1;
+}
+
+/* Ensure all content is above background */
+.home-wrapper > * {
+  position: relative;
+  z-index: 1;
 }
 
 .section-dark {
@@ -10,12 +43,13 @@
 }
 
 .section-ink {
-  background: linear-gradient(135deg, #0f0f12 0%, #1b1f29 50%, #0d1015 100%);
+  background: linear-gradient(135deg, #e7e7e7 0%, #d3d3d3 50%, #a5a5a5 100%);
   padding: 40px 0;
 }
 
 .section-carbon {
-  background: linear-gradient(180deg, #0f1318 0%, #0b0e12 100%);
+  background: linear-gradient(135deg, #e7e7e7 0%, #d3d3d3 50%, #a5a5a5 100%);
+
   padding: 40px 0;
 }
 
