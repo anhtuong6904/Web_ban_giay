@@ -2,11 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const sql = require('mssql');
 const bcrypt = require('bcryptjs');
+const { VNPay } = require('vnpay');
 require('dotenv').config();
-
+const paymentRoutes = require('./Routes/PaymentVnpay');
 const app = express();
 const PORT = process.env.PORT || 5000;
-
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -24,6 +24,46 @@ const config = {
     enableArithAbort: true
   }
 };
+
+const vnpay = new VNPay({
+  tmnCode: process.env.VNP_TMNCODE,
+  secureSecret: process.env.VNP_HASHSECRET,
+  testMode: true
+});
+
+
+// API tạo thanh toán
+app.post('/api/payments/create', (req, res) => {
+  try {
+    const { amount, orderInfo } = req.body;
+
+    const paymentUrl = vnpay.buildPaymentUrl({
+      vnp_Amount: amount, // VNPay yêu cầu nhân 100
+      vnp_IpAddr: req.ip,
+      vnp_ReturnUrl: `${process.env.APP_URL}/api/payments/verify`,
+      vnp_TxnRef: `ORDER_${Date.now()}`,
+      vnp_OrderInfo: orderInfo,
+    });
+
+    res.json({ success: true, paymentUrl });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// API xác thực thanh toán từ VNPay trả về
+app.get('/api/payments/verify', (req, res) => {
+  try {
+    const verification = vnpay.verifyReturnUrl(req.query);
+    if (verification.isVerified) {
+      res.json({ success: true, data: verification });
+    } else {
+      res.status(400).json({ success: false, message: 'Invalid signature' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // Test endpoint để kiểm tra server
 app.get('/api/test', (req, res) => {
@@ -200,7 +240,7 @@ async function ensureOrderTables() {
   `);
 }
 
-// Create order (COD/MoMo/VNPay pending)
+// Create order (COD / VNPay)
 app.post('/api/orders', async (req, res) => {
   const { recipient, items, paymentMethod = 'COD', note } = req.body || {};
   if (!recipient || !Array.isArray(items) || items.length === 0) {
@@ -227,16 +267,13 @@ app.post('/api/orders', async (req, res) => {
         VALUES (@CustomerName, @Email, @Address, @PhoneNumber, @PaymentMethod, @Status, @TotalAmount)
       `);
 
-    // Kiểm tra kết quả insert
     if (!insertOrder.recordset || insertOrder.recordset.length === 0) {
       throw new Error('Không thể tạo đơn hàng - không nhận được OrderID');
     }
 
     const orderId = insertOrder.recordset[0].OrderID;
-    if (!orderId) {
-      throw new Error('Không thể tạo đơn hàng - OrderID không hợp lệ');
-    }
 
+    // Lưu items
     for (const it of items) {
       await pool.request()
         .input('OrderID', sql.Int, orderId)
@@ -251,7 +288,37 @@ app.post('/api/orders', async (req, res) => {
         `);
     }
 
-    res.json({ success: true, orderId, total, status: paymentMethod === 'COD' ? 'CONFIRMED' : 'PENDING' });
+    // Nếu COD thì trả về ngay
+    if (paymentMethod === 'COD') {
+      return res.json({ success: true, orderId, total, status: 'CONFIRMED' });
+    }
+
+   // Nếu VNPay → gọi sang route /api/payments/vnpay/create bằng fetch
+    if (paymentMethod === 'VNPay') {
+      try {
+        const response = await fetch(`${process.env.APP_URL}/api/payments/vnpay/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: req.body.amount,
+            orderInfo: req.body.orderInfo
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          res.json({ success: true, paymentUrl: data.paymentUrl });
+        } else {
+          res.status(400).json({ success: false, error: data.error || 'Tạo thanh toán thất bại' });
+        }
+      } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+      }
+    }
+
+    // Sau này thêm MoMo, Paypal...
+    res.json({ success: true, orderId, total, status: 'PENDING' });
   } catch (err) {
     console.error('Create order error:', err);
     res.status(500).json({ error: err.message });
@@ -260,60 +327,6 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
-// API endpoints cho Users
-app.post('/api/users', async (req, res) => {
-  try {
-    const { firebaseUID, email, displayName, photoURL } = req.body;
-    
-    if (!firebaseUID || !email) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    const pool = await sql.connect(config);
-    
-    // Ensure Users table exists with correct structure
-    await ensureUsersLocalColumns(pool);
-    
-    // Check if user already exists
-    const existingUser = await pool.request()
-      .input('firebaseUID', sql.NVarChar(200), firebaseUID)
-      .query('SELECT * FROM Users WHERE FirebaseUID = @firebaseUID');
-    
-    if (existingUser.recordset.length > 0) {
-      // Update existing user
-      await pool.request()
-        .input('firebaseUID', sql.NVarChar(200), firebaseUID)
-        .input('email', sql.NVarChar(200), email)
-        .input('displayName', sql.NVarChar(200), displayName || '')
-        .input('photoURL', sql.NVarChar(500), photoURL || '')
-        .query(`
-          UPDATE Users 
-          SET Email = @email, DisplayName = @displayName, PhotoURL = @photoURL, UpdatedAt = GETDATE()
-          WHERE FirebaseUID = @firebaseUID
-        `);
-      
-      res.json({ success: true, message: 'User updated successfully' });
-    } else {
-      // Create new user
-      await pool.request()
-        .input('firebaseUID', sql.NVarChar(200), firebaseUID)
-        .input('email', sql.NVarChar(200), email)
-        .input('displayName', sql.NVarChar(200), displayName || '')
-        .input('photoURL', sql.NVarChar(500), photoURL || '')
-        .query(`
-          INSERT INTO Users (FirebaseUID, Email, DisplayName, PhotoURL, CreatedAt, UpdatedAt)
-          VALUES (@firebaseUID, @email, @displayName, @photoURL, GETDATE(), GETDATE())
-        `);
-      
-      res.json({ success: true, message: 'User created successfully' });
-    }
-  } catch (err) {
-    console.error('User API error:', err);
-    res.status(500).json({ error: err.message });
-  } finally {
-    try { await sql.close(); } catch {}
-  }
-});
 
 // Ensure Users table has all required columns
 async function ensureUsersLocalColumns(pool) {
