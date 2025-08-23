@@ -1,11 +1,11 @@
 require('dotenv').config();
 const sql = require('mssql');
 
-// Config sử dụng SQL Authentication với password đúng
+// Database configuration
 const config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD || 'Giakiet@123',  // Password đúng
-  server: process.env.DB_SERVER /*|| 'DESKTOP-3UR600M' || 'localhost' */|| 'DESKTOP-BRVN1O0',
+  server: process.env.DB_SERVER /*|| 'DESKTOP-3UR600M' || 'localhost' */|| '127.0.0.1',
   database: process.env.DB_DATABASE || 'shopgiay',  // Cập nhật tên database mới
   port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 1433,
   options: {
@@ -14,7 +14,6 @@ const config = {
     enableArithAbort: true
   }
 };
-
 // Log config để debug (không hiển thị password)
 console.log('🔌 Database config:', {
   user: config.user,
@@ -23,5 +22,6 @@ console.log('🔌 Database config:', {
   port: config.port,
   auth: 'SQL Authentication'
 });
+
 
 module.exports = { sql, config }; 

@@ -19,12 +19,13 @@ router.post('/create', (req, res) => {
     const { amount, orderInfo } = req.body;
 
     const paymentUrl = vnpay.buildPaymentUrl({
-      vnp_Amount: amount * 100, // ⚠️ VNPay yêu cầu nhân 100
+      vnp_Amount: amount, // nhớ nhân 100
       vnp_IpAddr: req.ip,
-      vnp_ReturnUrl: `${process.env.APP_URL}/api/payments/verify`,
+      vnp_ReturnUrl: process.env.VNP_RETURNURL,
       vnp_TxnRef: `ORDER_${Date.now()}`,
       vnp_OrderInfo: orderInfo,
     });
+
 
     res.json({ success: true, paymentUrl });
   } catch (error) {
@@ -36,14 +37,24 @@ router.post('/create', (req, res) => {
 router.get('/verify', (req, res) => {
   try {
     const verification = vnpay.verifyReturnUrl(req.query);
+
     if (verification.isVerified) {
-      res.json({ success: true, data: verification });
+      const success = verification.isSuccess;
+      const orderId = verification.vnp_TxnRef;
+      const amount = verification.vnp_Amount; // vì nhân 100 lúc tạo
+      const bank = verification.vnp_BankCode;
+      const transactionNo = verification.vnp_TransactionNo;
+
+      // Redirect frontend kèm query string
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/payment-status?success=${success}&orderId=${orderId}&amount=${amount}&bank=${bank}&transactionNo=${transactionNo}`
+      );
     } else {
-      res.status(400).json({ success: false, message: "Invalid signature" });
+      return res.redirect(`${process.env.FRONTEND_URL}/payment-status?success=false`);
     }
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    return res.redirect(`${process.env.FRONTEND_URL}/payment-status?success=false`);
   }
 });
 
-module.exports = router;
+module.exports = router; 

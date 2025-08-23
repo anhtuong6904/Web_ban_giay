@@ -4,10 +4,10 @@ const sql = require('mssql');
 const bcrypt = require('bcryptjs');
 const { VNPay } = require('vnpay');
 require('dotenv').config();
-const paymentRoutes = require('./Routes/PaymentVnpay');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const db = require('./db');
+
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -15,6 +15,34 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 const usersRoutes = require('./Routes/users');
 app.use('/api/users', usersRoutes);
+
+const vnpayRoutes = require('./Routes/PaymentVnpay');
+app.use('/api/payments', vnpayRoutes);
+
+// backend/routes/ipn.ts
+app.post('/api/payment/ipn', (req, res) => {
+  try {
+    const verification = vnpay.verifyIpnCall(req.body);
+    
+    if (verification.isSuccess) {
+      // ✅ Thanh toán thành công - cập nhật database
+      console.log('Payment successful:', verification.vnp_TxnRef);
+      
+      // Cập nhật order status trong database
+      // updateOrderStatus(verification.vnp_TxnRef, 'PAID');
+      
+      res.status(200).json({ RspCode: '00', Message: 'success' });
+    } else {
+      // ❌ Thanh toán thất bại
+      console.log('Payment failed:', verification.message);
+      res.status(200).json({ RspCode: '01', Message: 'fail' });
+    }
+  } catch (error) {
+    console.error('IPN processing error:', error);
+    res.status(500).json({ RspCode: '99', Message: 'error' });
+  }
+});
+
 
 // Database configuration
 const config = {
@@ -38,45 +66,7 @@ console.log('🔌 Database config:', {
   auth: 'SQL Authentication'
 });
 
-const vnpay = new VNPay({
-  tmnCode: process.env.VNP_TMNCODE,
-  secureSecret: process.env.VNP_HASHSECRET,
-  testMode: true
-});
 
-
-// API tạo thanh toán
-app.post('/api/payments/create', (req, res) => {
-  try {
-    const { amount, orderInfo } = req.body;
-
-    const paymentUrl = vnpay.buildPaymentUrl({
-      vnp_Amount: amount, // VNPay yêu cầu nhân 100
-      vnp_IpAddr: req.ip,
-      vnp_ReturnUrl: `${process.env.APP_URL}/api/payments/verify`,
-      vnp_TxnRef: `ORDER_${Date.now()}`,
-      vnp_OrderInfo: orderInfo,
-    });
-
-    res.json({ success: true, paymentUrl });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// API xác thực thanh toán từ VNPay trả về
-app.get('/api/payments/verify', (req, res) => {
-  try {
-    const verification = vnpay.verifyReturnUrl(req.query);
-    if (verification.isVerified) {
-      res.json({ success: true, data: verification });
-    } else {
-      res.status(400).json({ success: false, message: 'Invalid signature' });
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
 
 // Test endpoint để kiểm tra server
 app.get('/api/test', (req, res) => {
@@ -253,7 +243,6 @@ async function ensureOrderTables() {
   `);
 }
 
-// Create order (COD / VNPay)
 app.post('/api/orders', async (req, res) => {
   const { recipient, items, paymentMethod = 'COD', note } = req.body || {};
   if (!recipient || !Array.isArray(items) || items.length === 0) {
@@ -266,6 +255,7 @@ app.post('/api/orders', async (req, res) => {
 
     const total = items.reduce((s, it) => s + (Number(it.price) || 0) * (Number(it.quantity) || 0), 0);
 
+    // 1. Tạo order
     const insertOrder = await pool.request()
       .input('CustomerName', sql.NVarChar(200), recipient.name || '')
       .input('Email', sql.NVarChar(200), recipient.email || '')
@@ -280,13 +270,9 @@ app.post('/api/orders', async (req, res) => {
         VALUES (@CustomerName, @Email, @Address, @PhoneNumber, @PaymentMethod, @Status, @TotalAmount)
       `);
 
-    if (!insertOrder.recordset || insertOrder.recordset.length === 0) {
-      throw new Error('Không thể tạo đơn hàng - không nhận được OrderID');
-    }
-
     const orderId = insertOrder.recordset[0].OrderID;
 
-    // Lưu items
+    // 2. Lưu items
     for (const it of items) {
       await pool.request()
         .input('OrderID', sql.Int, orderId)
@@ -301,37 +287,37 @@ app.post('/api/orders', async (req, res) => {
         `);
     }
 
-    // Nếu COD thì trả về ngay
+    // 3. Nếu COD → trả về ngay
     if (paymentMethod === 'COD') {
       return res.json({ success: true, orderId, total, status: 'CONFIRMED' });
     }
 
-   // Nếu VNPay → gọi sang route /api/payments/vnpay/create bằng fetch
+    // 4. Nếu VNPay → gọi tạo payment URL
     if (paymentMethod === 'VNPay') {
       try {
-        const response = await fetch(`${process.env.APP_URL}/api/payments/vnpay/create`, {
+        const response = await fetch(`${process.env.SERVER_URL}/api/payments/vnpay/create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            amount: req.body.amount,
-            orderInfo: req.body.orderInfo
+            amount: total,
+            orderId,
+            orderInfo: `Thanh toán đơn #${orderId}`
           })
         });
 
         const data = await response.json();
 
         if (data.success) {
-          res.json({ success: true, paymentUrl: data.paymentUrl });
+          // Trả về payment URL cho client
+          return res.json({ success: true, orderId, total, status: 'PROCESSING', paymentUrl: data.paymentUrl });
         } else {
-          res.status(400).json({ success: false, error: data.error || 'Tạo thanh toán thất bại' });
+          return res.status(400).json({ success: false, error: data.error || 'Tạo thanh toán thất bại' });
         }
       } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        return res.status(500).json({ success: false, error: error.message });
       }
     }
 
-    // Sau này thêm MoMo, Paypal...
-    res.json({ success: true, orderId, total, status: 'PENDING' });
   } catch (err) {
     console.error('Create order error:', err);
     res.status(500).json({ error: err.message });
@@ -339,6 +325,7 @@ app.post('/api/orders', async (req, res) => {
     try { await sql.close(); } catch {}
   }
 });
+
 
 
 // Ensure Users table has all required columns

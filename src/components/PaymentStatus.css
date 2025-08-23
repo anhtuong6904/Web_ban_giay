@@ -1,0 +1,121 @@
+/* Container căn giữa toàn màn hình */
+.status-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card */
+.status-card {
+  background: #fff;
+  padding: 40px 50px;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  text-align: center;
+  width: 420px;
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Icon tròn */
+.icon {
+  font-size: 48px;
+  width: 90px;
+  height: 90px;
+  line-height: 90px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.icon.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 2px solid #2e7d32;
+}
+
+.icon.fail {
+  background: #ffebee;
+  color: #c62828;
+  border: 2px solid #c62828;
+}
+
+/* Tiêu đề */
+.title {
+  font-size: 26px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.title.success {
+  color: #2e7d32;
+}
+
+.title.fail {
+  color: #c62828;
+}
+
+/* Thông tin đơn hàng */
+.order-info {
+  text-align: left;
+  margin: 20px 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.order-info span {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Nút */
+.btn {
+  display: inline-block;
+  padding: 12px 25px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn.success {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.btn.success:hover {
+  background: #1b5e20;
+}
+
+.btn.fail {
+  background: #c62828;
+  color: #fff;
+}
+
+.btn.fail:hover {
+  background: #8e0000;
+}
+
+/* Mô tả lỗi */
+.desc {
+  font-size: 15px;
+  color: #666;
+  margin: 15px 0 25px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

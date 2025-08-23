@@ -15,6 +15,7 @@ import CartTest from './components/CartTest';
 import PaymentPage from './Pages/PaymentPage';
 import OrderTracker from './Pages/OrderTracker';
 import Brands from './Pages/Brands';
+import PaymentStatus from "./components/PaymentStatus";
 import Help from './Pages/Help';
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase";
@@ -28,6 +29,7 @@ import './App.css';
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isPaymentStatusRoute = location.pathname === '/payment-status';
 
   return (
     <div className="App">
@@ -35,7 +37,7 @@ function AppContent() {
       <ScrollToTop />
       
       {/* Hiển thị Header và Footer chỉ với người dùng thường */}
-      {!isAdminRoute && <Header className="App-header" />}
+      {!isAdminRoute && !isPaymentStatusRoute && <Header className="App-header" />}
 
       <Routes>
         {/* Public routes */}
@@ -57,12 +59,12 @@ function AppContent() {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/cart-test" element={<CartTest />} />
-
+        <Route path="/payment-status" element={<PaymentStatus />} />
         {/* Admin routes */}
         <Route path="/admin/*" element={<Admin />} />
       </Routes>
 
-      {!isAdminRoute && <Footer />}
+      {!isAdminRoute && !isPaymentStatusRoute && <Footer />}
     </div>
   );
 }

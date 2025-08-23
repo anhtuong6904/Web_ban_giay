@@ -49,100 +49,80 @@ export default function Recipient() {
   };
 
   // Gọi API thanh toán VNPay
-  const handlePayment = async () => {
-    try {
-      // Validate form data
-      if (!formData.name || !formData.email || !formData.address || !formData.phone) {
-        alert('Vui lòng điền đầy đủ thông tin nhận hàng!');
-        return;
-      }
+const handlePayment = async () => {
 
-      if (!checkoutItems || checkoutItems.length === 0) {
-        alert('Không có sản phẩm nào để đặt hàng!');
-        return;
-      }
 
+  if (!formData.name || !formData.email || !formData.address || !formData.phone) {
+      alert('Vui lòng điền đầy đủ thông tin nhận hàng!');
+      return;
+    }
+    
+    (async () => {
       setLoading(true);
-      
-      // Tính tổng tiền từ checkout items
-      const totalAmount = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      
-      const response = await fetch("http://localhost:5000/api/payments/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: totalAmount,
-          orderId: `ORDER_${Date.now()}`,
-          orderInfo: `Thanh toán đơn hàng ${checkoutItems.map(item => item.name).join(', ')}`,
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        // Lưu thông tin đơn hàng trước khi chuyển hướng
-        const orderInfo = {
-          orderId: `ORDER_${Date.now()}`,
-          items: checkoutItems,
-          recipient: formData,
-          paymentMethod: 'VNPay',
-          totalAmount: totalAmount,
-          status: 'pending',
-          createdAt: new Date().toISOString()
-        };
-        localStorage.setItem('currentOrder', JSON.stringify(orderInfo));
+      try {
+        const itemsToBuy = getCheckoutItems();
+        const items = (itemsToBuy && itemsToBuy.length > 0) ? itemsToBuy : readCart();
         
-        window.location.href = data.paymentUrl; // Redirect sang VNPay
-      } else {
-        alert("Lỗi tạo thanh toán!");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Không kết nối được server!");
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (!items || items.length === 0) {
+          alert('Không có sản phẩm nào để đặt hàng!');
+          return;
+        }
 
-  // Momo: tạo đơn qua backend (demo lưu DB), rồi điều hướng
-  const handlePaymentMomo = async () => {
-    try {
-      // Validate form data
-      if (!formData.name || !formData.email || !formData.address || !formData.phone) {
-        alert('Vui lòng điền đầy đủ thông tin nhận hàng!');
-        return;
-      }
+        setLoading(true);
 
-      if (!checkoutItems || checkoutItems.length === 0) {
-        alert('Không có sản phẩm nào để đặt hàng!');
-        return;
-      }
+        const totalAmount = checkoutItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
 
-      setLoading(true);
-      
-      console.log('Creating order with:', { formData, items: checkoutItems, paymentMethod: 'MOMO' });
-      
-      const result = await createOrder(formData, checkoutItems, 'MOMO');
-      
-      // Lưu đơn hàng vào localStorage để Order Tracker hiển thị
-      saveOrderToLocalStorage(result, checkoutItems, 'MOMO');
-      
-      alert(`Đã tạo đơn hàng #${result.orderId}. Vui lòng tiếp tục thanh toán trên ứng dụng MoMo.`);
-      
-      // Xóa checkout items hoặc cart tùy theo loại checkout
-      if (isDirectCheckout) {
-        clearCheckoutItems();
-      } else {
-        clearCart();
+        const orderId = `ORDER_${Date.now()}`;
+
+        // Gọi backend tạo order và tạo payment URL VNPay
+        const response = await fetch("http://localhost:5000/api/payments/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: totalAmount,
+            orderInfo: `Thanh toán đơn hàng #${orderId}`,
+            orderId,
+            recipient: formData, // gửi thông tin người nhận
+            items: checkoutItems, // gửi danh sách sản phẩm
+          }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          // Redirect sang VNPay
+          window.location.href = data.paymentUrl;
+        } else {
+          alert("Lỗi tạo thanh toán!");
+        }
+
+        console.log('Creating order with:', { formData, items, paymentMethod: 'VNpay' });
+        
+        const result = await createOrder(formData, items, 'VNpay');
+        
+        // Lưu đơn hàng vào localStorage để Order Tracker hiển thị
+        saveOrderToLocalStorage(result, items, 'VNPay');
+        
+        alert(`Đặt hàng thành công! Mã đơn #${result.orderId}.`);
+        if (itemsToBuy && itemsToBuy.length > 0) {
+          removeItems(itemsToBuy.map(it => it.key));
+          clearCheckoutItems();
+        } else {
+          clearCart();
+        }
+        navigate('/order-tracker');
+      } catch (error) {
+        console.error('Payment COD failed:', error);
+        alert('Lỗi khi đặt hàng: ' + error.message);
+      } finally {
+        setLoading(false);
       }
-      
-      navigate('/order-tracker');
-    } catch (error) {
-      console.error('Payment MOMO failed:', error);
-      alert('Lỗi khi đặt hàng: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    })();
+
+};
+
+
 
   // COD: xác nhận và tạo đơn nội bộ
   const handlePaymentCOD = () => {
@@ -347,13 +327,6 @@ export default function Recipient() {
               disabled={loading}
             >
               {loading ? "Đang xử lý..." : "💳 Thanh toán bằng VNPay"}
-            </button>
-            <button 
-              className="btn-payment momo" 
-              onClick={handlePaymentMomo} 
-              disabled={loading}
-            >
-              {loading ? "Đang xử lý..." : "📱 Thanh toán bằng Momo"}
             </button>
             <button 
               className="btn-payment cod" 
