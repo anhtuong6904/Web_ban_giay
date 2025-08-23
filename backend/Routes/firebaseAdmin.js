@@ -1,21 +1,17 @@
 // firebaseAdmin.js
 const admin = require('firebase-admin');
-const path = require('path');
+require('dotenv').config(); // load .env
 
-// Đảm bảo đường dẫn đúng với file JSON tải từ Firebase
-const serviceAccount = require(path.resolve(__dirname, 'serviceAccountKey.json'));
+
+// Dùng biến môi trường
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  // Nếu chưa dùng Storage thì có thể bỏ dòng bucket
-  storageBucket: 'your-project-id.appspot.com', // thay bằng bucket của bạn
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'your-project-id.appspot.com',
 });
 
-// Firestore instance
 const db = admin.firestore();
-
-// Storage instance
 const bucket = admin.storage().bucket();
 
-// Export các instance
 module.exports = { admin, db, bucket };
