@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './ManageUsers.css';
+import { set } from 'date-fns';
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
+  const [editingUser, setEditingUser] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -166,7 +167,6 @@ export default function ManageUsers() {
   const handleEdit = (user) => {
     setEditingUser(user);
     setFormData({
-      username: user.username || '',
       password: '',
       fullName: user.fullName || '',
       phoneNumber: user.phoneNumber || '',
@@ -381,7 +381,7 @@ export default function ManageUsers() {
 
             <form onSubmit={handleSubmit} className="user-form">
               <div className="form-row">
-                <div className="form-group">
+                {!editingUser && (<div className="form-group">
                   <label htmlFor="username">Tên đăng nhập *</label>
                   <input
                     type="text"
@@ -391,7 +391,7 @@ export default function ManageUsers() {
                     required
                     disabled={editingUser}
                   />
-                </div>
+                </div>)}
                 <div className="form-group">
                   <label htmlFor="password">
                     {editingUser ? 'Mật khẩu mới (để trống nếu không đổi)' : 'Mật khẩu *'}

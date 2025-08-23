@@ -13,6 +13,8 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+const usersRoutes = require('./Routes/users');
+app.use('/api/users', usersRoutes);
 
 // Database configuration
 const config = {
@@ -690,381 +692,381 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Users CRUD API
-app.get('/api/users', async (req, res) => {
-  try {
-    const pool = await sql.connect(config);
-    const result = await pool.request().query('SELECT * FROM Users ORDER BY createdAt DESC');
+// // Users CRUD API
+// app.get('/api/users', async (req, res) => {
+//   try {
+//     const pool = await sql.connect(config);
+//     const result = await pool.request().query('SELECT * FROM Users ORDER BY createdAt DESC');
     
-    // Kiểm tra kết quả
-    if (!result.recordset) {
-      throw new Error('Không nhận được dữ liệu từ database');
-    }
+//     // Kiểm tra kết quả
+//     if (!result.recordset) {
+//       throw new Error('Không nhận được dữ liệu từ database');
+//     }
     
-    // Kiểm tra và xử lý dữ liệu trước khi trả về
-    const users = result.recordset.map(user => ({
-      ...user,
-      // Đảm bảo các trường quan trọng không bị undefined
-      id: user.id || user.UserID || null,
-      username: user.username || user.Username || '',
-      fullName: user.fullName || user.FullName || '',
-      email: user.email || user.Email || '',
-      phoneNumber: user.phoneNumber || user.PhoneNumber || '',
-      address: user.address || user.Address || '',
-      image: user.image || user.Image || null,
-      createdAt: user.createdAt || user.CreatedAt || null,
-      updatedAt: user.updatedAt || user.UpdatedAt || null
-    }));
+//     // Kiểm tra và xử lý dữ liệu trước khi trả về
+//     const users = result.recordset.map(user => ({
+//       ...user,
+//       // Đảm bảo các trường quan trọng không bị undefined
+//       id: user.id || user.UserID || null,
+//       username: user.username || user.Username || '',
+//       fullName: user.fullName || user.FullName || '',
+//       email: user.email || user.Email || '',
+//       phoneNumber: user.phoneNumber || user.PhoneNumber || '',
+//       address: user.address || user.Address || '',
+//       image: user.image || user.Image || null,
+//       createdAt: user.createdAt || user.CreatedAt || null,
+//       updatedAt: user.updatedAt || user.UpdatedAt || null
+//     }));
     
-    console.log(`✅ Successfully fetched ${users.length} users`);
-    res.json(users);
-  } catch (err) {
-    console.error('❌ Error fetching users:', err);
-    res.status(500).json({ 
-      message: 'Lỗi khi lấy danh sách người dùng',
-      error: err.message 
-    });
-  } finally {
-    try { await sql.close(); } catch {}
-  }
-});
+//     console.log(`✅ Successfully fetched ${users.length} users`);
+//     res.json(users);
+//   } catch (err) {
+//     console.error('❌ Error fetching users:', err);
+//     res.status(500).json({ 
+//       message: 'Lỗi khi lấy danh sách người dùng',
+//       error: err.message 
+//     });
+//   } finally {
+//     try { await sql.close(); } catch {}
+//   }
+// });
 
-app.post('/api/users', async (req, res) => {
-  try {
-    const { username, password, fullName, phoneNumber, email, address, image } = req.body;
+// app.post('/api/users', async (req, res) => {
+//   try {
+//     const { username, password, fullName, phoneNumber, email, address, image } = req.body;
     
-    console.log('📥 Received user data:', { username, fullName, email, phoneNumber, address, hasImage: !!image });
+//     console.log('📥 Received user data:', { username, fullName, email, phoneNumber, address, hasImage: !!image });
     
-    if (!username || !password || !fullName || !email) {
-      console.log('❌ Missing required fields:', { username: !!username, password: !!password, fullName: !!fullName, email: !!email });
-      return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
-    }
+//     if (!username || !password || !fullName || !email) {
+//       console.log('❌ Missing required fields:', { username: !!username, password: !!password, fullName: !!fullName, email: !!email });
+//       return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
+//     }
 
-    console.log('🔌 Connecting to database...');
-    const pool = await sql.connect(config);
-    console.log('✅ Database connected successfully');
+//     console.log('🔌 Connecting to database...');
+//     const pool = await sql.connect(config);
+//     console.log('✅ Database connected successfully');
     
-    // Check if username already exists
-    console.log('🔍 Checking if username exists:', username);
-    const existingUser = await pool.request()
-      .input('username', sql.VarChar, username)
-      .query('SELECT * FROM Users WHERE username = @username');
+//     // Check if username already exists
+//     console.log('🔍 Checking if username exists:', username);
+//     const existingUser = await pool.request()
+//       .input('username', sql.VarChar, username)
+//       .query('SELECT * FROM Users WHERE username = @username');
     
-    if (existingUser.recordset.length > 0) {
-      console.log('❌ Username already exists:', username);
-      return res.status(400).json({ message: 'Tên đăng nhập đã tồn tại' });
-    }
-    console.log('✅ Username is available');
+//     if (existingUser.recordset.length > 0) {
+//       console.log('❌ Username already exists:', username);
+//       return res.status(400).json({ message: 'Tên đăng nhập đã tồn tại' });
+//     }
+//     console.log('✅ Username is available');
 
-    // Hash password
-    console.log('🔐 Hashing password...');
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log('✅ Password hashed successfully');
+//     // Hash password
+//     console.log('🔐 Hashing password...');
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     console.log('✅ Password hashed successfully');
     
-    // Process image if provided (limit length to avoid truncation)
-    let processedImage = null;
-    if (image && image.length > 0) {
-      // Limit image length to 1000 characters to avoid database truncation
-      processedImage = image.length > 1000 ? image.substring(0, 1000) : image;
-      console.log('🖼️ Image processed, length:', processedImage.length);
-    }
+//     // Process image if provided (limit length to avoid truncation)
+//     let processedImage = null;
+//     if (image && image.length > 0) {
+//       // Limit image length to 1000 characters to avoid database truncation
+//       processedImage = image.length > 1000 ? image.substring(0, 1000) : image;
+//       console.log('🖼️ Image processed, length:', processedImage.length);
+//     }
     
-    console.log('🔧 Executing INSERT query...');
-    const result = await pool.request()
-      .input('username', sql.VarChar, username)
-      .input('password', sql.VarChar, hashedPassword)
-      .input('fullName', sql.NVarChar, fullName)
-      .input('phoneNumber', sql.VarChar, phoneNumber || null)
-      .input('email', sql.VarChar, email)
-      .input('address', sql.NVarChar, address || null)
-      .input('image', sql.VarChar(1000), processedImage)
-      .query(`
-        INSERT INTO Users (username, password, fullName, PhoneNumber, email, address, image, createdAt)
-        VALUES (@username, @password, @fullName, @phoneNumber, @email, @address, @image, GETDATE());
-        SELECT SCOPE_IDENTITY() AS id;
-      `);
+//     console.log('🔧 Executing INSERT query...');
+//     const result = await pool.request()
+//       .input('username', sql.VarChar, username)
+//       .input('password', sql.VarChar, hashedPassword)
+//       .input('fullName', sql.NVarChar, fullName)
+//       .input('phoneNumber', sql.VarChar, phoneNumber || null)
+//       .input('email', sql.VarChar, email)
+//       .input('address', sql.NVarChar, address || null)
+//       .input('image', sql.VarChar(1000), processedImage)
+//       .query(`
+//         INSERT INTO Users (username, password, fullName, PhoneNumber, email, address, image, createdAt)
+//         VALUES (@username, @password, @fullName, @phoneNumber, @email, @address, @image, GETDATE());
+//         SELECT SCOPE_IDENTITY() AS id;
+//       `);
     
-    console.log('📊 Insert result:', result);
+//     console.log('📊 Insert result:', result);
     
-    // Kiểm tra kết quả insert
-    if (!result.recordset || result.recordset.length === 0) {
-      throw new Error('Không thể tạo người dùng - không nhận được ID');
-    }
+//     // Kiểm tra kết quả insert
+//     if (!result.recordset || result.recordset.length === 0) {
+//       throw new Error('Không thể tạo người dùng - không nhận được ID');
+//     }
 
-    const userId = result.recordset[0].id;
-    if (!userId) {
-      throw new Error('Không thể tạo người dùng - ID không hợp lệ');
-    }
+//     const userId = result.recordset[0].id;
+//     if (!userId) {
+//       throw new Error('Không thể tạo người dùng - ID không hợp lệ');
+//     }
     
-    console.log('✅ User created successfully with ID:', userId);
-    res.status(201).json({ 
-      message: 'Tạo người dùng thành công',
-      id: userId
-    });
-  } catch (err) {
-    console.error('❌ Error creating user:', err);
-    console.error('❌ Error stack:', err.stack);
-    res.status(500).json({ 
-      message: `Lỗi khi tạo người dùng: ${err.message}`,
-      details: err.stack
-    });
-  } finally {
-    try { 
-      await sql.close(); 
-      console.log('🔌 Database connection closed');
-    } catch (closeErr) {
-      console.error('❌ Error closing database connection:', closeErr);
-    }
-  }
-});
+//     console.log('✅ User created successfully with ID:', userId);
+//     res.status(201).json({ 
+//       message: 'Tạo người dùng thành công',
+//       id: userId
+//     });
+//   } catch (err) {
+//     console.error('❌ Error creating user:', err);
+//     console.error('❌ Error stack:', err.stack);
+//     res.status(500).json({ 
+//       message: `Lỗi khi tạo người dùng: ${err.message}`,
+//       details: err.stack
+//     });
+//   } finally {
+//     try { 
+//       await sql.close(); 
+//       console.log('🔌 Database connection closed');
+//     } catch (closeErr) {
+//       console.error('❌ Error closing database connection:', closeErr);
+//     }
+//   }
+// });
 
-app.put('/api/users/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { username, password, fullName, phoneNumber, email, address, image } = req.body;
+// app.put('/api/users/:id', async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { username, password, fullName, phoneNumber, email, address, image } = req.body;
     
-    console.log('📥 Update user data for ID:', id, { fullName, email, phoneNumber, address, hasImage: !!image });
+//     console.log('📥 Update user data for ID:', id, { fullName, email, phoneNumber, address, hasImage: !!image });
     
-    if (!fullName || !email) {
-      console.log('❌ Missing required fields:', { fullName: !!fullName, email: !!email });
-      return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
-    }
+//     if (!fullName || !email) {
+//       console.log('❌ Missing required fields:', { fullName: !!fullName, email: !!email });
+//       return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
+//     }
 
-    console.log('🔌 Connecting to database...');
-    const pool = await sql.connect(config);
-    console.log('✅ Database connected successfully');
+//     console.log('🔌 Connecting to database...');
+//     const pool = await sql.connect(config);
+//     console.log('✅ Database connected successfully');
     
-    // Process image if provided (limit length to avoid truncation)
-    let processedImage = null;
-    if (image !== undefined) {
-      if (image && image.length > 0) {
-        // Limit image length to 1000 characters to avoid database truncation
-        processedImage = image.length > 1000 ? image.substring(0, 1000) : image;
-        console.log('🖼️ Image processed for update, length:', processedImage.length);
-      }
-    }
+//     // Process image if provided (limit length to avoid truncation)
+//     let processedImage = null;
+//     if (image !== undefined) {
+//       if (image && image.length > 0) {
+//         // Limit image length to 1000 characters to avoid database truncation
+//         processedImage = image.length > 1000 ? image.substring(0, 1000) : image;
+//         console.log('🖼️ Image processed for update, length:', processedImage.length);
+//       }
+//     }
     
-    let updateQuery = `
-      UPDATE Users 
-      SET fullName = @fullName, 
-          PhoneNumber = @phoneNumber, 
-          email = @email, 
-          address = @address`;
+//     let updateQuery = `
+//       UPDATE Users 
+//       SET fullName = @fullName, 
+//           PhoneNumber = @phoneNumber, 
+//           email = @email, 
+//           address = @address`;
     
-    const request = pool.request()
-      .input('id', sql.Int, id)
-      .input('fullName', sql.NVarChar, fullName)
-      .input('phoneNumber', sql.VarChar, phoneNumber || null)
-      .input('email', sql.VarChar, email)
-      .input('address', sql.NVarChar, address || null);
+//     const request = pool.request()
+//       .input('id', sql.Int, id)
+//       .input('fullName', sql.NVarChar, fullName)
+//       .input('phoneNumber', sql.VarChar, phoneNumber || null)
+//       .input('email', sql.VarChar, email)
+//       .input('address', sql.NVarChar, address || null);
 
-    // Add image update if provided
-    if (image !== undefined) {
-      updateQuery += ', image = @image';
-      request.input('image', sql.VarChar(1000), processedImage);
-    }
+//     // Add image update if provided
+//     if (image !== undefined) {
+//       updateQuery += ', image = @image';
+//       request.input('image', sql.VarChar(1000), processedImage);
+//     }
 
-    // Update password if provided
-    if (password && password.trim()) {
-      console.log('🔐 Hashing new password...');
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updateQuery += ', password = @password';
-      request.input('password', sql.VarChar, hashedPassword);
-      console.log('✅ Password hashed successfully');
-    }
+//     // Update password if provided
+//     if (password && password.trim()) {
+//       console.log('🔐 Hashing new password...');
+//       const hashedPassword = await bcrypt.hash(password, 10);
+//       updateQuery += ', password = @password';
+//       request.input('password', sql.VarChar, hashedPassword);
+//       console.log('✅ Password hashed successfully');
+//     }
     
-    updateQuery += ', updatedAt = GETDATE() WHERE id = @id';
+//     updateQuery += ', updatedAt = GETDATE() WHERE id = @id';
     
-    console.log('🔧 Update query:', updateQuery);
-    console.log('🔧 Executing UPDATE query...');
+//     console.log('🔧 Update query:', updateQuery);
+//     console.log('🔧 Executing UPDATE query...');
     
-    const result = await request.query(updateQuery);
-    console.log('📊 Update result:', result);
+//     const result = await request.query(updateQuery);
+//     console.log('📊 Update result:', result);
     
-    if (result.rowsAffected[0] === 0) {
-      console.log('❌ No user found with ID:', id);
-      return res.status(404).json({ message: 'Không tìm thấy người dùng' });
-    }
+//     if (result.rowsAffected[0] === 0) {
+//       console.log('❌ No user found with ID:', id);
+//       return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+//     }
     
-    console.log('✅ User updated successfully');
-    res.json({ message: 'Cập nhật người dùng thành công' });
-  } catch (err) {
-    console.error('❌ Error updating user:', err);
-    console.error('❌ Error stack:', err.stack);
-    res.status(500).json({ 
-      message: `Lỗi khi cập nhật người dùng: ${err.message}`,
-      details: err.stack
-    });
-  } finally {
-    try { 
-      await sql.close(); 
-      console.log('🔌 Database connection closed');
-    } catch (closeErr) {
-      console.error('❌ Error closing database connection:', closeErr);
-    }
-  }
-});
+//     console.log('✅ User updated successfully');
+//     res.json({ message: 'Cập nhật người dùng thành công' });
+//   } catch (err) {
+//     console.error('❌ Error updating user:', err);
+//     console.error('❌ Error stack:', err.stack);
+//     res.status(500).json({ 
+//       message: `Lỗi khi cập nhật người dùng: ${err.message}`,
+//       details: err.stack
+//     });
+//   } finally {
+//     try { 
+//       await sql.close(); 
+//       console.log('🔌 Database connection closed');
+//     } catch (closeErr) {
+//       console.error('❌ Error closing database connection:', closeErr);
+//     }
+//   }
+// });
 
-app.delete('/api/users/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const pool = await sql.connect(config);
+// app.delete('/api/users/:id', async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const pool = await sql.connect(config);
     
-    const result = await pool.request()
-      .input('id', sql.Int, id)
-      .query('DELETE FROM Users WHERE id = @id');
+//     const result = await pool.request()
+//       .input('id', sql.Int, id)
+//       .query('DELETE FROM Users WHERE id = @id');
     
-    if (result.rowsAffected[0] === 0) {
-      return res.status(404).json({ message: 'Không tìm thấy người dùng' });
-    }
+//     if (result.rowsAffected[0] === 0) {
+//       return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+//     }
     
-    res.json({ message: 'Xóa người dùng thành công' });
-  } catch (err) {
-    console.error('❌ Error deleting user:', err);
-    res.status(500).json({ message: 'Lỗi khi xóa người dùng' });
-  } finally {
-    try { await sql.close(); } catch {}
-  }
-});
+//     res.json({ message: 'Xóa người dùng thành công' });
+//   } catch (err) {
+//     console.error('❌ Error deleting user:', err);
+//     res.status(500).json({ message: 'Lỗi khi xóa người dùng' });
+//   } finally {
+//     try { await sql.close(); } catch {}
+//   }
+// });
 
-// Products CRUD API
-app.post('/api/products', async (req, res) => {
-  try {
-    console.log('📥 Received product data:', req.body);
+// // Products CRUD API
+// app.post('/api/products', async (req, res) => {
+//   try {
+//     console.log('📥 Received product data:', req.body);
     
-    const { 
-      Name, Description, Price, OriginalPrice, Discount, CategoryID, 
-      BrandID, Rating, MainImage, StockQuantity, InStock 
-    } = req.body;
+//     const { 
+//       Name, Description, Price, OriginalPrice, Discount, CategoryID, 
+//       BrandID, Rating, MainImage, StockQuantity, InStock 
+//     } = req.body;
     
-    if (!Name || Price === undefined) {
-      return res.status(400).json({ message: 'Thiếu thông tin bắt buộc: Name và Price' });
-    }
+//     if (!Name || Price === undefined) {
+//       return res.status(400).json({ message: 'Thiếu thông tin bắt buộc: Name và Price' });
+//     }
 
-    const pool = await sql.connect(config);
+//     const pool = await sql.connect(config);
     
-    // Check if table exists and get its structure
-    const tableCheck = await pool.request().query(`
-      SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE 
-      FROM INFORMATION_SCHEMA.COLUMNS 
-      WHERE TABLE_NAME = 'Products'
-      ORDER BY ORDINAL_POSITION
-    `);
+//     // Check if table exists and get its structure
+//     const tableCheck = await pool.request().query(`
+//       SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE 
+//       FROM INFORMATION_SCHEMA.COLUMNS 
+//       WHERE TABLE_NAME = 'Products'
+//       ORDER BY ORDINAL_POSITION
+//     `);
     
-    console.log('📊 Table structure:', tableCheck.recordset);
+//     console.log('📊 Table structure:', tableCheck.recordset);
     
-    // Build dynamic INSERT query based on available columns
-    let columns = [];
-    let values = [];
-    let params = [];
+//     // Build dynamic INSERT query based on available columns
+//     let columns = [];
+//     let values = [];
+//     let params = [];
     
-    // Only add columns that exist in the database
-    const availableColumns = tableCheck.recordset.map(col => col.COLUMN_NAME);
-    console.log('📋 Available columns:', availableColumns);
+//     // Only add columns that exist in the database
+//     const availableColumns = tableCheck.recordset.map(col => col.COLUMN_NAME);
+//     console.log('📋 Available columns:', availableColumns);
     
-    if (Name && availableColumns.includes('Name')) { 
-      columns.push('Name'); 
-      values.push('@Name'); 
-      params.push(['Name', sql.NVarChar, Name]); 
-    }
-    if (Description && availableColumns.includes('Description')) { 
-      columns.push('Description'); 
-      values.push('@Description'); 
-      params.push(['Description', sql.NVarChar, Description]); 
-    }
-    if (Price !== undefined && availableColumns.includes('Price')) { 
-      columns.push('Price'); 
-      values.push('@Price'); 
-      params.push(['Price', sql.Int, Price]); 
-    }
-    if (OriginalPrice !== undefined && availableColumns.includes('OriginalPrice')) { 
-      columns.push('OriginalPrice'); 
-      values.push('@OriginalPrice'); 
-      params.push(['OriginalPrice', sql.Int, OriginalPrice]); 
-    }
-    if (Discount !== undefined && availableColumns.includes('Discount')) { 
-      columns.push('Discount'); 
-      values.push('@Discount'); 
-      params.push(['Discount', sql.Int, Discount]); 
-    }
-    if (CategoryID && availableColumns.includes('CategoryID')) { 
-      columns.push('CategoryID'); 
-      values.push('@CategoryID'); 
-      params.push(['CategoryID', sql.Int, CategoryID]); 
-    }
-    if (BrandID && availableColumns.includes('BrandID')) { 
-      columns.push('BrandID'); 
-      values.push('@BrandID'); 
-      params.push(['BrandID', sql.Int, BrandID]); 
-    }
-    if (Rating !== undefined && availableColumns.includes('Rating')) { 
-      columns.push('Rating'); 
-      values.push('@Rating'); 
-      params.push(['Rating', sql.Float, Rating]); 
-    }
-    if (MainImage && availableColumns.includes('MainImage')) { 
-      // Giới hạn độ dài MainImage để tránh lỗi truncation
-      const truncatedImage = MainImage.length > 1000 ? MainImage.substring(0, 1000) : MainImage;
-      columns.push('MainImage'); 
-      values.push('@MainImage'); 
-      params.push(['MainImage', sql.NVarChar(1000), truncatedImage]); 
-    }
-    if (StockQuantity !== undefined && availableColumns.includes('StockQuantity')) { 
-      columns.push('StockQuantity'); 
-      values.push('@StockQuantity'); 
-      params.push(['StockQuantity', sql.Int, StockQuantity]); 
-    }
-    if (InStock !== undefined && availableColumns.includes('InStock')) { 
-      columns.push('InStock'); 
-      values.push('@InStock'); 
-      params.push(['InStock', sql.Bit, InStock]); 
-    }
+//     if (Name && availableColumns.includes('Name')) { 
+//       columns.push('Name'); 
+//       values.push('@Name'); 
+//       params.push(['Name', sql.NVarChar, Name]); 
+//     }
+//     if (Description && availableColumns.includes('Description')) { 
+//       columns.push('Description'); 
+//       values.push('@Description'); 
+//       params.push(['Description', sql.NVarChar, Description]); 
+//     }
+//     if (Price !== undefined && availableColumns.includes('Price')) { 
+//       columns.push('Price'); 
+//       values.push('@Price'); 
+//       params.push(['Price', sql.Int, Price]); 
+//     }
+//     if (OriginalPrice !== undefined && availableColumns.includes('OriginalPrice')) { 
+//       columns.push('OriginalPrice'); 
+//       values.push('@OriginalPrice'); 
+//       params.push(['OriginalPrice', sql.Int, OriginalPrice]); 
+//     }
+//     if (Discount !== undefined && availableColumns.includes('Discount')) { 
+//       columns.push('Discount'); 
+//       values.push('@Discount'); 
+//       params.push(['Discount', sql.Int, Discount]); 
+//     }
+//     if (CategoryID && availableColumns.includes('CategoryID')) { 
+//       columns.push('CategoryID'); 
+//       values.push('@CategoryID'); 
+//       params.push(['CategoryID', sql.Int, CategoryID]); 
+//     }
+//     if (BrandID && availableColumns.includes('BrandID')) { 
+//       columns.push('BrandID'); 
+//       values.push('@BrandID'); 
+//       params.push(['BrandID', sql.Int, BrandID]); 
+//     }
+//     if (Rating !== undefined && availableColumns.includes('Rating')) { 
+//       columns.push('Rating'); 
+//       values.push('@Rating'); 
+//       params.push(['Rating', sql.Float, Rating]); 
+//     }
+//     if (MainImage && availableColumns.includes('MainImage')) { 
+//       // Giới hạn độ dài MainImage để tránh lỗi truncation
+//       const truncatedImage = MainImage.length > 1000 ? MainImage.substring(0, 1000) : MainImage;
+//       columns.push('MainImage'); 
+//       values.push('@MainImage'); 
+//       params.push(['MainImage', sql.NVarChar(1000), truncatedImage]); 
+//     }
+//     if (StockQuantity !== undefined && availableColumns.includes('StockQuantity')) { 
+//       columns.push('StockQuantity'); 
+//       values.push('@StockQuantity'); 
+//       params.push(['StockQuantity', sql.Int, StockQuantity]); 
+//     }
+//     if (InStock !== undefined && availableColumns.includes('InStock')) { 
+//       columns.push('InStock'); 
+//       values.push('@InStock'); 
+//       params.push(['InStock', sql.Bit, InStock]); 
+//     }
     
-    // Add timestamp if column exists
-    const hasCreatedAt = tableCheck.recordset.some(col => col.COLUMN_NAME === 'createdAt');
-    if (hasCreatedAt) {
-      columns.push('createdAt');
-      values.push('GETDATE()');
-    }
+//     // Add timestamp if column exists
+//     const hasCreatedAt = tableCheck.recordset.some(col => col.COLUMN_NAME === 'createdAt');
+//     if (hasCreatedAt) {
+//       columns.push('createdAt');
+//       values.push('GETDATE()');
+//     }
     
-    const insertQuery = `
-      INSERT INTO Products (${columns.join(', ')})
-      VALUES (${values.join(', ')});
-      SELECT SCOPE_IDENTITY() AS ProductID;
-    `;
+//     const insertQuery = `
+//       INSERT INTO Products (${columns.join(', ')})
+//       VALUES (${values.join(', ')});
+//       SELECT SCOPE_IDENTITY() AS ProductID;
+//     `;
     
-    console.log('🔧 Insert query:', insertQuery);
+//     console.log('🔧 Insert query:', insertQuery);
     
-    const request = pool.request();
-    params.forEach(([name, type, value]) => {
-      request.input(name, type, value);
-    });
+//     const request = pool.request();
+//     params.forEach(([name, type, value]) => {
+//       request.input(name, type, value);
+//     });
     
-    const result = await request.query(insertQuery);
+//     const result = await request.query(insertQuery);
     
-    console.log('✅ Insert result:', result);
+//     console.log('✅ Insert result:', result);
     
-    // Kiểm tra kết quả insert
-    if (!result.recordset || result.recordset.length === 0) {
-      throw new Error('Không thể tạo sản phẩm - không nhận được ProductID');
-    }
+//     // Kiểm tra kết quả insert
+//     if (!result.recordset || result.recordset.length === 0) {
+//       throw new Error('Không thể tạo sản phẩm - không nhận được ProductID');
+//     }
 
-    const productId = result.recordset[0].ProductID;
-    if (!productId) {
-      throw new Error('Không thể tạo sản phẩm - ProductID không hợp lệ');
-    }
+//     const productId = result.recordset[0].ProductID;
+//     if (!productId) {
+//       throw new Error('Không thể tạo sản phẩm - ProductID không hợp lệ');
+//     }
     
-    res.status(201).json({ 
-      message: 'Tạo sản phẩm thành công',
-      ProductID: productId
-    });
-  } catch (err) {
-    console.error('❌ Error creating product:', err);
-    res.status(500).json({ message: `Lỗi khi tạo sản phẩm: ${err.message}` });
-  } finally {
-    try { await sql.close(); } catch {}
-  }
-});
+//     res.status(201).json({ 
+//       message: 'Tạo sản phẩm thành công',
+//       ProductID: productId
+//     });
+//   } catch (err) {
+//     console.error('❌ Error creating product:', err);
+//     res.status(500).json({ message: `Lỗi khi tạo sản phẩm: ${err.message}` });
+//   } finally {
+//     try { await sql.close(); } catch {}
+//   }
+// });
 
 app.put('/api/products/:id', async (req, res) => {
   try {
