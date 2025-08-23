@@ -3,9 +3,9 @@ const sql = require('mssql');
 
 // Config sử dụng SQL Authentication với password đúng
 const config = {
-  user: process.env.DB_USER || 'sa',
+  user: process.env.DB_USER,
   password: process.env.DB_PASSWORD || 'Giakiet@123',  // Password đúng
-  server: process.env.DB_SERVER || 'DESKTOP-3UR600M',
+  server: process.env.DB_SERVER /*|| 'DESKTOP-3UR600M' || 'localhost' */|| 'DESKTOP-BRVN1O0',
   database: process.env.DB_DATABASE || 'shopgiay',  // Cập nhật tên database mới
   port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 1433,
   options: {

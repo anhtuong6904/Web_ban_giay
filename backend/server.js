@@ -7,23 +7,34 @@ require('dotenv').config();
 const paymentRoutes = require('./Routes/PaymentVnpay');
 const app = express();
 const PORT = process.env.PORT || 5000;
+const db = require('./db');
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+
 // Database configuration
 const config = {
-  user: 'sa',
-  password: 'Giakiet@123',
-  server: 'DESKTOP-3UR600M',
-  database: 'shopgiay',
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD || 'Giakiet@123',  // Password đúng
+  server: process.env.DB_SERVER /*|| 'DESKTOP-3UR600M' || 'localhost' */|| '127.0.0.1',
+  database: process.env.DB_DATABASE || 'shopgiay',  // Cập nhật tên database mới
+  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 1433,
   options: {
     encrypt: false,
     trustServerCertificate: true,
     enableArithAbort: true
   }
 };
+// Log config để debug (không hiển thị password)
+console.log('🔌 Database config:', {
+  user: config.user,
+  server: config.server,
+  database: config.database,
+  port: config.port,
+  auth: 'SQL Authentication'
+});
 
 const vnpay = new VNPay({
   tmnCode: process.env.VNP_TMNCODE,
