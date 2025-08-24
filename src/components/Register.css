@@ -15,7 +15,7 @@
   display: flex;
   width: 100%;
   max-width: 900px;
-  height: 600px;
+  height: 100%;
   background: white;
   border-radius: 20px;
   overflow: hidden;
@@ -25,6 +25,8 @@
 /* Left Column - Sign Up Form (Red Gradient) */
 .signup-section {
   flex: 1;
+  width: 100%;
+  height: auto;
   background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
   display: flex;
   align-items: center;
@@ -154,7 +156,7 @@
   border-radius: 8px;
   font-size: 13px;
   background: rgba(255, 255, 255, 0.1);
-  color: white;
+  color: rgb(14, 14, 14);
   transition: all 0.3s ease;
   box-sizing: border-box;
   backdrop-filter: blur(10px);
@@ -168,7 +170,7 @@
 }
 
 .form-group input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(14, 14, 14, 0.7);
   font-weight: 400;
 }
 

@@ -14,7 +14,6 @@ import Cart from './components/Cart';
 import CartTest from './components/CartTest';
 import PaymentPage from './Pages/PaymentPage';
 import OrderTracker from './Pages/OrderTracker';
-import Brands from './Pages/Brands';
 import PaymentStatus from "./components/PaymentStatus";
 import Help from './Pages/Help';
 import { onAuthStateChanged } from "firebase/auth";
@@ -48,7 +47,6 @@ function AppContent() {
         <Route path="/women" element={<Navigate to="/products?tag=women" replace />} />
         <Route path="/kids" element={<Navigate to="/products?tag=kids" replace />} />
         <Route path="/sports" element={<Navigate to="/products?tag=sports" replace />} />
-        <Route path="/brands" element={<Brands />} />
         <Route path="/shoes" element={<Navigate to="/products?tag=shoes" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

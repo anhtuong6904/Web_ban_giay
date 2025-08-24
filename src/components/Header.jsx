@@ -185,7 +185,6 @@ export default function Header() {
               <Link to="/products?category=women">WOMEN</Link>
               <Link to="/products?category=kids">KIDS</Link>
               <Link to="/products?category=sports">SPORTS</Link>
-              <Link to="/brands">BRANDS</Link>
               <Link to="/sale" className="sale-link">BACK TO SCHOOL SALE</Link>
             </nav>
           </div>

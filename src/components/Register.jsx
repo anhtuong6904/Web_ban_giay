@@ -1,87 +1,102 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Register.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../services/firebase"; // file config firebase
+import "./Register.css";
 
 export default function Register() {
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    fullName: '',
-    phoneNumber: '',
-    address: '',
-    password: '',
-    confirmPassword: ''
+    username: "",
+    email: "",
+    fullName: "",
+    phoneNumber: "",
+    address: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp!');
+      setError("Mật khẩu xác nhận không khớp!");
       return;
     }
-
     if (formData.password.length < 6) {
-      setError('Mật khẩu phải có ít nhất 6 ký tự!');
+      setError("Mật khẩu phải có ít nhất 6 ký tự!");
       return;
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const userCred = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      const token = await userCred.user.getIdToken();
+
+      const res = await fetch("http://localhost:5000/api/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
+          uid: userCred.user.uid,
           username: formData.username,
           email: formData.email,
           fullName: formData.fullName,
           phoneNumber: formData.phoneNumber,
           address: formData.address,
-          password: formData.password
-        })
+        }),
       });
 
       const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.error || 'Đăng ký thất bại!');
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Đăng ký thất bại!");
       }
 
-      setSuccess('Đăng ký thành công! Chuyển hướng đến trang đăng nhập...');
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
-
+      setSuccess("Đăng ký thành công! Chuyển hướng đến trang đăng nhập...");
+      alert("Đăng ký thành công! Vui lòng đăng nhập.");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      setError(err.message || 'Đăng ký thất bại!');
+      console.error("❌ Register error:", err);
+      setError(err.message || "Đăng ký thất bại!");
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        {/* Left Column - Sign Up Form */}
+        {/* Left Column - Sign Up */}
         <div className="signup-section">
           <div className="signup-content">
-            
-            {/* Social Register Buttons */}
-            
-            
+            <h1>Sign Up</h1>
+
+            {/* Social login buttons */}
+            <div className="social-login">
+              <button className="social-btn facebook"><span>F</span></button>
+              <button className="social-btn google"><span>G</span></button>
+              <button className="social-btn linkedin"><span>in</span></button>
+            </div>
+
+            <div className="separator">or use your email for registration</div>
+
             {error && <div className="error-message">{error}</div>}
             {success && <div className="success-message">{success}</div>}
-            
+
             <form className="auth-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <input
@@ -93,7 +108,6 @@ export default function Register() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <input
                   type="email"
@@ -104,7 +118,6 @@ export default function Register() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <input
                   type="text"
@@ -115,7 +128,6 @@ export default function Register() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <input
                   type="tel"
@@ -126,7 +138,6 @@ export default function Register() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <input
                   type="text"
@@ -137,7 +148,6 @@ export default function Register() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <input
                   type="password"
@@ -148,7 +158,6 @@ export default function Register() {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <input
                   type="password"
@@ -161,7 +170,7 @@ export default function Register() {
               </div>
 
               <button className="signup-btn" type="submit">
-                SIGN UP
+                Sign Up
               </button>
             </form>
           </div>
@@ -170,13 +179,10 @@ export default function Register() {
         {/* Right Column - Sign In */}
         <div className="signin-section">
           <div className="signin-content">
-            <h2>Hello, Friend!</h2>
+            <h2>Welcome Back!</h2>
             <p>To keep connected with us please login with your personal info</p>
-            <button 
-              className="signin-btn" 
-              onClick={() => navigate('/login')}
-            >
-              SIGN IN
+            <button className="signin-btn" onClick={() => navigate("/login")}>
+              Sign In
             </button>
           </div>
         </div>

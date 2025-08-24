@@ -1,40 +1,52 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import './LoginRegister.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../services/firebase";
+import { useAuth } from "../contexts/AuthContext";
+import "./LoginRegister.css";
 
 export default function LoginRegister() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+      // 1. Login Firebase
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      const token = await userCred.user.getIdToken();
+
+      // 2. Lấy thông tin từ backend
+      const res = await fetch("http://localhost:5000/api/users/me", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
       });
+
       const data = await res.json();
+      console.log("📥 Response:", data);
+
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Sai tài khoản hoặc mật khẩu, vui lòng đăng nhập lại');
+        throw new Error(data.error || "Sai email hoặc mật khẩu, vui lòng thử lại");
       }
+
       const u = data.user;
       await login({
-        uid: `local:${u.username}`,
-        email: u.email || '',
-        displayName: u.fullName || u.username,
-        fullName: u.fullName || u.username,
-        photoURL: u.imageUrl || null
+        uid: userCred.user.uid,
+        email: u.email || "",
+        displayName: u.fullName || u.email,
+        fullName: u.fullName || u.email,
+        photoURL: u.imageUrl || null,
       });
-      alert('Đăng nhập thành công!');
-      navigate('/home');
+
+      alert("Đăng nhập thành công!");
+      navigate("/home");
     } catch (err) {
-      setError(err.message || 'Sai tài khoản hoặc mật khẩu, vui lòng đăng nhập lại');
+      console.error("❌ Lỗi đăng nhập:", err);
+      setError(err.message || "Sai email hoặc mật khẩu, vui lòng thử lại");
     }
   };
 
@@ -45,36 +57,29 @@ export default function LoginRegister() {
         <div className="signin-section">
           <div className="signin-content">
             <h1>Sign in</h1>
-            
-            {/* Social Login Buttons */}
+
+            {/* Social login buttons */}
             <div className="social-login">
-              <button className="social-btn facebook">
-                <span>f</span>
-              </button>
-              <button className="social-btn google">
-                <span>G+</span>
-              </button>
-              <button className="social-btn linkedin">
-                <span>in</span>
-              </button>
+              <button className="social-btn facebook"><span>F</span></button>
+              <button className="social-btn google"><span>G</span></button>
+              <button className="social-btn linkedin"><span>in</span></button>
             </div>
-            
-            <p className="separator">or use your account</p>
-            
+
+            <div className="separator">or use your email</div>
+
             {error && <div className="error-message">{error}</div>}
-            
+
             <form className="auth-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <input
-                  type="text"
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
                   required
                 />
               </div>
-
               <div className="form-group">
                 <input
                   type="password"
@@ -86,10 +91,12 @@ export default function LoginRegister() {
                 />
               </div>
 
-              <a href="#" className="forgot-password">Forgot your password?</a>
+              <a href="#" className="forgot-password">
+                Forgot your password?
+              </a>
 
               <button className="signin-btn" type="submit">
-                SIGN IN
+                Sign In
               </button>
             </form>
           </div>
@@ -100,11 +107,8 @@ export default function LoginRegister() {
           <div className="signup-content">
             <h2>Hello, Friend!</h2>
             <p>Welcome to our UTH SHOES. Login to your account to continue</p>
-            <button 
-              className="signup-btn" 
-              onClick={() => navigate('/register')}
-            >
-              SIGN UP
+            <button className="signup-btn" onClick={() => navigate("/register")}>
+              Sign Up
             </button>
           </div>
         </div>

@@ -7,8 +7,14 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const db = require('./db');
+const syncUsers = require('./syncUsers');
+
+
+
+
 
 // Middleware
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -535,149 +541,111 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// API lấy thông tin chi tiết sản phẩm theo ID
-app.get('/api/products/:id', async (req, res) => {
-  try {
-    console.log(`Fetching product with ID: ${req.params.id}`);
+// // API lấy thông tin chi tiết sản phẩm theo ID
+// app.get('/api/products/:id', async (req, res) => {
+//   try {
+//     console.log(`Fetching product with ID: ${req.params.id}`);
     
-    const pool = await sql.connect(config);
-    const { id } = req.params;
+//     const pool = await sql.connect(config);
+//     const { id } = req.params;
     
-    // Query đơn giản
-    const query = 'SELECT * FROM Products WHERE ProductID = @ProductID';
-    console.log('Executing query:', query);
+//     // Query đơn giản
+//     const query = 'SELECT * FROM Products WHERE ProductID = @ProductID';
+//     console.log('Executing query:', query);
     
-    const result = await pool.request()
-      .input('ProductID', sql.Int, parseInt(id))
-      .query(query);
+//     const result = await pool.request()
+//       .input('ProductID', sql.Int, parseInt(id))
+//       .query(query);
       
-    // Kiểm tra kết quả
-    if (!result.recordset) {
-      throw new Error('Không nhận được dữ liệu từ database');
-    }
+//     // Kiểm tra kết quả
+//     if (!result.recordset) {
+//       throw new Error('Không nhận được dữ liệu từ database');
+//     }
       
-    console.log(`Found ${result.recordset.length} products with ID ${id}`);
-    if (result.recordset.length === 0) {
-      console.log(`Product with ID ${id} not found`);
-      return res.status(404).json({ error: 'Sản phẩm không tồn tại' });
-    }
+//     console.log(`Found ${result.recordset.length} products with ID ${id}`);
+//     if (result.recordset.length === 0) {
+//       console.log(`Product with ID ${id} not found`);
+//       return res.status(404).json({ error: 'Sản phẩm không tồn tại' });
+//     }
     
-    const product = result.recordset[0];
-    if (!product || !product.Name) {
-      throw new Error('Dữ liệu sản phẩm không hợp lệ');
-    }
+//     const product = result.recordset[0];
+//     if (!product || !product.Name) {
+//       throw new Error('Dữ liệu sản phẩm không hợp lệ');
+//     }
     
-    console.log('Product found:', product.Name);
+//     console.log('Product found:', product.Name);
     
-    res.json(product);
-  } catch (err) {
-    console.error('Lỗi truy vấn SQL:', err);
-    res.status(500).json({ error: err.message });
-  } finally {
-    try { await sql.close(); } catch {}
-  }
-});
+//     res.json(product);
+//   } catch (err) {
+//     console.error('Lỗi truy vấn SQL:', err);
+//     res.status(500).json({ error: err.message });
+//   } finally {
+//     try { await sql.close(); } catch {}
+//   }
+// });
 
-// Authentication endpoints
-app.post('/api/auth/register', async (req, res) => {
-  try {
-    const { username, password, email, fullName, phoneNumber, address } = req.body;
-    
-    console.log('🔍 Registration request body:', { username, email, fullName, phoneNumber, address });
-    
-    if (!username || !password || !email) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
+// // Authentication endpoints
+// app.post('/api/auth/register', async (req, res) => {
+//   try {
+//     const { username, password, email, fullName, phoneNumber, address } = req.body;
 
-    const pool = await sql.connect(config);
-    
-    // Ensure Users table exists
-    await ensureUsersLocalColumns(pool);
-    
-    // Check if username already exists
-    const existingUser = await pool.request()
-      .input('username', sql.NVarChar(100), username)
-      .query('SELECT * FROM Users WHERE Username = @username');
-    
-    if (existingUser.recordset.length > 0) {
-      return res.status(400).json({ error: 'Username already exists' });
-    }
+//     if (!username || !password || !email) {
+//       return res.status(400).json({ error: 'Missing required fields' });
+//     }
 
-    // Hash password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    
-    console.log('🔍 Creating user with fullName:', fullName);
-    
-    // Create new user
-    await pool.request()
-      .input('username', sql.NVarChar(100), username)
-      .input('passwordHash', sql.NVarChar(255), hashedPassword)
-      .input('email', sql.NVarChar(200), email)
-      .input('fullName', sql.NVarChar(200), fullName || '')
-      .input('phoneNumber', sql.NVarChar(50), phoneNumber || '')
-      .input('address', sql.NVarChar(400), address || '')
-      .query(`
-        INSERT INTO Users (Username, PasswordHash, Email, FullName, PhoneNumber, Address, CreatedAt, UpdatedAt)
-        VALUES (@username, @passwordHash, @email, @fullName, @phoneNumber, @address, GETDATE(), GETDATE())
-      `);
-    
-    console.log('✅ User registered successfully with fullName:', fullName);
-    res.json({ success: true, message: 'User registered successfully' });
-  } catch (err) {
-    console.error('Registration error:', err);
-    res.status(500).json({ error: err.message });
-  } finally {
-    try { await sql.close(); } catch {}
-  }
-});
+//     // 1) Tạo user trên Firebase Auth
+//     const userRecord = await admin.auth().createUser({
+//       email,
+//       password,
+//       displayName: fullName || username,
+//       disabled: false,
+//     });
 
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    
-    console.log('🔍 Login request for username:', username);
-    
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Missing username or password' });
-    }
+//     const uid = userRecord.uid;
 
-    const pool = await sql.connect(config);
-    
-    // Find user by username
-    const user = await pool.request()
-      .input('username', sql.NVarChar(100), username)
-      .query('SELECT * FROM Users WHERE Username = @username');
-    
-    if (user.recordset.length === 0) {
-      return res.status(401).json({ error: 'Sai tài khoản hoặc mật khẩu, vui lòng đăng nhập lại' });
-    }
+//     // 2) Lưu hồ sơ người dùng vào Firestore (collection "users")
+//     await db.collection('users').doc(uid).set({
+//       uid,
+//       username,
+//       fullName: fullName || '',
+//       email,
+//       phoneNumber: phoneNumber || '',
+//       address: address || '',
+//       createdAt: admin.firestore.FieldValue.serverTimestamp(),
+//       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+//     });
 
-    const userData = user.recordset[0];
-    console.log('🔍 Found user data:', { 
-      username: userData.Username, 
-      fullName: userData.FullName, 
-      email: userData.Email 
-    });
-    
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, userData.PasswordHash);
-    
-    if (!isValidPassword) {
-      return res.status(401).json({ error: 'Sai tài khoản hoặc mật khẩu, vui lòng đăng nhập lại' });
-    }
+//     return res.json({ success: true, message: 'User registered successfully', uid });
+//   } catch (err) {
+//     console.error('Registration error (Firebase):', err);
+//     // Firebase có thể trả về code như auth/email-already-exists
+//     return res.status(500).json({ error: err.message || 'Register failed' });
+//   }
+// });
 
-    // Return user data (without password)
-    const { PasswordHash, ...userInfo } = userData;
-    console.log('✅ Login successful, returning user info:', userInfo);
-    res.json({ success: true, user: userInfo });
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ error: err.message });
-  } finally {
-    try { await sql.close(); } catch {}
-  }
-});
+// app.post('/api/auth/login', async (req, res) => {
+//     try {
+//     const { token } = req.body;
+//     if (!token) return res.status(400).json({ message: 'Thiếu token' });
+
+//     // Verify token bằng Firebase Admin
+//     const decoded = await admin.auth().verifyIdToken(token);
+
+//     // Lấy profile user trong Firestore
+//     const doc = await db.collection('users').doc(decoded.uid).get();
+//     if (!doc.exists) {
+//       return res.status(404).json({ message: 'Không tìm thấy user' });
+//     }
+
+//     res.json({
+//       message: 'Đăng nhập thành công',
+//       user: { id: decoded.uid, ...doc.data() }
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(401).json({ message: 'Token không hợp lệ', error: err.message });
+//   }
+// });
 
 // // Users CRUD API
 // app.get('/api/users', async (req, res) => {
@@ -916,144 +884,144 @@ app.post('/api/auth/login', async (req, res) => {
 //   }
 // });
 
-// // Products CRUD API
-// app.post('/api/products', async (req, res) => {
-//   try {
-//     console.log('📥 Received product data:', req.body);
+// Products CRUD API
+app.post('/api/products', async (req, res) => {
+  try {
+    console.log('📥 Received product data:', req.body);
     
-//     const { 
-//       Name, Description, Price, OriginalPrice, Discount, CategoryID, 
-//       BrandID, Rating, MainImage, StockQuantity, InStock 
-//     } = req.body;
+    const { 
+      Name, Description, Price, OriginalPrice, Discount, CategoryID, 
+      BrandID, Rating, MainImage, StockQuantity, InStock 
+    } = req.body;
     
-//     if (!Name || Price === undefined) {
-//       return res.status(400).json({ message: 'Thiếu thông tin bắt buộc: Name và Price' });
-//     }
+    if (!Name || Price === undefined) {
+      return res.status(400).json({ message: 'Thiếu thông tin bắt buộc: Name và Price' });
+    }
 
-//     const pool = await sql.connect(config);
+    const pool = await sql.connect(config);
     
-//     // Check if table exists and get its structure
-//     const tableCheck = await pool.request().query(`
-//       SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE 
-//       FROM INFORMATION_SCHEMA.COLUMNS 
-//       WHERE TABLE_NAME = 'Products'
-//       ORDER BY ORDINAL_POSITION
-//     `);
+    // Check if table exists and get its structure
+    const tableCheck = await pool.request().query(`
+      SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_NAME = 'Products'
+      ORDER BY ORDINAL_POSITION
+    `);
     
-//     console.log('📊 Table structure:', tableCheck.recordset);
+    console.log('📊 Table structure:', tableCheck.recordset);
     
-//     // Build dynamic INSERT query based on available columns
-//     let columns = [];
-//     let values = [];
-//     let params = [];
+    // Build dynamic INSERT query based on available columns
+    let columns = [];
+    let values = [];
+    let params = [];
     
-//     // Only add columns that exist in the database
-//     const availableColumns = tableCheck.recordset.map(col => col.COLUMN_NAME);
-//     console.log('📋 Available columns:', availableColumns);
+    // Only add columns that exist in the database
+    const availableColumns = tableCheck.recordset.map(col => col.COLUMN_NAME);
+    console.log('📋 Available columns:', availableColumns);
     
-//     if (Name && availableColumns.includes('Name')) { 
-//       columns.push('Name'); 
-//       values.push('@Name'); 
-//       params.push(['Name', sql.NVarChar, Name]); 
-//     }
-//     if (Description && availableColumns.includes('Description')) { 
-//       columns.push('Description'); 
-//       values.push('@Description'); 
-//       params.push(['Description', sql.NVarChar, Description]); 
-//     }
-//     if (Price !== undefined && availableColumns.includes('Price')) { 
-//       columns.push('Price'); 
-//       values.push('@Price'); 
-//       params.push(['Price', sql.Int, Price]); 
-//     }
-//     if (OriginalPrice !== undefined && availableColumns.includes('OriginalPrice')) { 
-//       columns.push('OriginalPrice'); 
-//       values.push('@OriginalPrice'); 
-//       params.push(['OriginalPrice', sql.Int, OriginalPrice]); 
-//     }
-//     if (Discount !== undefined && availableColumns.includes('Discount')) { 
-//       columns.push('Discount'); 
-//       values.push('@Discount'); 
-//       params.push(['Discount', sql.Int, Discount]); 
-//     }
-//     if (CategoryID && availableColumns.includes('CategoryID')) { 
-//       columns.push('CategoryID'); 
-//       values.push('@CategoryID'); 
-//       params.push(['CategoryID', sql.Int, CategoryID]); 
-//     }
-//     if (BrandID && availableColumns.includes('BrandID')) { 
-//       columns.push('BrandID'); 
-//       values.push('@BrandID'); 
-//       params.push(['BrandID', sql.Int, BrandID]); 
-//     }
-//     if (Rating !== undefined && availableColumns.includes('Rating')) { 
-//       columns.push('Rating'); 
-//       values.push('@Rating'); 
-//       params.push(['Rating', sql.Float, Rating]); 
-//     }
-//     if (MainImage && availableColumns.includes('MainImage')) { 
-//       // Giới hạn độ dài MainImage để tránh lỗi truncation
-//       const truncatedImage = MainImage.length > 1000 ? MainImage.substring(0, 1000) : MainImage;
-//       columns.push('MainImage'); 
-//       values.push('@MainImage'); 
-//       params.push(['MainImage', sql.NVarChar(1000), truncatedImage]); 
-//     }
-//     if (StockQuantity !== undefined && availableColumns.includes('StockQuantity')) { 
-//       columns.push('StockQuantity'); 
-//       values.push('@StockQuantity'); 
-//       params.push(['StockQuantity', sql.Int, StockQuantity]); 
-//     }
-//     if (InStock !== undefined && availableColumns.includes('InStock')) { 
-//       columns.push('InStock'); 
-//       values.push('@InStock'); 
-//       params.push(['InStock', sql.Bit, InStock]); 
-//     }
+    if (Name && availableColumns.includes('Name')) { 
+      columns.push('Name'); 
+      values.push('@Name'); 
+      params.push(['Name', sql.NVarChar, Name]); 
+    }
+    if (Description && availableColumns.includes('Description')) { 
+      columns.push('Description'); 
+      values.push('@Description'); 
+      params.push(['Description', sql.NVarChar, Description]); 
+    }
+    if (Price !== undefined && availableColumns.includes('Price')) { 
+      columns.push('Price'); 
+      values.push('@Price'); 
+      params.push(['Price', sql.Int, Price]); 
+    }
+    if (OriginalPrice !== undefined && availableColumns.includes('OriginalPrice')) { 
+      columns.push('OriginalPrice'); 
+      values.push('@OriginalPrice'); 
+      params.push(['OriginalPrice', sql.Int, OriginalPrice]); 
+    }
+    if (Discount !== undefined && availableColumns.includes('Discount')) { 
+      columns.push('Discount'); 
+      values.push('@Discount'); 
+      params.push(['Discount', sql.Int, Discount]); 
+    }
+    if (CategoryID && availableColumns.includes('CategoryID')) { 
+      columns.push('CategoryID'); 
+      values.push('@CategoryID'); 
+      params.push(['CategoryID', sql.Int, CategoryID]); 
+    }
+    if (BrandID && availableColumns.includes('BrandID')) { 
+      columns.push('BrandID'); 
+      values.push('@BrandID'); 
+      params.push(['BrandID', sql.Int, BrandID]); 
+    }
+    if (Rating !== undefined && availableColumns.includes('Rating')) { 
+      columns.push('Rating'); 
+      values.push('@Rating'); 
+      params.push(['Rating', sql.Float, Rating]); 
+    }
+    if (MainImage && availableColumns.includes('MainImage')) { 
+      // Giới hạn độ dài MainImage để tránh lỗi truncation
+      const truncatedImage = MainImage.length > 1000 ? MainImage.substring(0, 1000) : MainImage;
+      columns.push('MainImage'); 
+      values.push('@MainImage'); 
+      params.push(['MainImage', sql.NVarChar(1000), truncatedImage]); 
+    }
+    if (StockQuantity !== undefined && availableColumns.includes('StockQuantity')) { 
+      columns.push('StockQuantity'); 
+      values.push('@StockQuantity'); 
+      params.push(['StockQuantity', sql.Int, StockQuantity]); 
+    }
+    if (InStock !== undefined && availableColumns.includes('InStock')) { 
+      columns.push('InStock'); 
+      values.push('@InStock'); 
+      params.push(['InStock', sql.Bit, InStock]); 
+    }
     
-//     // Add timestamp if column exists
-//     const hasCreatedAt = tableCheck.recordset.some(col => col.COLUMN_NAME === 'createdAt');
-//     if (hasCreatedAt) {
-//       columns.push('createdAt');
-//       values.push('GETDATE()');
-//     }
+    // Add timestamp if column exists
+    const hasCreatedAt = tableCheck.recordset.some(col => col.COLUMN_NAME === 'createdAt');
+    if (hasCreatedAt) {
+      columns.push('createdAt');
+      values.push('GETDATE()');
+    }
     
-//     const insertQuery = `
-//       INSERT INTO Products (${columns.join(', ')})
-//       VALUES (${values.join(', ')});
-//       SELECT SCOPE_IDENTITY() AS ProductID;
-//     `;
+    const insertQuery = `
+      INSERT INTO Products (${columns.join(', ')})
+      VALUES (${values.join(', ')});
+      SELECT SCOPE_IDENTITY() AS ProductID;
+    `;
     
-//     console.log('🔧 Insert query:', insertQuery);
+    console.log('🔧 Insert query:', insertQuery);
     
-//     const request = pool.request();
-//     params.forEach(([name, type, value]) => {
-//       request.input(name, type, value);
-//     });
+    const request = pool.request();
+    params.forEach(([name, type, value]) => {
+      request.input(name, type, value);
+    });
     
-//     const result = await request.query(insertQuery);
+    const result = await request.query(insertQuery);
     
-//     console.log('✅ Insert result:', result);
+    console.log('✅ Insert result:', result);
     
-//     // Kiểm tra kết quả insert
-//     if (!result.recordset || result.recordset.length === 0) {
-//       throw new Error('Không thể tạo sản phẩm - không nhận được ProductID');
-//     }
+    // Kiểm tra kết quả insert
+    if (!result.recordset || result.recordset.length === 0) {
+      throw new Error('Không thể tạo sản phẩm - không nhận được ProductID');
+    }
 
-//     const productId = result.recordset[0].ProductID;
-//     if (!productId) {
-//       throw new Error('Không thể tạo sản phẩm - ProductID không hợp lệ');
-//     }
+    const productId = result.recordset[0].ProductID;
+    if (!productId) {
+      throw new Error('Không thể tạo sản phẩm - ProductID không hợp lệ');
+    }
     
-//     res.status(201).json({ 
-//       message: 'Tạo sản phẩm thành công',
-//       ProductID: productId
-//     });
-//   } catch (err) {
-//     console.error('❌ Error creating product:', err);
-//     res.status(500).json({ message: `Lỗi khi tạo sản phẩm: ${err.message}` });
-//   } finally {
-//     try { await sql.close(); } catch {}
-//   }
-// });
+    res.status(201).json({ 
+      message: 'Tạo sản phẩm thành công',
+      ProductID: productId
+    });
+  } catch (err) {
+    console.error('❌ Error creating product:', err);
+    res.status(500).json({ message: `Lỗi khi tạo sản phẩm: ${err.message}` });
+  } finally {
+    try { await sql.close(); } catch {}
+  }
+});
 
 app.put('/api/products/:id', async (req, res) => {
   try {

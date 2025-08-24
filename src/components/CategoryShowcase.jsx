@@ -71,7 +71,7 @@ export default function CategoryShowcase() {
                   <i className="fas fa-arrow-right"></i>
                 </div>
 
-              <div className="category-hover-effect"></div>
+            
             </Link>
           </div>
 
@@ -96,7 +96,7 @@ export default function CategoryShowcase() {
                     <i className="fas fa-arrow-right"></i>
                   </div>
 
-                <div className="category-hover-effect"></div>
+              
               </Link>
             ))}
           </div>
